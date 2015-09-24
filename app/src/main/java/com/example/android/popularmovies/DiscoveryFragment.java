@@ -14,6 +14,8 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 
+import com.squareup.picasso.Picasso;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,6 +36,7 @@ import java.util.List;
  */
 public class DiscoveryFragment extends Fragment {
 
+    String[] mDiscoverMoviesPosterPath;
     ImageAdapter mDiscoveryAdapter;
 
     public DiscoveryFragment() {
@@ -42,8 +45,9 @@ public class DiscoveryFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-         // The ImageAdapter will take data in the ArrayList and populate the GridView it's attached to.
-        mDiscoveryAdapter=new ImageAdapter(getActivity());
+         // The ImageAdapter will take poster path in the String[] and populate the GridView with the corresponding images.
+        mDiscoverMoviesPosterPath=new String[]{};
+        mDiscoveryAdapter=new ImageAdapter(getActivity(),mDiscoverMoviesPosterPath );
 
         View rootView = inflater.inflate(R.layout.fragment_discovery, container, false);
 
@@ -83,8 +87,7 @@ public class DiscoveryFragment extends Fragment {
         @Override
         protected void onPostExecute(String[] result) {
             if (result != null) {
-                //mDiscoveryAdapter.clear();
-                //mDiscoveryAdapter.addAll(result);
+                mDiscoveryAdapter.updateResults(result);
             }
         }
 
@@ -194,9 +197,17 @@ public class DiscoveryFragment extends Fragment {
 
     public class ImageAdapter extends BaseAdapter {
         private Context mContext;
+        private String[] mThumbIds;
 
-        public ImageAdapter(Context c) {
+        public ImageAdapter(Context c, String[] thumbIds) {
             mContext = c;
+            mThumbIds=thumbIds;
+        }
+
+        public void updateResults(String[] results) {
+            mThumbIds = results;
+            //Triggers the list update
+            notifyDataSetChanged();
         }
 
         public int getCount() {
@@ -215,30 +226,18 @@ public class DiscoveryFragment extends Fragment {
         public View getView(int position, View convertView, ViewGroup parent) {
             ImageView imageView;
             if (convertView == null) {
-                LayoutInflater inflater = (LayoutInflater)getActivity().getSystemService
-                        (Context.LAYOUT_INFLATER_SERVICE);
+               // LayoutInflater inflater = (LayoutInflater)getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                LayoutInflater inflater = LayoutInflater.from(getActivity());
                 imageView= (ImageView) inflater.inflate(R.layout.grid_item_layout, parent,false);
             } else {
                 imageView = (ImageView) convertView;
             }
 
-            imageView.setImageResource(mThumbIds[position]);
+            //imageView.setImageResource(mThumbIds[position]);
+Log.v("PopularMovies","http://image.tmdb.org/t/p/w185/"+mThumbIds[position]);
+            Picasso.with(getActivity()).load("http://image.tmdb.org/t/p/w185/"+mThumbIds[position]).into(imageView);
             return imageView;
         }
 
-        // references to our images
-        private Integer[] mThumbIds = {
-                R.drawable.sample_2, R.drawable.sample_3,
-                R.drawable.sample_4, R.drawable.sample_5,
-                R.drawable.sample_6, R.drawable.sample_7,
-                R.drawable.sample_0, R.drawable.sample_1,
-                R.drawable.sample_2, R.drawable.sample_3,
-                R.drawable.sample_4, R.drawable.sample_5,
-                R.drawable.sample_6, R.drawable.sample_7,
-                R.drawable.sample_0, R.drawable.sample_1,
-                R.drawable.sample_2, R.drawable.sample_3,
-                R.drawable.sample_4, R.drawable.sample_5,
-                R.drawable.sample_6, R.drawable.sample_7
-        };
     }
 }
