@@ -11,6 +11,10 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -67,20 +71,27 @@ public class DiscoveryFragment extends Fragment {
     }
 
 
-    public class FetchMoviesTask extends AsyncTask<String, Void, Void> {
+    public class FetchMoviesTask extends AsyncTask<String, Void, String[]> {
 
         private final String LOG_TAG = FetchMoviesTask.class.getSimpleName();
         private final String API_KEY = "4691965cfc3e6f0591bc595986e92e84";
 
         @Override
-        protected Void doInBackground(String... params) {
-            URL url = constructTMDbURL(params[0], API_KEY);
-            Log.d("PopularMovies", url.toString());
-            String forecastJsonStr = getJsonString(url);
-            return null;
+        protected String[] doInBackground(String... params) {
+            URL url = constructTMDbURL(params[0]);
+            String popularMoviesJsonStr = getJsonString(url);
+
+            try {
+                return  getDiscoveryDataFromJson(popularMoviesJsonStr);
+            } catch (JSONException e) {
+                Log.e(LOG_TAG, e.getMessage(), e);
+                e.printStackTrace();
+                return null;
+            }
+
         }
 
-        private URL constructTMDbURL(String sortByValue, String key) {
+        private URL constructTMDbURL(String sortByValue) {
             try {
                 final String FORECAST_BASE_URL =
                         "http://api.themoviedb.org/3/discover/movie?";
@@ -89,7 +100,7 @@ public class DiscoveryFragment extends Fragment {
 
                 Uri builtUri = Uri.parse(FORECAST_BASE_URL).buildUpon()
                         .appendQueryParameter(SORTBY_PARAM, sortByValue)
-                        .appendQueryParameter(KEY_PARAM, key)
+                        .appendQueryParameter(KEY_PARAM, API_KEY)
                         .build();
 
                 return new URL(builtUri.toString());
@@ -154,6 +165,39 @@ public class DiscoveryFragment extends Fragment {
             }
             return moviesJsonStr;
         }
+
+
+        private String[] getDiscoveryDataFromJson(String moviesJsonStr) throws JSONException {
+
+
+            // These are the names of the JSON objects that need to be extracted.
+            final String RESULTS = "results";
+            final String ID = "id";
+            final String POSTER_PATH = "poster_path";
+
+            JSONObject moviesJson = new JSONObject(moviesJsonStr);
+            JSONArray moviesArray = moviesJson.getJSONArray(RESULTS);
+
+
+            String[] moviesList = new String[moviesArray.length()];
+            for (int i = 0; i < moviesArray.length(); i++) {
+
+                // Get the JSON object representing the movie
+                JSONObject aMovie = moviesArray.getJSONObject(i);
+
+                // For now, only the poster path
+                String posterPath = aMovie.getString(POSTER_PATH);
+                moviesList[i] = posterPath;
+            }
+
+            for (String s : moviesList) {
+                Log.v(LOG_TAG, "Movies entries: " + s);
+            }
+            return moviesList;
+
+        }
+
+
     }
 
 }
