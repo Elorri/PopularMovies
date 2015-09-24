@@ -82,23 +82,29 @@ public class DiscoveryFragment extends Fragment {
             String popularMoviesJsonStr = getJsonString(url);
 
             try {
-                return  getDiscoveryDataFromJson(popularMoviesJsonStr);
+                return getDiscoveryDataFromJson(popularMoviesJsonStr);
             } catch (JSONException e) {
                 Log.e(LOG_TAG, e.getMessage(), e);
                 e.printStackTrace();
                 return null;
             }
+        }
 
+        @Override
+        protected void onPostExecute(String[] result) {
+            if (result != null) {
+                mDiscoveryAdapter.clear();
+                mDiscoveryAdapter.addAll(result);
+            }
         }
 
         private URL constructTMDbURL(String sortByValue) {
             try {
-                final String FORECAST_BASE_URL =
-                        "http://api.themoviedb.org/3/discover/movie?";
+                final String BASE_URL = "http://api.themoviedb.org/3/discover/movie?";
                 final String SORTBY_PARAM = "sort_by";
                 final String KEY_PARAM = "api_key";
 
-                Uri builtUri = Uri.parse(FORECAST_BASE_URL).buildUpon()
+                Uri builtUri = Uri.parse(BASE_URL).buildUpon()
                         .appendQueryParameter(SORTBY_PARAM, sortByValue)
                         .appendQueryParameter(KEY_PARAM, API_KEY)
                         .build();
