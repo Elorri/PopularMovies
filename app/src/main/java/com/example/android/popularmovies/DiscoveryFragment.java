@@ -1,5 +1,6 @@
 package com.example.android.popularmovies;
 
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -62,27 +63,36 @@ public class DiscoveryFragment extends Fragment {
     public void onStart() {
         super.onStart();
         FetchMoviesTask movieTask = new FetchMoviesTask();
-        movieTask.execute();
+        movieTask.execute("popularity.desc");
     }
 
 
-    public class FetchMoviesTask extends AsyncTask<Void, Void, Void> {
+    public class FetchMoviesTask extends AsyncTask<String, Void, Void> {
 
         private final String LOG_TAG = FetchMoviesTask.class.getSimpleName();
         private final String API_KEY = "4691965cfc3e6f0591bc595986e92e84";
 
         @Override
-        protected Void doInBackground(Void... params) {
-            URL url = constructTMDbURL(API_KEY);
+        protected Void doInBackground(String... params) {
+            URL url = constructTMDbURL(params[0], API_KEY);
             Log.d("PopularMovies", url.toString());
             String forecastJsonStr = getJsonString(url);
-
             return null;
         }
 
-        private URL constructTMDbURL(String key) {
+        private URL constructTMDbURL(String sortByValue, String key) {
             try {
-                return new URL("http://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=" + key);
+                final String FORECAST_BASE_URL =
+                        "http://api.themoviedb.org/3/discover/movie?";
+                final String SORTBY_PARAM = "sort_by";
+                final String KEY_PARAM = "api_key";
+
+                Uri builtUri = Uri.parse(FORECAST_BASE_URL).buildUpon()
+                        .appendQueryParameter(SORTBY_PARAM, sortByValue)
+                        .appendQueryParameter(KEY_PARAM, key)
+                        .build();
+
+                return new URL(builtUri.toString());
             } catch (MalformedURLException e) {
                 Log.e(LOG_TAG, "Error " + e);
                 return null;
