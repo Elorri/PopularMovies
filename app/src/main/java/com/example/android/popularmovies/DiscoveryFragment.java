@@ -39,23 +39,10 @@ public class DiscoveryFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Create some mock data for the ListView.
-        String[] data = {
-                "MadMaxFuryRoad.jpg",
-                "JurassicWorld.jpg",
-                "AvengersLèredUltron.jpg",
-                "AlaPoursuiteDeDemain.jpg",
-                "LesMinions.jpg",
-                "SanAndreas.jpg",
-                "TerminatorGenisys.jpg"
-        };
-        List<String> imageNames = new ArrayList<String>(Arrays.asList(data));
-
-        // The ArrayAdapter will take data and populate the GridView it's attached to.
-        mDiscoveryAdapter = new ArrayAdapter<String>(getActivity(), R.layout.grid_item_layout, R.id.grid_item_layout, imageNames);
+         // The ArrayAdapter will take data in the ArrayList and populate the GridView it's attached to.
+        mDiscoveryAdapter = new ArrayAdapter<String>(getActivity(), R.layout.grid_item_layout, R.id.grid_item_layout, new ArrayList<String>());
 
         View rootView = inflater.inflate(R.layout.fragment_discovery, container, false);
-
 
         // Get a reference to the ListView, and attach this adapter to it.
         GridView gridView = (GridView) rootView.findViewById(R.id.gridView_discovery);
@@ -194,10 +181,6 @@ public class DiscoveryFragment extends Fragment {
                 // For now, only the poster path
                 String posterPath = aMovie.getString(POSTER_PATH);
                 moviesList[i] = posterPath;
-            }
-
-            for (String s : moviesList) {
-                Log.v(LOG_TAG, "Movies entries: " + s);
             }
             return moviesList;
 
