@@ -4,11 +4,16 @@
     android:layout_height="match_parent"
     tools:context=".DiscoveryFragment">
 
+
     <GridView
         android:id="@+id/gridView_discovery"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="center"
-        android:numColumns="auto_fit" />
+        android:columnWidth="90dp"
+        android:numColumns="auto_fit"
+        android:stretchMode="columnWidth"
+        android:gravity="center"
+        android:background="@android:color/holo_blue_light"
+        />
 
 </FrameLayout>

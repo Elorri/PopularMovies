@@ -1,5 +1,6 @@
 package com.example.android.popularmovies;
 
+import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -9,7 +10,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.GridView;
+import android.widget.ImageView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,7 +34,7 @@ import java.util.List;
  */
 public class DiscoveryFragment extends Fragment {
 
-    ArrayAdapter<String> mDiscoveryAdapter;
+    ImageAdapter mDiscoveryAdapter;
 
     public DiscoveryFragment() {
     }
@@ -39,8 +42,8 @@ public class DiscoveryFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-         // The ArrayAdapter will take data in the ArrayList and populate the GridView it's attached to.
-        mDiscoveryAdapter = new ArrayAdapter<String>(getActivity(), R.layout.grid_item_layout, R.id.grid_item_layout, new ArrayList<String>());
+         // The ImageAdapter will take data in the ArrayList and populate the GridView it's attached to.
+        mDiscoveryAdapter=new ImageAdapter(getActivity());
 
         View rootView = inflater.inflate(R.layout.fragment_discovery, container, false);
 
@@ -80,8 +83,8 @@ public class DiscoveryFragment extends Fragment {
         @Override
         protected void onPostExecute(String[] result) {
             if (result != null) {
-                mDiscoveryAdapter.clear();
-                mDiscoveryAdapter.addAll(result);
+                //mDiscoveryAdapter.clear();
+                //mDiscoveryAdapter.addAll(result);
             }
         }
 
@@ -189,4 +192,53 @@ public class DiscoveryFragment extends Fragment {
 
     }
 
+    public class ImageAdapter extends BaseAdapter {
+        private Context mContext;
+
+        public ImageAdapter(Context c) {
+            mContext = c;
+        }
+
+        public int getCount() {
+            return mThumbIds.length;
+        }
+
+        public Object getItem(int position) {
+            return null;
+        }
+
+        public long getItemId(int position) {
+            return 0;
+        }
+
+        // create a new ImageView for each item referenced by the Adapter
+        public View getView(int position, View convertView, ViewGroup parent) {
+            ImageView imageView;
+            if (convertView == null) {
+                LayoutInflater inflater = (LayoutInflater)getActivity().getSystemService
+                        (Context.LAYOUT_INFLATER_SERVICE);
+                imageView= (ImageView) inflater.inflate(R.layout.grid_item_layout, parent,false);
+            } else {
+                imageView = (ImageView) convertView;
+            }
+
+            imageView.setImageResource(mThumbIds[position]);
+            return imageView;
+        }
+
+        // references to our images
+        private Integer[] mThumbIds = {
+                R.drawable.sample_2, R.drawable.sample_3,
+                R.drawable.sample_4, R.drawable.sample_5,
+                R.drawable.sample_6, R.drawable.sample_7,
+                R.drawable.sample_0, R.drawable.sample_1,
+                R.drawable.sample_2, R.drawable.sample_3,
+                R.drawable.sample_4, R.drawable.sample_5,
+                R.drawable.sample_6, R.drawable.sample_7,
+                R.drawable.sample_0, R.drawable.sample_1,
+                R.drawable.sample_2, R.drawable.sample_3,
+                R.drawable.sample_4, R.drawable.sample_5,
+                R.drawable.sample_6, R.drawable.sample_7
+        };
+    }
 }
