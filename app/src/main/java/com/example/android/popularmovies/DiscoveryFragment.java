@@ -9,10 +9,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -27,9 +28,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -45,15 +43,22 @@ public class DiscoveryFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-         // The ImageAdapter will take poster path in the String[] and populate the GridView with the corresponding images.
-        mDiscoverMoviesPosterPath=new String[]{};
-        mDiscoveryAdapter=new ImageAdapter(getActivity(),mDiscoverMoviesPosterPath );
+        // The ImageAdapter will take poster path in the String[] and populate the GridView with the corresponding images.
+        mDiscoverMoviesPosterPath = new String[]{};
+        mDiscoveryAdapter = new ImageAdapter(getActivity(), mDiscoverMoviesPosterPath);
 
         View rootView = inflater.inflate(R.layout.fragment_discovery, container, false);
 
         // Get a reference to the ListView, and attach this adapter to it.
         GridView gridView = (GridView) rootView.findViewById(R.id.gridView_discovery);
         gridView.setAdapter(mDiscoveryAdapter);
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String movie = mDiscoveryAdapter.getItem(position);
+                Toast.makeText(getActivity(), movie, Toast.LENGTH_SHORT).show();
+            }
+        });
         return rootView;
     }
 
@@ -201,7 +206,7 @@ public class DiscoveryFragment extends Fragment {
 
         public ImageAdapter(Context c, String[] thumbIds) {
             mContext = c;
-            mThumbIds=thumbIds;
+            mThumbIds = thumbIds;
         }
 
         public void updateResults(String[] results) {
@@ -214,8 +219,8 @@ public class DiscoveryFragment extends Fragment {
             return mThumbIds.length;
         }
 
-        public Object getItem(int position) {
-            return null;
+        public String getItem(int position) {
+            return mThumbIds[position];
         }
 
         public long getItemId(int position) {
@@ -226,16 +231,14 @@ public class DiscoveryFragment extends Fragment {
         public View getView(int position, View convertView, ViewGroup parent) {
             ImageView imageView;
             if (convertView == null) {
-               // LayoutInflater inflater = (LayoutInflater)getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                // LayoutInflater inflater = (LayoutInflater)getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 LayoutInflater inflater = LayoutInflater.from(getActivity());
-                imageView= (ImageView) inflater.inflate(R.layout.grid_item_layout, parent,false);
+                imageView = (ImageView) inflater.inflate(R.layout.grid_item_layout, parent, false);
             } else {
                 imageView = (ImageView) convertView;
             }
 
-            //imageView.setImageResource(mThumbIds[position]);
-Log.v("PopularMovies","http://image.tmdb.org/t/p/w185/"+mThumbIds[position]);
-            Picasso.with(getActivity()).load("http://image.tmdb.org/t/p/w185/"+mThumbIds[position]).into(imageView);
+            Picasso.with(getActivity()).load("http://image.tmdb.org/t/p/w185/" + mThumbIds[position]).into(imageView);
             return imageView;
         }
 
