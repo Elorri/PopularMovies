@@ -25,7 +25,7 @@
         android:orientation="horizontal">
 
         <ImageView
-            android:id="@+id/posterName"
+            android:id="@+id/posterImage"
             android:layout_width="@dimen/posterNameWidth"
             android:layout_height="@dimen/posterNameHeight"
             android:layout_marginBottom="@dimen/posterNamePaddingBottom"
