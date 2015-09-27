@@ -9,7 +9,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+<<<<<<< HEAD
 import android.widget.AdapterView;
+=======
+>>>>>>> 2.02_fetch_network_poster_images
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -77,7 +80,7 @@ public class DiscoveryFragment extends Fragment {
 
         @Override
         protected String[] doInBackground(String... params) {
-            URL url = constructTMDbURL(params[0]);
+            URL url = constructMovieQuery(params[0]);
             String popularMoviesJsonStr = getJsonString(url);
 
             try {
@@ -96,7 +99,7 @@ public class DiscoveryFragment extends Fragment {
             }
         }
 
-        private URL constructTMDbURL(String sortByValue) {
+        private URL constructMovieQuery(String sortByValue) {
             try {
                 final String BASE_URL = "http://api.themoviedb.org/3/discover/movie?";
                 final String SORTBY_PARAM = "sort_by";
@@ -113,6 +116,8 @@ public class DiscoveryFragment extends Fragment {
                 return null;
             }
         }
+
+
 
 
         private String getJsonString(URL url) {
@@ -201,6 +206,7 @@ public class DiscoveryFragment extends Fragment {
     }
 
     public class ImageAdapter extends BaseAdapter {
+        private final String LOG_TAG = ImageAdapter.class.getSimpleName() ;
         private Context mContext;
         private String[] mThumbIds;
 
@@ -227,7 +233,6 @@ public class DiscoveryFragment extends Fragment {
             return 0;
         }
 
-        // create a new ImageView for each item referenced by the Adapter
         public View getView(int position, View convertView, ViewGroup parent) {
             ImageView imageView;
             if (convertView == null) {
@@ -238,8 +243,27 @@ public class DiscoveryFragment extends Fragment {
                 imageView = (ImageView) convertView;
             }
 
-            Picasso.with(getActivity()).load("http://image.tmdb.org/t/p/w185/" + mThumbIds[position]).into(imageView);
+            Log.v("PopularMovies", constructPosterImageURL(mThumbIds[position]).toString());
+            Picasso.with(getActivity()).load(constructPosterImageURL(mThumbIds[position]).toString()).into(imageView);
             return imageView;
+        }
+
+        private URL constructPosterImageURL(String posterPath) {
+            String posterName=posterPath.split("/")[1]; //To remove the unwanted '/' given by the api
+            try {
+                final String BASE_URL = "http://image.tmdb.org/t/p/";
+                final String SIZE = "w185";
+
+                Uri builtUri = Uri.parse(BASE_URL).buildUpon()
+                        .appendPath(SIZE)
+                        .appendPath(posterName)
+                        .build();
+
+                return new URL(builtUri.toString());
+            } catch (MalformedURLException e) {
+                Log.e(LOG_TAG, "Error " + e);
+                return null;
+            }
         }
 
     }
