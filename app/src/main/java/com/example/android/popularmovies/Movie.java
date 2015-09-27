@@ -10,8 +10,9 @@ public class Movie implements Serializable {
     String posterName;
     String title;
     String overview;
-    String vote_average;
-    String release_date;
+    String voteAverage;
+    String releaseDate;
+    String duration;
 
     public Movie(String id, String posterName){
         this.id=id;
@@ -34,24 +35,32 @@ public class Movie implements Serializable {
         this.overview = overview;
     }
 
-    public String getVote_average() {
-        return vote_average;
+    public String getVoteAverage() {
+        return voteAverage;
     }
 
-    public void setVote_average(String vote_average) {
-        this.vote_average = vote_average;
+    public void setVoteAverage(String voteAverage) {
+        this.voteAverage = voteAverage;
     }
 
-    public String getRelease_date() {
-        return release_date;
+    public String getReleaseDate() {
+        return releaseDate;
     }
 
-    public void setRelease_date(String release_date) {
-        this.release_date = release_date;
+    public void setReleaseDate(String releaseDate) {
+        this.releaseDate = releaseDate;
     }
 
     public String getId() {
         return id;
+    }
+
+    public String getDuration() {
+        return duration;
+    }
+
+    public void setDuration(String duration) {
+        this.duration = duration;
     }
 
     public String getPosterName() {
