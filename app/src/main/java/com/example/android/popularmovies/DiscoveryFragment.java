@@ -33,7 +33,7 @@ import java.net.URL;
  * A placeholder fragment containing a simple view.
  */
 public class DiscoveryFragment extends Fragment {
-    
+
 
     Movie[] mDiscoverMoviesPosterPath;
     ImageAdapter mDiscoveryAdapter;
@@ -80,7 +80,7 @@ public class DiscoveryFragment extends Fragment {
 
         @Override
         protected Movie[] doInBackground(String... params) {
-            URL url = constructMovieQuery(params[0]);
+            URL url = constructMovieListQuery(params[0]);
             String popularMoviesJsonStr = getJsonString(url);
 
             try {
@@ -99,7 +99,7 @@ public class DiscoveryFragment extends Fragment {
             }
         }
 
-        private URL constructMovieQuery(String sortByValue) {
+        private URL constructMovieListQuery(String sortByValue) {
             try {
                 final String BASE_URL = "http://api.themoviedb.org/3/discover/movie?";
                 final String SORTBY_PARAM = "sort_by";
@@ -125,7 +125,7 @@ public class DiscoveryFragment extends Fragment {
             BufferedReader reader = null;
 
             // Will contain the raw JSON response as a string.
-            String moviesJsonStr = null;
+            String jsonStr = null;
 
             try {
                 // Create the request http, and open the connection
@@ -154,7 +154,7 @@ public class DiscoveryFragment extends Fragment {
                     // Stream was empty.  No point in parsing.
                     return null;
                 }
-                moviesJsonStr = buffer.toString();
+                jsonStr = buffer.toString();
             } catch (IOException e) {
                 Log.e(LOG_TAG, "Error ", e);
                 return null;
@@ -170,7 +170,7 @@ public class DiscoveryFragment extends Fragment {
                     }
                 }
             }
-            return moviesJsonStr;
+            return jsonStr;
         }
 
 
