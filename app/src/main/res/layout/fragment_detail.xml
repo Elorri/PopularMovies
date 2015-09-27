@@ -9,14 +9,15 @@
         android:id="@+id/title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:background="#009688"
-        android:paddingBottom="40dp"
-        android:paddingLeft="26dp"
-        android:paddingTop="40dp"
+        android:layout_marginBottom="@dimen/titleMarginBottom"
+        android:background="@color/titleBackground"
+        android:paddingBottom="@dimen/titlePaddingBottom"
+        android:paddingLeft="@dimen/paddingLeft"
+        android:paddingTop="@dimen/titlePaddingTop"
         android:text="Chappie"
         android:textColor="@android:color/white"
-        android:textSize="38sp" />
+        android:textSize="@dimen/titleTextSize"
+        />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -25,11 +26,11 @@
 
         <ImageView
             android:id="@+id/posterName"
-            android:layout_width="100dp"
-            android:layout_height="160dp"
-            android:layout_marginBottom="26dp"
-            android:layout_marginLeft="26dp"
-            android:layout_marginRight="26dp"
+            android:layout_width="@dimen/posterNameWidth"
+            android:layout_height="@dimen/posterNameHeight"
+            android:layout_marginBottom="@dimen/posterNamePaddingBottom"
+            android:layout_marginLeft="@dimen/paddingLeft"
+            android:layout_marginRight="@dimen/posterNamePaddingRight"
             android:scaleType="centerCrop"
             android:src="@drawable/sample_7" />
 
@@ -42,7 +43,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="2015"
-                android:textSize="26sp" />
+                android:textSize="@dimen/releaseYearTextSize" />
 
             <TextView
                 android:id="@+id/duration"
@@ -50,6 +51,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/releaseYear"
                 android:text="120 min"
+                android:textSize="@dimen/durationTextSize"
                 android:textStyle="italic" />
 
             <TextView
@@ -59,7 +61,7 @@
                 android:layout_below="@id/duration"
                 android:text="8.1/10"
                 android:textColor="@android:color/black"
-                android:textSize="10sp" />
+                android:textSize="@dimen/voteAverageTextSize" />
         </RelativeLayout>
     </LinearLayout>
 
@@ -67,8 +69,8 @@
         android:id="@+id/overview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingLeft="26dp"
-        android:paddingRight="8dp"
+        android:paddingLeft="@dimen/paddingLeft"
+        android:paddingRight="@dimen/paddingRight"
         android:text="An apocalyptic story set in the furthest reaches of our planet, in a stark desert landscape where humanity is broken, and most everyone is crazed fighting for the necessities of life. Within this world exist two rebels on the run who just might be able to restore order. There's Max, a man of action and a man of few words, who seeks peace of mind following the loss of his wife and child in the aftermath of the chaos. And Furiosa, a woman of action and a woman who believes her path to survival may be achieved if she can make it across the desert back to her childhood homeland." />
 
 </LinearLayout>

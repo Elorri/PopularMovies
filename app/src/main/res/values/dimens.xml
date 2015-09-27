@@ -2,4 +2,17 @@
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="titleMarginBottom">8dp</dimen>
+    <dimen name="titlePaddingBottom">40dp</dimen>
+    <dimen name="titlePaddingTop">40dp</dimen>
+    <dimen name="paddingLeft">26dp</dimen>
+    <dimen name="paddingRight">8dp</dimen>
+    <dimen name="titleTextSize">38sp</dimen>
+    <dimen name="posterNameWidth">100dp</dimen>
+    <dimen name="posterNameHeight">160dp</dimen>
+    <dimen name="posterNamePaddingBottom">26dp</dimen>
+    <dimen name="posterNamePaddingRight">26dp</dimen>
+    <dimen name="releaseYearTextSize">28sp</dimen>
+    <dimen name="voteAverageTextSize">12sp</dimen>
+    <dimen name="durationTextSize">16dp</dimen>
 </resources>
