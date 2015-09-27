@@ -237,13 +237,14 @@ public class DiscoveryFragment extends Fragment {
         }
 
         private URL constructPosterImageURL(String posterPath) {
+            String posterName=posterPath.split("/")[1]; //To remove the unwanted '/' given by the api
             try {
                 final String BASE_URL = "http://image.tmdb.org/t/p/";
                 final String SIZE = "w185";
 
                 Uri builtUri = Uri.parse(BASE_URL).buildUpon()
                         .appendPath(SIZE)
-                        .appendPath(posterPath)
+                        .appendPath(posterName)
                         .build();
 
                 return new URL(builtUri.toString());
