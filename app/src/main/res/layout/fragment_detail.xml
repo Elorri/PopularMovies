@@ -14,7 +14,6 @@
         android:paddingBottom="@dimen/titlePaddingBottom"
         android:paddingLeft="@dimen/paddingLeft"
         android:paddingTop="@dimen/titlePaddingTop"
-        android:text="Chappie"
         android:textColor="@android:color/white"
         android:textSize="@dimen/titleTextSize"
         />
@@ -32,7 +31,7 @@
             android:layout_marginLeft="@dimen/paddingLeft"
             android:layout_marginRight="@dimen/posterNamePaddingRight"
             android:scaleType="centerCrop"
-            android:src="@drawable/sample_7" />
+            />
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -42,7 +41,6 @@
                 android:id="@+id/releaseYear"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="2015"
                 android:textSize="@dimen/releaseYearTextSize" />
 
             <TextView
@@ -50,7 +48,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/releaseYear"
-                android:text="120 min"
                 android:textSize="@dimen/durationTextSize"
                 android:textStyle="italic" />
 
@@ -59,7 +56,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/duration"
-                android:text="8.1/10"
                 android:textColor="@android:color/black"
                 android:textSize="@dimen/voteAverageTextSize" />
         </RelativeLayout>
@@ -71,6 +67,6 @@
         android:layout_height="wrap_content"
         android:paddingLeft="@dimen/paddingLeft"
         android:paddingRight="@dimen/paddingRight"
-        android:text="An apocalyptic story set in the furthest reaches of our planet, in a stark desert landscape where humanity is broken, and most everyone is crazed fighting for the necessities of life. Within this world exist two rebels on the run who just might be able to restore order. There's Max, a man of action and a man of few words, who seeks peace of mind following the loss of his wife and child in the aftermath of the chaos. And Furiosa, a woman of action and a woman who believes her path to survival may be achieved if she can make it across the desert back to her childhood homeland." />
+        />
 
 </LinearLayout>
