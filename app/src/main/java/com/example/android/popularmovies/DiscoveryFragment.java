@@ -9,10 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-<<<<<<< HEAD
 import android.widget.AdapterView;
-=======
->>>>>>> 2.02_fetch_network_poster_images
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -242,8 +239,6 @@ public class DiscoveryFragment extends Fragment {
             } else {
                 imageView = (ImageView) convertView;
             }
-
-            Log.v("PopularMovies", constructPosterImageURL(mThumbIds[position]).toString());
             Picasso.with(getActivity()).load(constructPosterImageURL(mThumbIds[position]).toString()).into(imageView);
             return imageView;
         }
