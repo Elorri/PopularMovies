@@ -1,6 +1,7 @@
 package com.example.android.popularmovies;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -13,7 +14,6 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -56,7 +56,9 @@ public class DiscoveryFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String movie = mDiscoveryAdapter.getItem(position);
-                Toast.makeText(getActivity(), movie, Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getActivity(), DetailActivity.class)
+                        .putExtra(Intent.EXTRA_TEXT, movie);
+                startActivity(intent);
             }
         });
         return rootView;
@@ -113,8 +115,6 @@ public class DiscoveryFragment extends Fragment {
                 return null;
             }
         }
-
-
 
 
         private String getJsonString(URL url) {
@@ -203,7 +203,7 @@ public class DiscoveryFragment extends Fragment {
     }
 
     public class ImageAdapter extends BaseAdapter {
-        private final String LOG_TAG = ImageAdapter.class.getSimpleName() ;
+        private final String LOG_TAG = ImageAdapter.class.getSimpleName();
         private Context mContext;
         private String[] mThumbIds;
 
@@ -244,7 +244,7 @@ public class DiscoveryFragment extends Fragment {
         }
 
         private URL constructPosterImageURL(String posterPath) {
-            String posterName=posterPath.split("/")[1]; //To remove the unwanted '/' given by the api
+            String posterName = posterPath.split("/")[1]; //To remove the unwanted '/' given by the api
             try {
                 final String BASE_URL = "http://image.tmdb.org/t/p/";
                 final String SIZE = "w185";
