@@ -3,5 +3,12 @@
     <string name="action_settings">Settings</string>
     <string name="title_activity_detail">Detail Activity</string>
     <string name="min">min</string>
+
     <string name="title_activity_settings">Settings</string>
+    <string name="pref_sort_order_label">Sort order</string>
+    <string name="pref_sort_order_key">sortOrder</string>
+    <string name="pref_sort_order_label_popularity">Popularity</string>
+    <string name="pref_sort_order_label_rate">Rate</string>
+    <string name="pref_sort_order_popularity">popularity.desc</string>
+    <string name="pref_sort_order_rate">vote_average.desc</string>
 </resources>
