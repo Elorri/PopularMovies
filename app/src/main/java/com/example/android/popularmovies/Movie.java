@@ -1,19 +1,21 @@
 package com.example.android.popularmovies;
 
+import java.io.Serializable;
+
 /**
  * Created by Elorri-user on 27/09/2015.
  */
-public class Movie {
+public class Movie implements Serializable {
     String id;
-    String posterPath;
+    String posterName;
     String title;
     String overview;
     String vote_average;
     String release_date;
 
-    public Movie(String id, String posterPath){
+    public Movie(String id, String posterName){
         this.id=id;
-        this.posterPath=posterPath;
+        this.posterName = posterName;
     }
 
     public String getTitle() {
@@ -46,6 +48,14 @@ public class Movie {
 
     public void setRelease_date(String release_date) {
         this.release_date = release_date;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getPosterName() {
+        return posterName;
     }
 }
 

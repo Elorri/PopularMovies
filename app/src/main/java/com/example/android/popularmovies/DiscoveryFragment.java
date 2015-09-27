@@ -33,8 +33,9 @@ import java.net.URL;
  * A placeholder fragment containing a simple view.
  */
 public class DiscoveryFragment extends Fragment {
+    
 
-    String[] mDiscoverMoviesPosterPath;
+    Movie[] mDiscoverMoviesPosterPath;
     ImageAdapter mDiscoveryAdapter;
 
     public DiscoveryFragment() {
@@ -44,7 +45,7 @@ public class DiscoveryFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // The ImageAdapter will take poster path in the String[] and populate the GridView with the corresponding images.
-        mDiscoverMoviesPosterPath = new String[]{};
+        mDiscoverMoviesPosterPath = new Movie[]{};
         mDiscoveryAdapter = new ImageAdapter(getActivity(), mDiscoverMoviesPosterPath);
 
         View rootView = inflater.inflate(R.layout.fragment_discovery, container, false);
@@ -55,9 +56,9 @@ public class DiscoveryFragment extends Fragment {
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String movie = mDiscoveryAdapter.getItem(position);
-                Intent intent = new Intent(getActivity(), DetailActivity.class)
-                        .putExtra(Intent.EXTRA_TEXT, movie);
+                Movie movie = mDiscoveryAdapter.getItem(position);
+                Intent intent = new Intent(getActivity(), DetailActivity.class);
+                intent.putExtra(Intent.EXTRA_TEXT, movie);
                 startActivity(intent);
             }
         });
@@ -72,13 +73,13 @@ public class DiscoveryFragment extends Fragment {
     }
 
 
-    public class FetchMoviesTask extends AsyncTask<String, Void, String[]> {
+    public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
 
         private final String LOG_TAG = FetchMoviesTask.class.getSimpleName();
         private final String API_KEY = "4691965cfc3e6f0591bc595986e92e84";
 
         @Override
-        protected String[] doInBackground(String... params) {
+        protected Movie[] doInBackground(String... params) {
             URL url = constructMovieQuery(params[0]);
             String popularMoviesJsonStr = getJsonString(url);
 
@@ -92,7 +93,7 @@ public class DiscoveryFragment extends Fragment {
         }
 
         @Override
-        protected void onPostExecute(String[] result) {
+        protected void onPostExecute(Movie[] result) {
             if (result != null) {
                 mDiscoveryAdapter.updateResults(result);
             }
@@ -173,7 +174,7 @@ public class DiscoveryFragment extends Fragment {
         }
 
 
-        private String[] getDiscoveryDataFromJson(String moviesJsonStr) throws JSONException {
+        private Movie[] getDiscoveryDataFromJson(String moviesJsonStr) throws JSONException {
 
 
             // These are the names of the JSON objects that need to be extracted.
@@ -185,15 +186,17 @@ public class DiscoveryFragment extends Fragment {
             JSONArray moviesArray = moviesJson.getJSONArray(RESULTS);
 
 
-            String[] moviesList = new String[moviesArray.length()];
+            Movie[] moviesList = new Movie[moviesArray.length()];
             for (int i = 0; i < moviesArray.length(); i++) {
 
                 // Get the JSON object representing the movie
                 JSONObject aMovie = moviesArray.getJSONObject(i);
 
                 // For now, only the poster path
+                String id = aMovie.getString(ID);
                 String posterPath = aMovie.getString(POSTER_PATH);
-                moviesList[i] = posterPath;
+                String posterName = posterPath.split("/")[1]; //To remove the unwanted '/' given by the api
+                moviesList[i] = new Movie(id, posterName);
             }
             return moviesList;
 
@@ -205,14 +208,14 @@ public class DiscoveryFragment extends Fragment {
     public class ImageAdapter extends BaseAdapter {
         private final String LOG_TAG = ImageAdapter.class.getSimpleName();
         private Context mContext;
-        private String[] mThumbIds;
+        private Movie[] mThumbIds;
 
-        public ImageAdapter(Context c, String[] thumbIds) {
+        public ImageAdapter(Context c, Movie[] thumbIds) {
             mContext = c;
             mThumbIds = thumbIds;
         }
 
-        public void updateResults(String[] results) {
+        public void updateResults(Movie[] results) {
             mThumbIds = results;
             //Triggers the list update
             notifyDataSetChanged();
@@ -222,7 +225,7 @@ public class DiscoveryFragment extends Fragment {
             return mThumbIds.length;
         }
 
-        public String getItem(int position) {
+        public Movie getItem(int position) {
             return mThumbIds[position];
         }
 
@@ -239,12 +242,11 @@ public class DiscoveryFragment extends Fragment {
             } else {
                 imageView = (ImageView) convertView;
             }
-            Picasso.with(getActivity()).load(constructPosterImageURL(mThumbIds[position]).toString()).into(imageView);
+            Picasso.with(getActivity()).load(constructPosterImageURL(mThumbIds[position].getPosterName()).toString()).into(imageView);
             return imageView;
         }
 
-        private URL constructPosterImageURL(String posterPath) {
-            String posterName = posterPath.split("/")[1]; //To remove the unwanted '/' given by the api
+        private URL constructPosterImageURL(String posterName) {
             try {
                 final String BASE_URL = "http://image.tmdb.org/t/p/";
                 final String SIZE = "w185";
