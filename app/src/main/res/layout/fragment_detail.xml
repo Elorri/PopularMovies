@@ -17,10 +17,10 @@
             android:layout_marginBottom="@dimen/titleMarginBottom"
             android:background="@color/titleBackground"
             android:paddingBottom="@dimen/titlePaddingBottom"
-            android:paddingLeft="@dimen/paddingLeft"
+            android:paddingLeft="@dimen/overviewPaddingLeft"
             android:paddingTop="@dimen/titlePaddingTop"
             android:textColor="@android:color/white"
-            android:textSize="@dimen/titleTextSize" />
+            android:textSize="@dimen/detailTitleTextSize" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -32,7 +32,7 @@
                 android:layout_width="@dimen/posterNameWidth"
                 android:layout_height="@dimen/posterNameHeight"
                 android:layout_marginBottom="@dimen/posterNamePaddingBottom"
-                android:layout_marginLeft="@dimen/paddingLeft"
+                android:layout_marginLeft="@dimen/overviewPaddingLeft"
                 android:layout_marginRight="@dimen/posterNamePaddingRight"
                 android:scaleType="centerCrop" />
 
@@ -68,8 +68,9 @@
             android:id="@+id/overview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingLeft="@dimen/paddingLeft"
-            android:paddingRight="@dimen/paddingRight" />
+            android:paddingLeft="@dimen/overviewPaddingLeft"
+            android:paddingRight="@dimen/overviewPaddingRight"
+            android:paddingBottom="@dimen/overviewPaddingBottom"/>
 
     </LinearLayout>
 </ScrollView>

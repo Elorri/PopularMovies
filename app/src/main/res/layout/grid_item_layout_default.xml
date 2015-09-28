@@ -6,6 +6,6 @@
     android:text="Toto"
     android:gravity="center"
     android:background="@color/titleBackground"
-    android:textSize="@dimen/releaseYearTextSize"
+    android:textSize="@dimen/titleTextSize"
     android:textColor="@android:color/white">
 </TextView>
