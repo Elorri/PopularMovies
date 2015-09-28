@@ -3,6 +3,7 @@ package com.example.android.popularmovies;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.Image;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
@@ -201,9 +203,9 @@ public class DiscoveryFragment extends Fragment {
                 String id = aMovie.getString(ID);
                 String posterPath = aMovie.getString(POSTER_PATH);
                 Log.v(LOG_TAG, posterPath);
-                String posterName=null;
+                String posterName = null;
                 if (!posterPath.equals("null"))
-                     posterName = posterPath.split("/")[1]; //To remove the unwanted '/' given by the api
+                    posterName = posterPath.split("/")[1]; //To remove the unwanted '/' given by the api
                 moviesList[i] = new Movie(id, posterName);
             }
             return moviesList;
@@ -241,16 +243,25 @@ public class DiscoveryFragment extends Fragment {
         }
 
         public View getView(int position, View convertView, ViewGroup parent) {
-            ImageView imageView;
-            if (convertView == null) {
-                // LayoutInflater inflater = (LayoutInflater)getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                LayoutInflater inflater = LayoutInflater.from(getActivity());
-                imageView = (ImageView) inflater.inflate(R.layout.grid_item_layout, parent, false);
-            } else {
-                imageView = (ImageView) convertView;
+            View customView;
+            if (mThumbIds[position].getPosterName() == null) { //The poster image doesn't exist. Display the movie title instead
+                if ((convertView == null)||(convertView instanceof ImageView))  {
+                    LayoutInflater inflater = LayoutInflater.from(getActivity());
+                    customView =  inflater.inflate(R.layout.grid_item_layout_default, parent, false);
+                } else {
+                    customView = convertView;
+                }
+                ((TextView)customView).setText(mThumbIds[position].getTitle());
+            } else {//The poster image exists, we can display the image
+                if((convertView == null)||(convertView instanceof TextView)) {
+                    LayoutInflater inflater = LayoutInflater.from(getActivity());
+                    customView =  inflater.inflate(R.layout.grid_item_layout, parent, false);
+                } else {
+                    customView =  convertView;
+                }
+                Picasso.with(getActivity()).load(constructPosterImageURL(mThumbIds[position].getPosterName()).toString()).into((ImageView)customView);
             }
-            Picasso.with(getActivity()).load(constructPosterImageURL(mThumbIds[position].getPosterName()).toString()).into(imageView);
-            return imageView;
+            return customView;
         }
 
         private URL constructPosterImageURL(String posterName) {
