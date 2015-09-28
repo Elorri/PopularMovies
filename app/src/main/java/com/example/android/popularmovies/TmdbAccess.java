@@ -37,13 +37,12 @@ public class TmdbAccess {
         }
     }
 
-
     public Movie getMovieById(String id){
         URL url = constructMovieDetailQuery(id);
         String popularMoviesJsonStr = getJsonString(url);
 
         try {
-            return getMovieDataFromJson(popularMoviesJsonStr);
+            return getOneMovieFromJson(popularMoviesJsonStr);
         } catch (JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
             e.printStackTrace();
@@ -51,32 +50,21 @@ public class TmdbAccess {
         }
     }
 
-    private Movie getMovieDataFromJson(String theMovieJsonStr) throws JSONException {
+    public URL constructPosterImageURL(String posterName) {
+        try {
+            final String BASE_URL = "http://image.tmdb.org/t/p/";
+            final String SIZE = "w185";
 
-        // These are the names of the JSON objects that need to be extracted.
-        final String ID = "id";
-        final String TITLE="title";
-        final String POSTER_PATH = "poster_path";
-        final String OVERVIEW = "overview";
-        final String VOTE_AVERAGE = "vote_average";
-        final String RELEASE_DATE = "release_date";
-        final String DURATION = "runtime";
+            Uri builtUri = Uri.parse(BASE_URL).buildUpon()
+                    .appendPath(SIZE)
+                    .appendPath(posterName)
+                    .build();
 
-        JSONObject movieJson = new JSONObject(theMovieJsonStr);
-
-        String id = movieJson.getString(ID);
-        String title =movieJson.getString(TITLE);
-        String posterPath = movieJson.getString(POSTER_PATH);
-        String posterName = null;
-        if (!posterPath.equals("null"))
-            posterName = posterPath.split("/")[1]; //To remove the unwanted '/' given by the api
-        String releaseDate =movieJson.getString(RELEASE_DATE);
-        String duration =movieJson.getString(DURATION);
-        String voteAverage =movieJson.getString(VOTE_AVERAGE);
-        String overview =movieJson.getString(OVERVIEW);
-
-        return new Movie(id, title, posterName, releaseDate, duration, voteAverage, overview);
-
+            return new URL(builtUri.toString());
+        } catch (MalformedURLException e) {
+            Log.e(LOG_TAG, "Error " + e);
+            return null;
+        }
     }
 
     private URL constructMovieListQuery(String sortByValue) {
@@ -113,22 +101,7 @@ public class TmdbAccess {
         }
     }
 
-    public URL constructPosterImageURL(String posterName) {
-        try {
-            final String BASE_URL = "http://image.tmdb.org/t/p/";
-            final String SIZE = "w185";
 
-            Uri builtUri = Uri.parse(BASE_URL).buildUpon()
-                    .appendPath(SIZE)
-                    .appendPath(posterName)
-                    .build();
-
-            return new URL(builtUri.toString());
-        } catch (MalformedURLException e) {
-            Log.e(LOG_TAG, "Error " + e);
-            return null;
-        }
-    }
 
     private String getJsonString(URL url) {
         // These two need to be declared outside the try/catch
@@ -214,6 +187,34 @@ public class TmdbAccess {
             moviesList[i] = new Movie(id, title, posterName);
         }
         return moviesList;
+
+    }
+
+    private Movie getOneMovieFromJson(String theMovieJsonStr) throws JSONException {
+
+        // These are the names of the JSON objects that need to be extracted.
+        final String ID = "id";
+        final String TITLE="title";
+        final String POSTER_PATH = "poster_path";
+        final String OVERVIEW = "overview";
+        final String VOTE_AVERAGE = "vote_average";
+        final String RELEASE_DATE = "release_date";
+        final String DURATION = "runtime";
+
+        JSONObject movieJson = new JSONObject(theMovieJsonStr);
+
+        String id = movieJson.getString(ID);
+        String title =movieJson.getString(TITLE);
+        String posterPath = movieJson.getString(POSTER_PATH);
+        String posterName = null;
+        if (!posterPath.equals("null"))
+            posterName = posterPath.split("/")[1]; //To remove the unwanted '/' given by the api
+        String releaseDate =movieJson.getString(RELEASE_DATE);
+        String duration =movieJson.getString(DURATION);
+        String voteAverage =movieJson.getString(VOTE_AVERAGE);
+        String overview =movieJson.getString(OVERVIEW);
+
+        return new Movie(id, title, posterName, releaseDate, duration, voteAverage, overview);
 
     }
 }

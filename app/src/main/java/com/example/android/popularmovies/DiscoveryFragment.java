@@ -20,7 +20,6 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
@@ -90,7 +89,6 @@ public class DiscoveryFragment extends Fragment {
     }
 
     public class CustomAdapter extends BaseAdapter {
-        private final String LOG_TAG = CustomAdapter.class.getSimpleName();
         private Context mContext;
         private Movie[] mThumbIds;
 
