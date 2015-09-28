@@ -22,6 +22,5 @@
 
     <!-- strings diplayed on the UI -->
     <string name="min">min</string>
-
-
+    <string name="rateMax">/10</string>
 </resources>

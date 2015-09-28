@@ -111,7 +111,7 @@ public class DetailFragment extends Fragment {
             if (result != null) {
                 title.setText(result.getTitle());
                 overview.setText(result.getOverview());
-                voteAverage.setText(result.getVoteAverage());
+                voteAverage.setText(result.getVoteAverage()+getString(R.string.rateMax));
                 releaseDate.setText(result.getReleaseDate().split("-")[0]); //To extract the year from the date
                 duration.setText(result.getDuration()+" "+getString(R.string.min));
             }
