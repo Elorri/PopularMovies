@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * Created by Elorri-user on 27/09/2015.
  */
-public class Movie implements Serializable {
+public class Movie{
     String id;
     String posterName;
     String title;
@@ -14,43 +14,41 @@ public class Movie implements Serializable {
     String releaseDate;
     String duration;
 
-    public Movie(String id, String title, String posterName){
-        this.id=id;
-        this.title=title;
+    public Movie(String id, String title, String posterName) {
+        this.id = id;
+        this.title = title;
         this.posterName = posterName;
+    }
+
+    public Movie(String id, String title, String posterName, String releaseDate, String duration, String voteAverage, String overview) {
+        this.id = id;
+        this.title = title;
+        this.posterName = posterName;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+        this.voteAverage = voteAverage;
+        this.overview = overview;
     }
 
     public String getTitle() {
         return title;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
 
     public String getOverview() {
         return overview;
     }
 
-    public void setOverview(String overview) {
-        this.overview = overview;
-    }
 
     public String getVoteAverage() {
         return voteAverage;
     }
 
-    public void setVoteAverage(String voteAverage) {
-        this.voteAverage = voteAverage;
-    }
 
     public String getReleaseDate() {
         return releaseDate;
     }
 
-    public void setReleaseDate(String releaseDate) {
-        this.releaseDate = releaseDate;
-    }
 
     public String getId() {
         return id;
@@ -60,9 +58,6 @@ public class Movie implements Serializable {
         return duration;
     }
 
-    public void setDuration(String duration) {
-        this.duration = duration;
-    }
 
     public String getPosterName() {
         return posterName;

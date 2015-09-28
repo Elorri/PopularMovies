@@ -31,7 +31,8 @@ import java.net.URL;
 public class DetailFragment extends Fragment {
 
     private static final String LOG_TAG = DetailFragment.class.getSimpleName();
-    private Movie movie;
+    private String movieId;
+    private TmdbAccess tmdbAccess;
 
     private ImageView posterImage;
     private TextView title;
@@ -47,62 +48,35 @@ public class DetailFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
-
+        tmdbAccess=new TmdbAccess();
         Intent intent = getActivity().getIntent();
         if (intent != null && intent.hasExtra(Intent.EXTRA_TEXT)) {
-            movie = (Movie) intent.getSerializableExtra(Intent.EXTRA_TEXT);
+            movieId =  intent.getStringExtra(Intent.EXTRA_TEXT);
             title = (TextView) rootView.findViewById(R.id.title);
             posterImage = (ImageView) rootView.findViewById(R.id.posterImage);
             overview = (TextView) rootView.findViewById(R.id.overview);
             voteAverage = (TextView) rootView.findViewById(R.id.voteAverage);
             releaseDate = (TextView) rootView.findViewById(R.id.releaseYear);
             duration = (TextView) rootView.findViewById(R.id.duration);
-            Picasso.with(getActivity()).load(constructPosterImageURL(movie.getPosterName()).toString()).into(posterImage);
         }
         return rootView;
     }
 
-    private URL constructPosterImageURL(String posterName) {
-        try {
-            final String BASE_URL = "http://image.tmdb.org/t/p/";
-            final String SIZE = "w185";
-
-            Uri builtUri = Uri.parse(BASE_URL).buildUpon()
-                    .appendPath(SIZE)
-                    .appendPath(posterName)
-                    .build();
-
-            return new URL(builtUri.toString());
-        } catch (MalformedURLException e) {
-            Log.e(LOG_TAG, "Error " + e);
-            return null;
-        }
-    }
 
     @Override
     public void onStart() {
         super.onStart();
         FetchOneMovieTask movieTask = new FetchOneMovieTask();
-        movieTask.execute(movie);
+        movieTask.execute(movieId);
     }
 
-    public class FetchOneMovieTask extends AsyncTask<Movie, Void, Movie> {
+    public class FetchOneMovieTask extends AsyncTask<String, Void, Movie> {
 
         private final String LOG_TAG = FetchOneMovieTask.class.getSimpleName();
-        private final String API_KEY = "4691965cfc3e6f0591bc595986e92e84";
 
         @Override
-        protected Movie doInBackground(Movie... params) {
-            URL url = constructMovieDetailQuery(params[0]);
-            String popularMoviesJsonStr = getJsonString(url);
-
-            try {
-                return getMovieDataFromJson(params[0], popularMoviesJsonStr);
-            } catch (JSONException e) {
-                Log.e(LOG_TAG, e.getMessage(), e);
-                e.printStackTrace();
-                return null;
-            }
+        protected Movie doInBackground(String... params) {
+            return tmdbAccess.getMovieById(params[0]);
         }
 
 
@@ -114,45 +88,14 @@ public class DetailFragment extends Fragment {
                 voteAverage.setText(result.getVoteAverage()+getString(R.string.rateMax));
                 releaseDate.setText(result.getReleaseDate().split("-")[0]); //To extract the year from the date
                 duration.setText(result.getDuration()+" "+getString(R.string.min));
+                Picasso.with(getActivity()).load(tmdbAccess.constructPosterImageURL(result.getPosterName()).toString()).into(posterImage);
             }
         }
 
-        private Movie getMovieDataFromJson(Movie theMovie, String theMovieJsonStr) throws JSONException {
-
-            // These are the names of the JSON objects that need to be extracted.
-            final String TITLE = "title";
-            final String OVERVIEW = "overview";
-            final String VOTE_AVERAGE = "vote_average";
-            final String RELEASE_DATE = "release_date";
-            final String DURATION = "runtime";
-
-            JSONObject movieJson = new JSONObject(theMovieJsonStr);
-            theMovie.setTitle(movieJson.getString(TITLE));
-            theMovie.setOverview(movieJson.getString(OVERVIEW));
-            theMovie.setVoteAverage(movieJson.getString(VOTE_AVERAGE));
-            theMovie.setReleaseDate(movieJson.getString(RELEASE_DATE));
-            theMovie.setDuration(movieJson.getString(DURATION));
-            return theMovie;
-
-        }
 
 
-        private URL constructMovieDetailQuery(Movie aMovie) {
-            try {
-                final String BASE_URL = "http://api.themoviedb.org/3/movie/";
-                final String SORTBY_PARAM = "sort_by";
-                final String KEY_PARAM = "api_key";
 
-                Uri builtUri = Uri.parse(BASE_URL).buildUpon()
-                        .appendPath(aMovie.getId())
-                        .appendQueryParameter(KEY_PARAM, API_KEY)
-                        .build();
-                return new URL(builtUri.toString());
-            } catch (MalformedURLException e) {
-                Log.e(LOG_TAG, "Error " + e);
-                return null;
-            }
-        }
+
 
 
         private String getJsonString(URL url) {
