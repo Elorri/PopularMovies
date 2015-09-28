@@ -1,72 +1,75 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     tools:context="com.example.android.popularmovies.DetailFragment">
-
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/titleMarginBottom"
-        android:background="@color/titleBackground"
-        android:paddingBottom="@dimen/titlePaddingBottom"
-        android:paddingLeft="@dimen/paddingLeft"
-        android:paddingTop="@dimen/titlePaddingTop"
-        android:textColor="@android:color/white"
-        android:textSize="@dimen/titleTextSize"
-        />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <ImageView
-            android:id="@+id/posterImage"
-            android:layout_width="@dimen/posterNameWidth"
-            android:layout_height="@dimen/posterNameHeight"
-            android:layout_marginBottom="@dimen/posterNamePaddingBottom"
-            android:layout_marginLeft="@dimen/paddingLeft"
-            android:layout_marginRight="@dimen/posterNamePaddingRight"
-            android:scaleType="centerCrop"
-            />
-
-        <RelativeLayout
+        <TextView
+            android:id="@+id/title"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/titleMarginBottom"
+            android:background="@color/titleBackground"
+            android:paddingBottom="@dimen/titlePaddingBottom"
+            android:paddingLeft="@dimen/paddingLeft"
+            android:paddingTop="@dimen/titlePaddingTop"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/titleTextSize" />
 
-            <TextView
-                android:id="@+id/releaseYear"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="@dimen/releaseYearTextSize" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/duration"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/releaseYear"
-                android:textSize="@dimen/durationTextSize"
-                android:textStyle="italic" />
+            <ImageView
+                android:id="@+id/posterImage"
+                android:layout_width="@dimen/posterNameWidth"
+                android:layout_height="@dimen/posterNameHeight"
+                android:layout_marginBottom="@dimen/posterNamePaddingBottom"
+                android:layout_marginLeft="@dimen/paddingLeft"
+                android:layout_marginRight="@dimen/posterNamePaddingRight"
+                android:scaleType="centerCrop" />
 
-            <TextView
-                android:id="@+id/voteAverage"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/duration"
-                android:textColor="@android:color/black"
-                android:textSize="@dimen/voteAverageTextSize" />
-        </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/releaseYear"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/releaseYearTextSize" />
+
+                <TextView
+                    android:id="@+id/duration"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/releaseYear"
+                    android:textSize="@dimen/durationTextSize"
+                    android:textStyle="italic" />
+
+                <TextView
+                    android:id="@+id/voteAverage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/duration"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/voteAverageTextSize" />
+            </RelativeLayout>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/overview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="@dimen/paddingLeft"
+            android:paddingRight="@dimen/paddingRight" />
+
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/overview"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="@dimen/paddingLeft"
-        android:paddingRight="@dimen/paddingRight"
-        />
-
-</LinearLayout>
+</ScrollView>
