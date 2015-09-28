@@ -2,9 +2,11 @@ package com.example.android.popularmovies;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -69,7 +71,10 @@ public class DiscoveryFragment extends Fragment {
     public void onStart() {
         super.onStart();
         FetchMoviesTask movieTask = new FetchMoviesTask();
-        movieTask.execute("popularity.desc");
+        SharedPreferences sharedPrefs =
+                PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String sortType = sharedPrefs.getString(getString(R.string.pref_sort_order_key), getString(R.string.pref_sort_order_popularity));
+        movieTask.execute(sortType);
     }
 
 
@@ -195,13 +200,15 @@ public class DiscoveryFragment extends Fragment {
                 // For now, only the poster path
                 String id = aMovie.getString(ID);
                 String posterPath = aMovie.getString(POSTER_PATH);
-                String posterName = posterPath.split("/")[1]; //To remove the unwanted '/' given by the api
+                Log.v(LOG_TAG, posterPath);
+                String posterName=null;
+                if (!posterPath.equals("null"))
+                     posterName = posterPath.split("/")[1]; //To remove the unwanted '/' given by the api
                 moviesList[i] = new Movie(id, posterName);
             }
             return moviesList;
 
         }
-
 
     }
 
