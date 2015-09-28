@@ -3,7 +3,6 @@ package com.example.android.popularmovies;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.media.Image;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -40,7 +39,7 @@ public class DiscoveryFragment extends Fragment {
 
 
     Movie[] mDiscoverMoviesPosterPath;
-    ImageAdapter mDiscoveryAdapter;
+    CustomAdapter mDiscoveryAdapter;
 
     public DiscoveryFragment() {
     }
@@ -48,9 +47,9 @@ public class DiscoveryFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // The ImageAdapter will take poster path in the String[] and populate the GridView with the corresponding images.
+        // The CustomAdapter will take poster path in the String[] and populate the GridView with the corresponding images.
         mDiscoverMoviesPosterPath = new Movie[]{};
-        mDiscoveryAdapter = new ImageAdapter(getActivity(), mDiscoverMoviesPosterPath);
+        mDiscoveryAdapter = new CustomAdapter(getActivity(), mDiscoverMoviesPosterPath);
 
         View rootView = inflater.inflate(R.layout.fragment_discovery, container, false);
 
@@ -187,6 +186,7 @@ public class DiscoveryFragment extends Fragment {
             // These are the names of the JSON objects that need to be extracted.
             final String RESULTS = "results";
             final String ID = "id";
+            final String TITLE="title";
             final String POSTER_PATH = "poster_path";
 
             JSONObject moviesJson = new JSONObject(moviesJsonStr);
@@ -201,12 +201,12 @@ public class DiscoveryFragment extends Fragment {
 
                 // For now, only the poster path
                 String id = aMovie.getString(ID);
+                String title =aMovie.getString(TITLE);
                 String posterPath = aMovie.getString(POSTER_PATH);
-                Log.v(LOG_TAG, posterPath);
                 String posterName = null;
                 if (!posterPath.equals("null"))
                     posterName = posterPath.split("/")[1]; //To remove the unwanted '/' given by the api
-                moviesList[i] = new Movie(id, posterName);
+                moviesList[i] = new Movie(id, title, posterName);
             }
             return moviesList;
 
@@ -214,12 +214,12 @@ public class DiscoveryFragment extends Fragment {
 
     }
 
-    public class ImageAdapter extends BaseAdapter {
-        private final String LOG_TAG = ImageAdapter.class.getSimpleName();
+    public class CustomAdapter extends BaseAdapter {
+        private final String LOG_TAG = CustomAdapter.class.getSimpleName();
         private Context mContext;
         private Movie[] mThumbIds;
 
-        public ImageAdapter(Context c, Movie[] thumbIds) {
+        public CustomAdapter(Context c, Movie[] thumbIds) {
             mContext = c;
             mThumbIds = thumbIds;
         }

@@ -14,8 +14,9 @@ public class Movie implements Serializable {
     String releaseDate;
     String duration;
 
-    public Movie(String id, String posterName){
+    public Movie(String id, String title, String posterName){
         this.id=id;
+        this.title=title;
         this.posterName = posterName;
     }
 
