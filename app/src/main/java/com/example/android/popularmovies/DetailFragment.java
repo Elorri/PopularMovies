@@ -147,7 +147,6 @@ public class DetailFragment extends Fragment {
                         .appendPath(aMovie.getId())
                         .appendQueryParameter(KEY_PARAM, API_KEY)
                         .build();
-                Log.v(LOG_TAG, builtUri.toString());
                 return new URL(builtUri.toString());
             } catch (MalformedURLException e) {
                 Log.e(LOG_TAG, "Error " + e);
