@@ -1,9 +1,8 @@
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.android.popularmovies.DetailFragment">
+    >
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -44,7 +43,8 @@
                     android:id="@+id/releaseYear"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="@dimen/releaseYearTextSize" />
+                    android:textSize="@dimen/releaseYearTextSize"
+                    />
 
                 <TextView
                     android:id="@+id/duration"

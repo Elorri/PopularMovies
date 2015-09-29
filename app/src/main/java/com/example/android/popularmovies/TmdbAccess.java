@@ -95,6 +95,8 @@ public class TmdbAccess {
                     .appendQueryParameter(KEY_PARAM, API_KEY)
                     .build();
             return new URL(builtUri.toString());
+
+
         } catch (MalformedURLException e) {
             Log.e(LOG_TAG, "Error " + e);
             return null;
