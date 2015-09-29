@@ -16,7 +16,7 @@
             android:layout_marginBottom="@dimen/titleMarginBottom"
             android:background="@color/titleBackground"
             android:paddingBottom="@dimen/titlePaddingBottom"
-            android:paddingLeft="@dimen/overviewPaddingLeft"
+            android:paddingLeft="@dimen/titlePaddingLeft"
             android:paddingTop="@dimen/titlePaddingTop"
             android:textColor="@android:color/white"
             android:textSize="@dimen/detailTitleTextSize" />

@@ -17,4 +17,5 @@
     <dimen name="voteAverageTextSize">12sp</dimen>
     <dimen name="durationTextSize">16dp</dimen>
     <dimen name="overviewPaddingBottom">26dp</dimen>
+    <dimen name="titlePaddingLeft">8dp</dimen>
 </resources>
