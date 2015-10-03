@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -39,13 +38,13 @@ public class DiscoveryFragment extends Fragment {
     public DiscoveryFragment() {
     }
 
-    private BroadcastReceiver receiver = new BroadcastReceiver() {
+    private BroadcastReceiver receiver = new InternetReceiver(getActivity()) {
         @Override
-        public void onReceive(Context context, Intent intent) {
-            if (isConnected()) {
-                // The device is connected to the internet, we can update the screen.
-                refresh();
-            }
+        protected void refresh() {
+            FetchMoviesTask movieTask = new FetchMoviesTask();
+            SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            String sortType = sharedPrefs.getString(getString(R.string.pref_sort_order_key), getString(R.string.pref_sort_order_popularity));
+            movieTask.execute(sortType);
         }
     };
 
@@ -88,12 +87,6 @@ public class DiscoveryFragment extends Fragment {
         super.onStop();
     }
 
-    private void refresh() {
-        FetchMoviesTask movieTask = new FetchMoviesTask();
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        String sortType = sharedPrefs.getString(getString(R.string.pref_sort_order_key), getString(R.string.pref_sort_order_popularity));
-        movieTask.execute(sortType);
-    }
 
     public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
 
@@ -112,13 +105,7 @@ public class DiscoveryFragment extends Fragment {
 
     }
 
-    private boolean isConnected() {
-        ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
 
-        NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
-        boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
-        return isConnected;
-    }
 
     public class CustomAdapter extends ArrayAdapter<Movie> {
 
