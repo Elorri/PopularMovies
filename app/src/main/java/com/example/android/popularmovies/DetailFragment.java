@@ -1,11 +1,12 @@
 package com.example.android.popularmovies;
 
+import android.content.BroadcastReceiver;
 import android.content.Intent;
-import android.net.Uri;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,17 +14,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -40,6 +30,8 @@ public class DetailFragment extends Fragment {
     private TextView voteAverage;
     private TextView releaseDate;
     private TextView duration;
+
+    private BroadcastReceiver receiver;
 
     public DetailFragment() {
     }
@@ -65,9 +57,23 @@ public class DetailFragment extends Fragment {
 
     @Override
     public void onStart() {
+        receiver = new InternetReceiver(getActivity()) {
+            @Override
+            protected void refresh() {
+                FetchOneMovieTask movieTask = new FetchOneMovieTask();
+                movieTask.execute(movieId);
+            }
+        };
+
+        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        getActivity().registerReceiver(receiver, filter);
         super.onStart();
-        FetchOneMovieTask movieTask = new FetchOneMovieTask();
-        movieTask.execute(movieId);
+    }
+
+    @Override
+    public void onStop() {
+        getActivity().unregisterReceiver(receiver);
+        super.onStop();
     }
 
     public class FetchOneMovieTask extends AsyncTask<String, Void, Movie> {

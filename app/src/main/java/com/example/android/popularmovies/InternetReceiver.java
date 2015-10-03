@@ -38,7 +38,5 @@ public abstract class InternetReceiver extends BroadcastReceiver {
     /**
      * This method is called whenever the connection is back and it's time to refresh the screen.
      */
-    protected void refresh(){
-
-    };
+    protected abstract void refresh();
 }

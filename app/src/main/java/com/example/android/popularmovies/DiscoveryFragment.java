@@ -31,22 +31,14 @@ import java.util.Arrays;
 public class DiscoveryFragment extends Fragment {
 
 
-    ArrayList<Movie> mDiscoverMoviesPosterPath;
-    CustomAdapter mDiscoveryAdapter;
+    private ArrayList<Movie> mDiscoverMoviesPosterPath;
+    private CustomAdapter mDiscoveryAdapter;
     private TmdbAccess tmdbAccess;
+    private BroadcastReceiver receiver;
 
     public DiscoveryFragment() {
     }
 
-    private BroadcastReceiver receiver = new InternetReceiver(getActivity()) {
-        @Override
-        protected void refresh() {
-            FetchMoviesTask movieTask = new FetchMoviesTask();
-            SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            String sortType = sharedPrefs.getString(getString(R.string.pref_sort_order_key), getString(R.string.pref_sort_order_popularity));
-            movieTask.execute(sortType);
-        }
-    };
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -74,11 +66,20 @@ public class DiscoveryFragment extends Fragment {
 
     @Override
     public void onStart() {
+        receiver = new InternetReceiver(getActivity()) {
+            @Override
+            protected void refresh() {
+                FetchMoviesTask movieTask = new FetchMoviesTask();
+                SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                String sortType = sharedPrefs.getString(getString(R.string.pref_sort_order_key), getString(R.string.pref_sort_order_popularity));
+                movieTask.execute(sortType);
+            }
+        };
+
         IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
         getActivity().registerReceiver(receiver, filter);
         super.onStart();
     }
-
 
 
     @Override
@@ -104,7 +105,6 @@ public class DiscoveryFragment extends Fragment {
         }
 
     }
-
 
 
     public class CustomAdapter extends ArrayAdapter<Movie> {
