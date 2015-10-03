@@ -19,7 +19,6 @@ import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -43,7 +42,10 @@ public class DiscoveryFragment extends Fragment {
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Toast.makeText(getActivity(), "isConnected : "+isConnected(), Toast.LENGTH_SHORT).show();
+            if (isConnected()) {
+                // The device is connected to the internet, we can update the screen.
+                refresh();
+            }
         }
     };
 
@@ -75,20 +77,22 @@ public class DiscoveryFragment extends Fragment {
     public void onStart() {
         IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
         getActivity().registerReceiver(receiver, filter);
-
-        if (isConnected()) {
-            FetchMoviesTask movieTask = new FetchMoviesTask();
-            SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            String sortType = sharedPrefs.getString(getString(R.string.pref_sort_order_key), getString(R.string.pref_sort_order_popularity));
-            movieTask.execute(sortType);
-        }
         super.onStart();
     }
+
+
 
     @Override
     public void onStop() {
         getActivity().unregisterReceiver(receiver);
         super.onStop();
+    }
+
+    private void refresh() {
+        FetchMoviesTask movieTask = new FetchMoviesTask();
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String sortType = sharedPrefs.getString(getString(R.string.pref_sort_order_key), getString(R.string.pref_sort_order_popularity));
+        movieTask.execute(sortType);
     }
 
     public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
