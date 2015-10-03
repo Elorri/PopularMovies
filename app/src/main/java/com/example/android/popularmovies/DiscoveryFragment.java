@@ -1,7 +1,9 @@
 package com.example.android.popularmovies;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -17,6 +19,7 @@ import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -36,6 +39,13 @@ public class DiscoveryFragment extends Fragment {
 
     public DiscoveryFragment() {
     }
+
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Toast.makeText(getActivity(), "isConnected : "+isConnected(), Toast.LENGTH_SHORT).show();
+        }
+    };
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -63,24 +73,30 @@ public class DiscoveryFragment extends Fragment {
 
     @Override
     public void onStart() {
+        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        getActivity().registerReceiver(receiver, filter);
+
+        if (isConnected()) {
+            FetchMoviesTask movieTask = new FetchMoviesTask();
+            SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            String sortType = sharedPrefs.getString(getString(R.string.pref_sort_order_key), getString(R.string.pref_sort_order_popularity));
+            movieTask.execute(sortType);
+        }
         super.onStart();
-        FetchMoviesTask movieTask = new FetchMoviesTask();
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        String sortType = sharedPrefs.getString(getString(R.string.pref_sort_order_key), getString(R.string.pref_sort_order_popularity));
-        movieTask.execute(sortType);
     }
 
+    @Override
+    public void onStop() {
+        getActivity().unregisterReceiver(receiver);
+        super.onStop();
+    }
 
     public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
 
         @Override
         protected Movie[] doInBackground(String... params) {
-            if (isConnected()) {
-                tmdbAccess = new TmdbAccess();
-                return tmdbAccess.getMoviesSortBy(params[0]);
-            } else {
-                return null;
-            }
+            tmdbAccess = new TmdbAccess();
+            return tmdbAccess.getMoviesSortBy(params[0]);
         }
 
         @Override
@@ -90,12 +106,12 @@ public class DiscoveryFragment extends Fragment {
             }
         }
 
-
     }
 
     private boolean isConnected() {
-        ConnectivityManager cm =  (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
         boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
         return isConnected;
     }
