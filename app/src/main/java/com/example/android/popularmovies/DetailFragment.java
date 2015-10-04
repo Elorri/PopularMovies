@@ -1,11 +1,11 @@
 package com.example.android.popularmovies;
 
+import android.content.BroadcastReceiver;
 import android.content.Intent;
-import android.net.Uri;
-import android.os.AsyncTask;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,24 +14,12 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-
 /**
  * A placeholder fragment containing a simple view.
  */
 public class DetailFragment extends Fragment {
 
-    private static final String LOG_TAG = DetailFragment.class.getSimpleName();
-    private String movieId;
+    private Movie movie;
     private TmdbAccess tmdbAccess;
 
     private ImageView posterImage;
@@ -40,6 +28,8 @@ public class DetailFragment extends Fragment {
     private TextView voteAverage;
     private TextView releaseDate;
     private TextView duration;
+
+    private BroadcastReceiver receiver;
 
     public DetailFragment() {
     }
@@ -51,13 +41,19 @@ public class DetailFragment extends Fragment {
         tmdbAccess=new TmdbAccess();
         Intent intent = getActivity().getIntent();
         if (intent != null && intent.hasExtra(Intent.EXTRA_TEXT)) {
-            movieId =  intent.getStringExtra(Intent.EXTRA_TEXT);
+            movie =  intent.getParcelableExtra(Intent.EXTRA_TEXT);
             title = (TextView) rootView.findViewById(R.id.title);
             posterImage = (ImageView) rootView.findViewById(R.id.posterImage);
             overview = (TextView) rootView.findViewById(R.id.overview);
             voteAverage = (TextView) rootView.findViewById(R.id.voteAverage);
             releaseDate = (TextView) rootView.findViewById(R.id.releaseYear);
             duration = (TextView) rootView.findViewById(R.id.duration);
+
+            title.setText(movie.getTitle());
+            overview.setText(movie.getOverview());
+            voteAverage.setText(movie.getVoteAverage()+getString(R.string.rateMax));
+            releaseDate.setText(movie.getReleaseDate().split("-")[0]); //To extract the year from the date
+            duration.setText(movie.getDuration() + " " + getString(R.string.min));
         }
         return rootView;
     }
@@ -65,31 +61,22 @@ public class DetailFragment extends Fragment {
 
     @Override
     public void onStart() {
-        super.onStart();
-        FetchOneMovieTask movieTask = new FetchOneMovieTask();
-        movieTask.execute(movieId);
-    }
-
-    public class FetchOneMovieTask extends AsyncTask<String, Void, Movie> {
-
-
-        @Override
-        protected Movie doInBackground(String... params) {
-            return tmdbAccess.getMovieById(params[0]);
-        }
-
-
-        @Override
-        protected void onPostExecute(Movie result) {
-            if (result != null) {
-                title.setText(result.getTitle());
-                overview.setText(result.getOverview());
-                voteAverage.setText(result.getVoteAverage()+getString(R.string.rateMax));
-                releaseDate.setText(result.getReleaseDate().split("-")[0]); //To extract the year from the date
-                duration.setText(result.getDuration()+" "+getString(R.string.min));
-                Picasso.with(getActivity()).load(tmdbAccess.constructPosterImageURL(result.getPosterName()).toString()).into(posterImage);
+        receiver = new InternetReceiver(getActivity()) {
+            @Override
+            protected void refresh() {
+                Picasso.with(getActivity()).load(tmdbAccess.constructPosterImageURL(movie.getPosterName()).toString()).into(posterImage);
             }
-        }
+        };
 
+        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        getActivity().registerReceiver(receiver, filter);
+        super.onStart();
     }
+
+    @Override
+    public void onStop() {
+        getActivity().unregisterReceiver(receiver);
+        super.onStop();
+    }
+
 }

@@ -24,6 +24,7 @@ public class TmdbAccess {
     private static final String LOG_TAG = TmdbAccess.class.getSimpleName();
     private final String API_KEY = "real_api_key_here";
 
+
     public Movie[] getMoviesSortBy(String sortBy) {
         URL url = constructMovieListQuery(sortBy);
         String popularMoviesJsonStr = getJsonString(url);
@@ -37,7 +38,7 @@ public class TmdbAccess {
         }
     }
 
-    public Movie getMovieById(String id){
+    private Movie getMovieById(String id){
         URL url = constructMovieDetailQuery(id);
         String popularMoviesJsonStr = getJsonString(url);
 
@@ -166,8 +167,6 @@ public class TmdbAccess {
         // These are the names of the JSON objects that need to be extracted.
         final String RESULTS = "results";
         final String ID = "id";
-        final String TITLE="title";
-        final String POSTER_PATH = "poster_path";
 
         JSONObject moviesJson = new JSONObject(moviesJsonStr);
         JSONArray moviesArray = moviesJson.getJSONArray(RESULTS);
@@ -181,12 +180,7 @@ public class TmdbAccess {
 
             // Create Movie Object
             String id = aMovie.getString(ID);
-            String title =aMovie.getString(TITLE);
-            String posterPath = aMovie.getString(POSTER_PATH);
-            String posterName = null;
-            if (!posterPath.equals("null"))
-                posterName = posterPath.split("/")[1]; //To remove the unwanted '/' given by the api
-            moviesList[i] = new Movie(id, title, posterName);
+            moviesList[i] = getMovieById(id);
         }
         return moviesList;
 

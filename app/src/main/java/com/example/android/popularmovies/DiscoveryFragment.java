@@ -1,8 +1,11 @@
 package com.example.android.popularmovies;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -28,19 +31,33 @@ import java.util.Arrays;
 public class DiscoveryFragment extends Fragment {
 
 
-    ArrayList<Movie> mDiscoverMoviesPosterPath;
-    CustomAdapter mDiscoveryAdapter;
+    private ArrayList<Movie> mDiscoverMovies;
+    private CustomAdapter mDiscoveryAdapter;
     private TmdbAccess tmdbAccess;
+    private BroadcastReceiver receiver;
+    private String lastSortType;
+
+
+    private static final String MOVIE_ARRAY_LIST_TAG = "movie_array_list_tag";
 
     public DiscoveryFragment() {
     }
 
+
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // The CustomAdapter will take poster path in the String[] and populate the GridView with the corresponding images.
-        mDiscoverMoviesPosterPath = new ArrayList<Movie>();
-        mDiscoveryAdapter = new CustomAdapter(getActivity(), mDiscoverMoviesPosterPath);
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        //if the ArrayListof Movies already exist we use it otherwise we create another one.
+        if ((savedInstanceState == null) || (!savedInstanceState.containsKey(MOVIE_ARRAY_LIST_TAG)))
+            mDiscoverMovies = new ArrayList<Movie>();
+        else
+            mDiscoverMovies = savedInstanceState.getParcelableArrayList(MOVIE_ARRAY_LIST_TAG);
+        mDiscoveryAdapter = new CustomAdapter(getActivity(), mDiscoverMovies);
+        tmdbAccess = new TmdbAccess();
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.fragment_discovery, container, false);
 
@@ -52,7 +69,7 @@ public class DiscoveryFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Movie movie = mDiscoveryAdapter.getItem(position);
                 Intent intent = new Intent(getActivity(), DetailActivity.class);
-                intent.putExtra(Intent.EXTRA_TEXT, movie.getId());
+                intent.putExtra(Intent.EXTRA_TEXT, movie);
                 startActivity(intent);
             }
         });
@@ -61,12 +78,29 @@ public class DiscoveryFragment extends Fragment {
 
     @Override
     public void onStart() {
+        receiver = new InternetReceiver(getActivity()) {
+            @Override
+            protected void refresh() {
+                SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                String sortType = sharedPrefs.getString(getString(R.string.pref_sort_order_key), getString(R.string.pref_sort_order_popularity));
+                if ((lastSortType==null)||!sortType.equals(lastSortType)) {
+                    FetchMoviesTask movieTask = new FetchMoviesTask();
+                    movieTask.execute(sortType);
+                    lastSortType=sortType;
+                }
+            }
+        };
+
+        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        getActivity().registerReceiver(receiver, filter);
         super.onStart();
-        FetchMoviesTask movieTask = new FetchMoviesTask();
-        SharedPreferences sharedPrefs =
-                PreferenceManager.getDefaultSharedPreferences(getActivity());
-        String sortType = sharedPrefs.getString(getString(R.string.pref_sort_order_key), getString(R.string.pref_sort_order_popularity));
-        movieTask.execute(sortType);
+    }
+
+
+    @Override
+    public void onStop() {
+        getActivity().unregisterReceiver(receiver);
+        super.onStop();
     }
 
 
@@ -74,7 +108,6 @@ public class DiscoveryFragment extends Fragment {
 
         @Override
         protected Movie[] doInBackground(String... params) {
-            tmdbAccess=new TmdbAccess();
             return tmdbAccess.getMoviesSortBy(params[0]);
         }
 
@@ -85,14 +118,14 @@ public class DiscoveryFragment extends Fragment {
             }
         }
 
-
     }
+
 
     public class CustomAdapter extends ArrayAdapter<Movie> {
 
         public CustomAdapter(Context context, ArrayList<Movie> thumbIds) {
             //We pass '0' for the 'int resource' layout, because the layout we are going to inflate can vary. Will be R.layout.grid_item_layout_default or R.layout.grid_item_layout
-            super(context,0,thumbIds);
+            super(context, 0, thumbIds);
         }
 
         public void refresh(Movie[] results) {
@@ -116,25 +149,31 @@ public class DiscoveryFragment extends Fragment {
         public View getView(int position, View convertView, ViewGroup parent) {
             View customView;
             if (getItem(position).getPosterName() == null) { //The poster image doesn't exist. Display the movie title instead
-                if ((convertView == null)||(convertView instanceof ImageView))  {
+                if ((convertView == null) || (convertView instanceof ImageView)) {
                     LayoutInflater inflater = LayoutInflater.from(getActivity());
-                    customView =  inflater.inflate(R.layout.grid_item_layout_default, parent, false);
+                    customView = inflater.inflate(R.layout.grid_item_layout_default, parent, false);
                 } else {
                     customView = convertView;
                 }
-                ((TextView)customView).setText(getItem(position).getTitle());
+                ((TextView) customView).setText(getItem(position).getTitle());
             } else {//The poster image exists, we can display the image
-                if((convertView == null)||(convertView instanceof TextView)) {
+                if ((convertView == null) || (convertView instanceof TextView)) {
                     LayoutInflater inflater = LayoutInflater.from(getActivity());
-                    customView =  inflater.inflate(R.layout.grid_item_layout, parent, false);
+                    customView = inflater.inflate(R.layout.grid_item_layout, parent, false);
                 } else {
-                    customView =  convertView;
+                    customView = convertView;
                 }
-                URL posterURL=tmdbAccess.constructPosterImageURL(getItem(position).getPosterName());
-                Picasso.with(getActivity()).load(posterURL.toString()).into((ImageView)customView);
+                URL posterURL = tmdbAccess.constructPosterImageURL(getItem(position).getPosterName());
+                Picasso.with(getActivity()).load(posterURL.toString()).into((ImageView) customView);
             }
             return customView;
         }
 
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList(MOVIE_ARRAY_LIST_TAG, mDiscoverMovies);
     }
 }
