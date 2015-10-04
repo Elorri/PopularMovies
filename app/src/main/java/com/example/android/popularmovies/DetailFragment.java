@@ -21,7 +21,7 @@ import com.squareup.picasso.Picasso;
 public class DetailFragment extends Fragment {
 
     private static final String LOG_TAG = DetailFragment.class.getSimpleName();
-    private String movieId;
+    private Movie movie;
     private TmdbAccess tmdbAccess;
 
     private ImageView posterImage;
@@ -43,7 +43,7 @@ public class DetailFragment extends Fragment {
         tmdbAccess=new TmdbAccess();
         Intent intent = getActivity().getIntent();
         if (intent != null && intent.hasExtra(Intent.EXTRA_TEXT)) {
-            movieId =  intent.getStringExtra(Intent.EXTRA_TEXT);
+            movie =  intent.getParcelableExtra(Intent.EXTRA_TEXT);
             title = (TextView) rootView.findViewById(R.id.title);
             posterImage = (ImageView) rootView.findViewById(R.id.posterImage);
             overview = (TextView) rootView.findViewById(R.id.overview);
@@ -61,7 +61,7 @@ public class DetailFragment extends Fragment {
             @Override
             protected void refresh() {
                 FetchOneMovieTask movieTask = new FetchOneMovieTask();
-                movieTask.execute(movieId);
+                movieTask.execute(movie);
             }
         };
 
@@ -76,12 +76,12 @@ public class DetailFragment extends Fragment {
         super.onStop();
     }
 
-    public class FetchOneMovieTask extends AsyncTask<String, Void, Movie> {
+    public class FetchOneMovieTask extends AsyncTask<Movie, Void, Movie> {
 
 
         @Override
-        protected Movie doInBackground(String... params) {
-            return tmdbAccess.getMovieById(params[0]);
+        protected Movie doInBackground(Movie... params) {
+            return params[0];
         }
 
 
@@ -96,6 +96,5 @@ public class DetailFragment extends Fragment {
                 Picasso.with(getActivity()).load(tmdbAccess.constructPosterImageURL(result.getPosterName()).toString()).into(posterImage);
             }
         }
-
     }
 }
