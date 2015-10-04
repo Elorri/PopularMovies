@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -20,7 +19,6 @@ import com.squareup.picasso.Picasso;
  */
 public class DetailFragment extends Fragment {
 
-    private static final String LOG_TAG = DetailFragment.class.getSimpleName();
     private Movie movie;
     private TmdbAccess tmdbAccess;
 
@@ -50,6 +48,12 @@ public class DetailFragment extends Fragment {
             voteAverage = (TextView) rootView.findViewById(R.id.voteAverage);
             releaseDate = (TextView) rootView.findViewById(R.id.releaseYear);
             duration = (TextView) rootView.findViewById(R.id.duration);
+
+            title.setText(movie.getTitle());
+            overview.setText(movie.getOverview());
+            voteAverage.setText(movie.getVoteAverage()+getString(R.string.rateMax));
+            releaseDate.setText(movie.getReleaseDate().split("-")[0]); //To extract the year from the date
+            duration.setText(movie.getDuration() + " " + getString(R.string.min));
         }
         return rootView;
     }
@@ -60,8 +64,7 @@ public class DetailFragment extends Fragment {
         receiver = new InternetReceiver(getActivity()) {
             @Override
             protected void refresh() {
-                FetchOneMovieTask movieTask = new FetchOneMovieTask();
-                movieTask.execute(movie);
+                Picasso.with(getActivity()).load(tmdbAccess.constructPosterImageURL(movie.getPosterName()).toString()).into(posterImage);
             }
         };
 
@@ -76,25 +79,4 @@ public class DetailFragment extends Fragment {
         super.onStop();
     }
 
-    public class FetchOneMovieTask extends AsyncTask<Movie, Void, Movie> {
-
-
-        @Override
-        protected Movie doInBackground(Movie... params) {
-            return params[0];
-        }
-
-
-        @Override
-        protected void onPostExecute(Movie result) {
-            if (result != null) {
-                title.setText(result.getTitle());
-                overview.setText(result.getOverview());
-                voteAverage.setText(result.getVoteAverage()+getString(R.string.rateMax));
-                releaseDate.setText(result.getReleaseDate().split("-")[0]); //To extract the year from the date
-                duration.setText(result.getDuration()+" "+getString(R.string.min));
-                Picasso.with(getActivity()).load(tmdbAccess.constructPosterImageURL(result.getPosterName()).toString()).into(posterImage);
-            }
-        }
-    }
 }
