@@ -31,21 +31,33 @@ import java.util.Arrays;
 public class DiscoveryFragment extends Fragment {
 
 
-    private ArrayList<Movie> mDiscoverMoviesPosterPath;
+    private ArrayList<Movie> mDiscoverMovies;
     private CustomAdapter mDiscoveryAdapter;
     private TmdbAccess tmdbAccess;
     private BroadcastReceiver receiver;
+    private String lastSortType;
+
+
+    private static final String MOVIE_ARRAY_LIST_TAG = "movie_array_list_tag";
 
     public DiscoveryFragment() {
     }
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // The CustomAdapter will take poster path in the String[] and populate the GridView with the corresponding images.
-        mDiscoverMoviesPosterPath = new ArrayList<Movie>();
-        mDiscoveryAdapter = new CustomAdapter(getActivity(), mDiscoverMoviesPosterPath);
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        //if the ArrayListof Movies already exist we use it otherwise we create another one.
+        if ((savedInstanceState == null) || (!savedInstanceState.containsKey(MOVIE_ARRAY_LIST_TAG)))
+            mDiscoverMovies = new ArrayList<Movie>();
+        else
+            mDiscoverMovies = savedInstanceState.getParcelableArrayList(MOVIE_ARRAY_LIST_TAG);
+        mDiscoveryAdapter = new CustomAdapter(getActivity(), mDiscoverMovies);
+        tmdbAccess = new TmdbAccess();
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.fragment_discovery, container, false);
 
@@ -69,10 +81,13 @@ public class DiscoveryFragment extends Fragment {
         receiver = new InternetReceiver(getActivity()) {
             @Override
             protected void refresh() {
-                FetchMoviesTask movieTask = new FetchMoviesTask();
                 SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
                 String sortType = sharedPrefs.getString(getString(R.string.pref_sort_order_key), getString(R.string.pref_sort_order_popularity));
-                movieTask.execute(sortType);
+                if ((lastSortType==null)||!sortType.equals(lastSortType)) {
+                    FetchMoviesTask movieTask = new FetchMoviesTask();
+                    movieTask.execute(sortType);
+                    lastSortType=sortType;
+                }
             }
         };
 
@@ -93,7 +108,6 @@ public class DiscoveryFragment extends Fragment {
 
         @Override
         protected Movie[] doInBackground(String... params) {
-            tmdbAccess = new TmdbAccess();
             return tmdbAccess.getMoviesSortBy(params[0]);
         }
 
@@ -155,5 +169,11 @@ public class DiscoveryFragment extends Fragment {
             return customView;
         }
 
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList(MOVIE_ARRAY_LIST_TAG, mDiscoverMovies);
     }
 }
