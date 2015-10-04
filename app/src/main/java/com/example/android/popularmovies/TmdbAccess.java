@@ -22,7 +22,7 @@ public class TmdbAccess {
 
 
     private static final String LOG_TAG = TmdbAccess.class.getSimpleName();
-    private final String API_KEY = "4691965cfc3e6f0591bc595986e92e84";
+    private final String API_KEY = "real_api_name_here";
 
     public Movie[] getMoviesSortBy(String sortBy) {
         URL url = constructMovieListQuery(sortBy);
