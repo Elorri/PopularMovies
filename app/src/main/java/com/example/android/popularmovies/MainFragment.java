@@ -11,6 +11,9 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -28,7 +31,7 @@ import java.util.Arrays;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class DiscoveryFragment extends Fragment {
+public class MainFragment extends Fragment {
 
 
     private ArrayList<Movie> mDiscoverMovies;
@@ -40,13 +43,15 @@ public class DiscoveryFragment extends Fragment {
 
     private static final String MOVIE_ARRAY_LIST_TAG = "movie_array_list_tag";
 
-    public DiscoveryFragment() {
+    public MainFragment() {
     }
 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+
         //if the ArrayListof Movies already exist we use it otherwise we create another one.
         if ((savedInstanceState == null) || (!savedInstanceState.containsKey(MOVIE_ARRAY_LIST_TAG)))
             mDiscoverMovies = new ArrayList<Movie>();
@@ -74,6 +79,21 @@ public class DiscoveryFragment extends Fragment {
             }
         });
         return rootView;
+    }
+
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.fragment_main, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_refresh) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
