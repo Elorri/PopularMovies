@@ -37,8 +37,7 @@ public class MovieContract {
         public static final String FAVORITE_POPULARITY = "popularity.desc";
 
         public static Uri buildMovieDetailUri(Long id) {
-            //return ContentUris.withAppendedId(CONTENT_URI, id);
-            return CONTENT_URI.buildUpon().appendPath(Long.toString(id)).build();
+            return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
         public static Uri buildMovieSortByUri(String sort_by) {
