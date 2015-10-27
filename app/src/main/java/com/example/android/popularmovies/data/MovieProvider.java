@@ -36,13 +36,13 @@ public class MovieProvider extends ContentProvider {
         // URI.  It's common to use NO_MATCH as the code for this case.
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
         matcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_MOVIE, MOVIE);
+        matcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_MOVIE+"/#", MOVIE_DETAIL);
         matcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_MOVIE+"/*", MOVIES_SORT_BY);
-        matcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_MOVIE+"/favorite/*", MOVIES_FAVORITE);
-        matcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_MOVIE+"/id/*", MOVIE_DETAIL);
+        matcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_MOVIE+"/*/*", MOVIES_FAVORITE);
         matcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_TRAILER, TRAILER);
-        matcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_TRAILER+"/*", TRAILERS_MOVIE);
+        matcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_TRAILER+"/#", TRAILERS_MOVIE);
         matcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_REVIEW, REVIEW);
-        matcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_REVIEW+"/*", REVIEWS_MOVIE);
+        matcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_REVIEW+"/#", REVIEWS_MOVIE);
         return matcher;
     }
 
