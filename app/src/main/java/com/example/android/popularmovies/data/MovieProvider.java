@@ -15,10 +15,10 @@ public class MovieProvider extends ContentProvider {
     static final int MOVIE = 100;
     //will match content://com.example.android.popularmovies/movie/
     static final int MOVIES_SORT_BY = 101;
-    //will match content://com.example.android.popularmovies/movie?sort_by=popularity.desc
-    //will match content://com.example.android.popularmovies/movie?sort_by=rate.desc
+    //will match content://com.example.android.popularmovies/movie/popularity.desc
+    //will match content://com.example.android.popularmovies/movie/rate.desc
     static final int MOVIES_FAVORITE = 102;
-    //will match content://com.example.android.popularmovies/movie?favorite=true&sort_by=popularity.desc
+    //will match content://com.example.android.popularmovies/movie/favorite/popularity.desc
     static final int MOVIE_DETAIL = 103;
     //will match content://com.example.android.popularmovies/movie/135399
     static final int TRAILER = 200;
@@ -36,8 +36,8 @@ public class MovieProvider extends ContentProvider {
         // URI.  It's common to use NO_MATCH as the code for this case.
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
         matcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_MOVIE, MOVIE);
-        matcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_MOVIE+"?*=*", MOVIES_SORT_BY);
-        matcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_MOVIE+"?*=*&*=*", MOVIES_FAVORITE);
+        matcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_MOVIE+"/*", MOVIES_SORT_BY);
+        matcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_MOVIE+"/*/*", MOVIES_FAVORITE);
         matcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_MOVIE+"/#", MOVIE_DETAIL);
         matcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_TRAILER, TRAILER);
         matcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_TRAILER+"/#", TRAILERS_MOVIE);

@@ -34,21 +34,18 @@ public class MovieContract {
         public static final String COLUMN_POPULARITY = "popularity";
         public static final String COLUMN_FAVORITE = "favorite";
 
-
-        public static final String SORT_BY="sort_by";
-        public static final String SORT_BY_DEFAULT_VALUE=COLUMN_POPULARITY+".desc";
-        public static final String COLUMN_FAVORITE_DEFAULT_VALUE="1";
+        public static final String FAVORITE_POPULARITY = "popularity.desc";
 
         public static Uri buildMovieDetailUri(Long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
         public static Uri buildMovieSortByUri(String sort_by) {
-            return CONTENT_URI.buildUpon().appendQueryParameter(SORT_BY, sort_by).build();
+            return CONTENT_URI.buildUpon().appendPath(sort_by).build();
         }
 
         public static Uri buildMovieFavoriteUri() {
-            return CONTENT_URI.buildUpon().appendQueryParameter(COLUMN_FAVORITE, COLUMN_FAVORITE_DEFAULT_VALUE).appendQueryParameter(SORT_BY, SORT_BY_DEFAULT_VALUE).build();
+            return CONTENT_URI.buildUpon().appendPath(COLUMN_FAVORITE).appendPath(FAVORITE_POPULARITY).build();
         }
     }
 
