@@ -19,22 +19,22 @@ public class TestMovieContract extends AndroidTestCase {
         Uri movieDetailUri = MovieEntry.buildMovieDetailUri(MOVIE_ID);
         assertNotNull("Error: Null Uri returned.  You must fill-in buildMovieDetailUri in MovieContract.", movieDetailUri);
         assertEquals("Error: movie not properly appended to the end of the Uri",  MOVIE_ID, Long.valueOf(movieDetailUri.getLastPathSegment()));
-        assertEquals("Error: movieDetailUri"+movieDetailUri.toString()+" doesn't match our expected result", movieDetailUri.toString(),"content://com.example.android.popularmovies/movie/135399");
+        assertEquals("Error: movieDetailUri doesn't match our expected result", movieDetailUri.toString(),"content://com.example.android.popularmovies/movie/135399");
     }
 
 
     public void testBuildSortByUri() {
         Uri movieSortByUri = MovieEntry.buildMovieSortByUri(SORT_BY_VALUE);
         assertNotNull("Error: Null Uri returned.  You must fill-in buildMovieDetailUri in MovieContract.", movieSortByUri);
-        assertEquals("Error: query parameter not properly appended to the end of the Uri",  "sort_by=popularity.desc", movieSortByUri.getQuery());
-        assertEquals("Error: movieSortByUri doesn't match our expected result", movieSortByUri.toString(),"content://com.example.android.popularmovies/movie?sort_by=popularity.desc");
+        assertEquals("Error: query parameter not properly appended to the end of the Uri",  "popularity.desc", movieSortByUri.getLastPathSegment());
+        assertEquals("Error: movieSortByUri doesn't match our expected result", movieSortByUri.toString(),"content://com.example.android.popularmovies/movie/popularity.desc");
     }
 
     public void testBuildFavoriteUri() {
         Uri movieFavoriteUri = MovieEntry.buildMovieFavoriteUri();
         assertNotNull("Error: Null Uri returned.  You must fill-in buildMovieDetailUri in MovieContract.", movieFavoriteUri);
-        assertEquals("Error: query parameter not properly appended to the end of the Uri",  "favorite=1&sort_by=popularity.desc", movieFavoriteUri.getQuery());
-        assertEquals("Error: movieFavoriteUri"+movieFavoriteUri.toString()+" doesn't match our expected result", movieFavoriteUri.toString(),"content://com.example.android.popularmovies/movie?favorite=1&sort_by=popularity.desc");
+        assertEquals("Error: query parameter not properly appended to the end of the Uri",  "popularity.desc", movieFavoriteUri.getLastPathSegment());
+        assertEquals("Error: movieFavoriteUri"+movieFavoriteUri.toString()+" doesn't match our expected result", movieFavoriteUri.toString(),"content://com.example.android.popularmovies/movie/favorite/popularity.desc");
     }
 
     public void testBuildMovieTrailerUri() {
