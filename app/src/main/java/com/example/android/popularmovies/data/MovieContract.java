@@ -4,6 +4,7 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.net.Uri;
 import android.provider.BaseColumns;
+import android.util.Log;
 
 /**
  * Created by Elorri on 26/10/2015.
@@ -38,7 +39,7 @@ public class MovieContract {
 
         public static Uri buildMovieDetailUri(Long id) {
             //return ContentUris.withAppendedId(CONTENT_URI, id);
-            return CONTENT_URI.buildUpon().appendPath(Long.toString(id)).build();
+            return CONTENT_URI.buildUpon().appendPath("id").appendPath(Long.toString(id)).build();
         }
 
         public static Uri buildMovieSortByUri(String sort_by) {
@@ -46,7 +47,9 @@ public class MovieContract {
         }
 
         public static Uri buildMovieFavoriteUri() {
-            return CONTENT_URI.buildUpon().appendPath(COLUMN_FAVORITE).appendPath(FAVORITE_POPULARITY).build();
+            Uri uri=CONTENT_URI.buildUpon().appendPath(COLUMN_FAVORITE).appendPath(FAVORITE_POPULARITY).build();
+            Log.e("PopularMovies",uri.toString());
+            return uri;
         }
     }
 
