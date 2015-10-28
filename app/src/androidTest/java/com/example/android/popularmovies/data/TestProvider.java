@@ -1,11 +1,13 @@
 package com.example.android.popularmovies.data;
 
 import android.content.ComponentName;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.pm.PackageManager;
 import android.content.pm.ProviderInfo;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.test.AndroidTestCase;
 
 import com.example.android.popularmovies.data.MovieContract.MovieEntry;
@@ -186,5 +188,87 @@ public class TestProvider extends AndroidTestCase {
 
         // Make sure we get the correct cursor out of the database
         TestUtilities.validateCursor("testReviewMovieQuery", cursor, reviewValues);
+    }
+
+
+    public void testMovieInsertProvider() {
+        ContentValues movieValues = TestUtilities.createMovieValues();
+
+        // Register a content observer for our insert.  This time, directly with the content resolver
+        TestUtilities.TestContentObserver tco = TestUtilities.getTestContentObserver();
+        mContext.getContentResolver().registerContentObserver(MovieEntry.CONTENT_URI, true, tco);
+        Uri movieUri = mContext.getContentResolver().insert(MovieEntry.CONTENT_URI, movieValues);
+
+        // Did our content observer get called? If this fails, your insert method
+        // isn't calling getContext().getContentResolver().notifyChange(uri, null);
+        tco.waitForNotificationOrFail();
+        mContext.getContentResolver().unregisterContentObserver(tco);
+
+        long rowId = ContentUris.parseId(movieUri);
+
+        // Verify we got a row back.
+        assertTrue(rowId != -1);
+
+        // Data's inserted.  Now pull some out to stare at it and verify it made the round trip.
+        Cursor movieCursor = mContext.getContentResolver().query(
+                MovieEntry.buildMovieFavoriteUri(),
+                null, // leaving "columns" null just returns all the columns.
+                null, // cols for "where" clause
+                null, // values for "where" clause
+                null  // sort order
+        );
+
+        TestUtilities.validateCursor(" Error :",  movieCursor, movieValues);
+
+
+    }
+
+    public void testReviewInsertProvider() {
+
+        ContentValues reviewValues = TestUtilities.createReviewValues();
+
+        TestUtilities.TestContentObserver tco = TestUtilities.getTestContentObserver();
+        mContext.getContentResolver().registerContentObserver(ReviewEntry.CONTENT_URI, true, tco);
+        Uri reviewUri = mContext.getContentResolver().insert(ReviewEntry.CONTENT_URI, reviewValues);
+        assertTrue(reviewUri != null);
+
+        // Did our content observer get called?
+        tco.waitForNotificationOrFail();
+        mContext.getContentResolver().unregisterContentObserver(tco);
+
+        // A cursor is your primary interface to the query results.
+        Cursor reviewCursor = mContext.getContentResolver().query(
+                ReviewEntry.buildMovieReviewUri(MOVIE_ID),  // Table to Query
+                null, // leaving "columns" null just returns all the columns.
+                null, // cols for "where" clause
+                null, // values for "where" clause
+                null // columns to group by
+        );
+
+        TestUtilities.validateCursor("Error:", reviewCursor, reviewValues);
+    }
+
+    public void testTrailerInsertProvider() {
+        ContentValues trailerValues = TestUtilities.createTrailerValues();
+        // The TestContentObserver is a one-shot class
+        TestUtilities.TestContentObserver tco = TestUtilities.getTestContentObserver();
+        mContext.getContentResolver().registerContentObserver(TrailerEntry.CONTENT_URI, true, tco);
+        Uri trailerUri = mContext.getContentResolver().insert(TrailerEntry.CONTENT_URI, trailerValues);
+        assertTrue(trailerUri != null);
+
+        // Did our content observer get called?
+        tco.waitForNotificationOrFail();
+        mContext.getContentResolver().unregisterContentObserver(tco);
+
+        // A cursor is your primary interface to the query results.
+        Cursor trailerCursor = mContext.getContentResolver().query(
+                TrailerEntry.buildMovieTrailerUri(MOVIE_ID),  // Table to Query
+                null, // leaving "columns" null just returns all the columns.
+                null, // cols for "where" clause
+                null, // values for "where" clause
+                null // columns to group by
+        );
+
+        TestUtilities.validateCursor("Error:", trailerCursor, trailerValues);
     }
 }
