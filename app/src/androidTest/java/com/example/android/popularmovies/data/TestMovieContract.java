@@ -14,6 +14,8 @@ public class TestMovieContract extends AndroidTestCase {
 
     private static final Long MOVIE_ID = 135399l;
     public static final String SORT_BY_VALUE="popularity.desc";
+    private static final String TRAILER_ID = "559198cac3a3685710000b58";
+    private static final String REVIEW_ID = "75660928c3a3687ad7002db";
 
     public void testBuildMovieDetailUri() {
         Uri movieDetailUri = MovieEntry.buildMovieDetailUri(MOVIE_ID);
@@ -37,11 +39,25 @@ public class TestMovieContract extends AndroidTestCase {
         assertEquals("Error: movieFavoriteUri"+movieFavoriteUri.toString()+" doesn't match our expected result", movieFavoriteUri.toString(),"content://com.example.android.popularmovies/movie/favorite/popularity.desc");
     }
 
+    public void testBuildTrailerDetailUri() {
+        Uri trailerDetailUri = TrailerEntry.buildTrailerDetailUri(TRAILER_ID);
+        assertNotNull("Error: Null Uri returned.  You must fill-in buildTrailerDetailUri in MovieContract.", trailerDetailUri);
+        assertEquals("Error: trailer not properly appended to the end of the Uri",  TRAILER_ID, trailerDetailUri.getLastPathSegment());
+        assertEquals("Error: trailerDetailUri doesn't match our expected result", trailerDetailUri.toString(),"content://com.example.android.popularmovies/trailer/559198cac3a3685710000b58");
+    }
+
     public void testBuildMovieTrailerUri() {
         Uri movieTrailerUri = TrailerEntry.buildMovieTrailerUri(MOVIE_ID);
         assertNotNull("Error: Null Uri returned.  You must fill-in buildMovieDetailUri in MovieContract.", movieTrailerUri);
         assertEquals("Error: movie not properly appended to the end of the Uri",  MOVIE_ID, Long.valueOf(movieTrailerUri.getLastPathSegment()));
         assertEquals("Error: movieTrailerUri"+movieTrailerUri.toString()+" doesn't match our expected result", movieTrailerUri.toString(),"content://com.example.android.popularmovies/trailer/135399");
+    }
+
+    public void testBuildReviewDetailUri() {
+        Uri reviewDetailUri = ReviewEntry.buildReviewDetailUri(REVIEW_ID);
+        assertNotNull("Error: Null Uri returned.  You must fill-in buildTrailerDetailUri in MovieContract.", reviewDetailUri);
+        assertEquals("Error: review not properly appended to the end of the Uri",  REVIEW_ID, reviewDetailUri.getLastPathSegment());
+        assertEquals("Error: reviewDetailUri doesn't match our expected result", reviewDetailUri.toString(),"content://com.example.android.popularmovies/review/75660928c3a3687ad7002db");
     }
 
     public void testBuildMovieReviewUri() {

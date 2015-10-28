@@ -18,22 +18,26 @@ import com.example.android.popularmovies.data.MovieContract.TrailerEntry;
 public class MovieProvider extends ContentProvider {
 
     static final int MOVIE = 100;
-    //will match content://com.example.android.popularmovies/movie/
+    //will match content://com.example.android.popularmovies/movie/ (directory)
     static final int MOVIES_SORT_BY = 101;
-    //will match content://com.example.android.popularmovies/movie/popularity.desc
-    //will match content://com.example.android.popularmovies/movie/rate.desc
+    //will match content://com.example.android.popularmovies/movie/popularity.desc (directory)
+    //will match content://com.example.android.popularmovies/movie/rate.desc (directory)
     static final int MOVIES_FAVORITE = 102;
-    //will match content://com.example.android.popularmovies/movie/favorite/popularity.desc
+    //will match content://com.example.android.popularmovies/movie/favorite/popularity.desc (directory)
     static final int MOVIE_DETAIL = 103;
-    //will match content://com.example.android.popularmovies/movie/135399
+    //will match content://com.example.android.popularmovies/movie/135399  (item)
     static final int TRAILER = 200;
-    //will match content://com.example.android.popularmovies/trailer/
+    //will match content://com.example.android.popularmovies/trailer/ (directory)
     static final int TRAILERS_MOVIE = 201;
-    //will match content://com.example.android.popularmovies/trailer/135399/
+    //will match content://com.example.android.popularmovies/trailer/135399/ (directory)
+    static final int TRAILERS_DETAIL = 202;
+    //will match content://com.example.android.popularmovies/trailer/559198cac3a3685710000b58 (item)
     static final int REVIEW = 300;
-    //will match content://com.example.android.popularmovies/review/
+    //will match content://com.example.android.popularmovies/review/ (directory)
     static final int REVIEWS_MOVIE = 301;
-    //will match content://com.example.android.popularmovies/review/135399/
+    //will match content://com.example.android.popularmovies/review/135399/ (directory)
+    static final int REVIEWS_DETAIL = 302;
+    //will match content://com.example.android.popularmovies/review/75660928c3a3687ad7002db (item)
 
 
     private static final UriMatcher sUriMatcher = buildUriMatcher();
@@ -50,8 +54,10 @@ public class MovieProvider extends ContentProvider {
         matcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_MOVIE + "/*/*", MOVIES_FAVORITE);
         matcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_TRAILER, TRAILER);
         matcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_TRAILER + "/#", TRAILERS_MOVIE);
+        matcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_TRAILER + "/*", TRAILERS_DETAIL);
         matcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_REVIEW, REVIEW);
         matcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_REVIEW + "/#", REVIEWS_MOVIE);
+        matcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_REVIEW + "/*", REVIEWS_DETAIL);
         return matcher;
     }
 
@@ -141,14 +147,14 @@ public class MovieProvider extends ContentProvider {
             case TRAILER:
                 _id = db.insert(TrailerEntry.TABLE_NAME, null, values);
                 if (_id > 0)
-                    returnUri = TrailerEntry.buildMovieTrailerUri(_id); //This won't work but we leave it for now
+                    returnUri = TrailerEntry.buildTrailerDetailUri(Long.toString(_id));
                 else
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
             case REVIEW:
                 _id = db.insert(ReviewEntry.TABLE_NAME, null, values);
                 if (_id > 0)
-                    returnUri = ReviewEntry.buildMovieReviewUri(_id); //This won't work but we leave it for now
+                    returnUri = ReviewEntry.buildReviewDetailUri(Long.toString(_id));
                 else
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;

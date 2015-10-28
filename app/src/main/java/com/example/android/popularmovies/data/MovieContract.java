@@ -4,7 +4,6 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.net.Uri;
 import android.provider.BaseColumns;
-import android.util.Log;
 
 /**
  * Created by Elorri on 26/10/2015.
@@ -48,9 +47,7 @@ public class MovieContract {
         }
 
         public static Uri buildMovieFavoriteUri() {
-            Uri uri=CONTENT_URI.buildUpon().appendPath(COLUMN_FAVORITE).appendPath(FAVORITE_POPULARITY).build();
-            Log.e("PopularMovies",uri.toString());
-            return uri;
+            return CONTENT_URI.buildUpon().appendPath(COLUMN_FAVORITE).appendPath(FAVORITE_POPULARITY).build();
         }
 
         public static String getSortOrderFromMovieSortByUri(Uri uri) {
@@ -76,6 +73,10 @@ public class MovieContract {
         public static final String COLUMN_TYPE = "type";
         public static final String COLUMN_MOVIE_ID = "movie_id";
 
+        public static Uri buildTrailerDetailUri(String id) {
+            return CONTENT_URI.buildUpon().appendPath(id).build();
+        }
+
         public static Uri buildMovieTrailerUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
@@ -95,6 +96,10 @@ public class MovieContract {
         public static final String COLUMN_AUTHOR = "author";
         public static final String COLUMN_CONTENT = "content";
         public static final String COLUMN_MOVIE_ID = "movie_id";
+
+        public static Uri buildReviewDetailUri(String id) {
+            return CONTENT_URI.buildUpon().appendPath(id).build();
+        }
 
         public static Uri buildMovieReviewUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
