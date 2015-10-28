@@ -22,6 +22,39 @@ public class TestProvider extends AndroidTestCase {
 
 
 
+    /*
+   This helper function deletes all records from both database tables using the database
+   functions only.  This is designed to be used to reset the state of the database until the
+   delete functionality is available in the ContentProvider.
+ */
+    public void deleteAllRecordsFromDB() {
+        MoviesDbHelper dbHelper = new MoviesDbHelper(mContext);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        db.delete(TrailerEntry.TABLE_NAME, null, null);
+        db.delete(ReviewEntry.TABLE_NAME, null, null);
+        db.delete(MovieEntry.TABLE_NAME, null, null);
+        db.close();
+    }
+
+    /*
+        Student: Refactor this function to use the deleteAllRecordsFromProvider functionality once
+        you have implemented delete functionality there.
+     */
+    public void deleteAllRecords() {
+        deleteAllRecordsFromDB();
+    }
+
+    // Since we want each test to start with a clean slate, run deleteAllRecords
+    // in setUp (called by the test runner before each test).
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        deleteAllRecords();
+    }
+
+
+
     public void testProviderRegistry() {
         PackageManager pm = mContext.getPackageManager();
         ComponentName componentName = new ComponentName(mContext.getPackageName(),MovieProvider.class.getName());
@@ -145,6 +178,8 @@ public class TestProvider extends AndroidTestCase {
     }
 
     public void testTrailerMovieQuery() {
+        testMovieInsert();
+
         // insert our test records into the database
         MoviesDbHelper dbHelper = new MoviesDbHelper(mContext);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -168,6 +203,8 @@ public class TestProvider extends AndroidTestCase {
     }
 
     public void testReviewMovieQuery() {
+        testMovieInsert();
+
         // insert our test records into the database
         MoviesDbHelper dbHelper = new MoviesDbHelper(mContext);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -191,7 +228,7 @@ public class TestProvider extends AndroidTestCase {
     }
 
 
-    public void testMovieInsertProvider() {
+    public void testMovieInsert() {
         ContentValues movieValues = TestUtilities.createMovieValues();
 
         // Register a content observer for our insert.  This time, directly with the content resolver
@@ -211,7 +248,7 @@ public class TestProvider extends AndroidTestCase {
 
         // Data's inserted.  Now pull some out to stare at it and verify it made the round trip.
         Cursor movieCursor = mContext.getContentResolver().query(
-                MovieEntry.buildMovieFavoriteUri(),
+                MovieEntry.CONTENT_URI,
                 null, // leaving "columns" null just returns all the columns.
                 null, // cols for "where" clause
                 null, // values for "where" clause
@@ -223,7 +260,8 @@ public class TestProvider extends AndroidTestCase {
 
     }
 
-    public void testReviewInsertProvider() {
+    public void testReviewInsert() {
+        testMovieInsert();
 
         ContentValues reviewValues = TestUtilities.createReviewValues();
 
@@ -238,7 +276,7 @@ public class TestProvider extends AndroidTestCase {
 
         // A cursor is your primary interface to the query results.
         Cursor reviewCursor = mContext.getContentResolver().query(
-                ReviewEntry.buildMovieReviewUri(MOVIE_ID),  // Table to Query
+                ReviewEntry.CONTENT_URI,  // Table to Query
                 null, // leaving "columns" null just returns all the columns.
                 null, // cols for "where" clause
                 null, // values for "where" clause
@@ -248,7 +286,9 @@ public class TestProvider extends AndroidTestCase {
         TestUtilities.validateCursor("Error:", reviewCursor, reviewValues);
     }
 
-    public void testTrailerInsertProvider() {
+    public void testTrailerInsert() {
+        testMovieInsert();
+
         ContentValues trailerValues = TestUtilities.createTrailerValues();
         // The TestContentObserver is a one-shot class
         TestUtilities.TestContentObserver tco = TestUtilities.getTestContentObserver();
@@ -262,7 +302,7 @@ public class TestProvider extends AndroidTestCase {
 
         // A cursor is your primary interface to the query results.
         Cursor trailerCursor = mContext.getContentResolver().query(
-                TrailerEntry.buildMovieTrailerUri(MOVIE_ID),  // Table to Query
+                TrailerEntry.CONTENT_URI,  // Table to Query
                 null, // leaving "columns" null just returns all the columns.
                 null, // cols for "where" clause
                 null, // values for "where" clause
