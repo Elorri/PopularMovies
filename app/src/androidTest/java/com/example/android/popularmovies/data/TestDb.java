@@ -62,16 +62,7 @@ public class TestDb extends AndroidTestCase {
         assertEquals(true, db.isOpen());
 
         // Second Step: Create ContentValues of what you want to insert
-        ContentValues movieValues =  new ContentValues();
-        movieValues.put(MovieEntry._ID,135398);
-        movieValues.put(MovieEntry.COLUMN_TITLE,"Jurassic World");
-        movieValues.put(MovieEntry.COLUMN_DURATION,120);
-        movieValues.put(MovieEntry.COLUMN_RELEASE_DATE,189978989);
-        movieValues.put(MovieEntry.COLUMN_POSTER_PATH,"/jjBgi2r5cRt36xF6iNUEhzscEcb.jpg");
-        movieValues.put(MovieEntry.COLUMN_PLOT_SYNOPSIS,"Twenty-two years after the events of Jurassic Park, Isla Nublar now features a fully functioning dinosaur theme park, Jurassic World, as originally envisioned by John Hammond.");
-        movieValues.put(MovieEntry.COLUMN_RATE,6.9);
-        movieValues.put(MovieEntry.COLUMN_POPULARITY,"43.57727");
-        movieValues.put(MovieEntry.COLUMN_FAVORITE, 1);
+        ContentValues movieValues =  TestUtilities.createMovieValues();
 
         // Third Step: Insert ContentValues into database and get a row ID back
         long rowId = db.insert(MovieEntry.TABLE_NAME, null, movieValues);
@@ -117,13 +108,7 @@ public class TestDb extends AndroidTestCase {
 
 
         // Second Step: Create ContentValues of what you want to insert
-        ContentValues trailerValues =  new ContentValues();
-        trailerValues.put(TrailerEntry._ID,"559198cac3a3685710000b58");
-        trailerValues.put(TrailerEntry.COLUMN_KEY,"FRDdRto_3SA");
-        trailerValues.put(TrailerEntry.COLUMN_NAME,"Trailers From Hell");
-        trailerValues.put(TrailerEntry.COLUMN_TYPE,"Featurette");
-        trailerValues.put(TrailerEntry.COLUMN_MOVIE_ID,135398);
-
+        ContentValues trailerValues =  TestUtilities.createTrailerValues();
 
         // Third Step: Insert ContentValues into database and get a row ID back
         long rowId = db.insert(TrailerEntry.TABLE_NAME, null, trailerValues);
@@ -169,13 +154,7 @@ public class TestDb extends AndroidTestCase {
         assertEquals(true, db.isOpen());
 
         // Second Step: Create ContentValues of what you want to insert
-        ContentValues reviewValues =  new ContentValues();
-        reviewValues.put(ReviewEntry._ID,"55660928c3a3687ad7001db");
-        reviewValues.put(ReviewEntry.COLUMN_AUTHOR,"Phileas Fogg5");
-        reviewValues.put(ReviewEntry.COLUMN_CONTENT,"Fabulous action movie. Lots of interesting characters. They don''t make many movies like this. The whole movie from start to finish was entertaining I''m looking forward to seeing it again. I definitely recommend seeing it.");
-        reviewValues.put(ReviewEntry.COLUMN_MOVIE_ID,135398);
-
-
+        ContentValues reviewValues =  TestUtilities.createReviewValues();
 
         // Third Step: Insert ContentValues into database and get a row ID back
         long rowId = db.insert(ReviewEntry.TABLE_NAME, null, reviewValues);

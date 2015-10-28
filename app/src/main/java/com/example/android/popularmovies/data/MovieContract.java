@@ -36,6 +36,8 @@ public class MovieContract {
         public static final String COLUMN_FAVORITE = "favorite";
 
         public static final String FAVORITE_POPULARITY = "popularity.desc";
+        public static final String FAVORITE_ON_VALUE = "1";
+        public static final String FAVORITE_OFF_VALUE = "0";
 
         public static Uri buildMovieDetailUri(Long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
@@ -49,6 +51,16 @@ public class MovieContract {
             Uri uri=CONTENT_URI.buildUpon().appendPath(COLUMN_FAVORITE).appendPath(FAVORITE_POPULARITY).build();
             Log.e("PopularMovies",uri.toString());
             return uri;
+        }
+
+        public static String getSortOrderFromMovieSortByUri(Uri uri) {
+            String sortOrder=uri.getPathSegments().get(1);
+            sortOrder=sortOrder.split("\\.")[0];
+            return sortOrder;
+        }
+
+        public static String getMovieIdFromMovieDetailUri(Uri uri) {
+            return uri.getPathSegments().get(1);
         }
     }
 
@@ -67,6 +79,10 @@ public class MovieContract {
         public static Uri buildMovieTrailerUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
+
+        public static String getMovieIdFromMovieTrailerUri(Uri uri) {
+            return uri.getPathSegments().get(1);
+        }
     }
 
     public static final class ReviewEntry implements BaseColumns {
@@ -82,6 +98,10 @@ public class MovieContract {
 
         public static Uri buildMovieReviewUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+
+        public static String getMovieIdFromMovieReviewUri(Uri uri) {
+            return uri.getPathSegments().get(1);
         }
     }
 }

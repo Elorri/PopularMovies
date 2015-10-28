@@ -51,4 +51,25 @@ public class TestMovieContract extends AndroidTestCase {
         assertEquals("Error: movieReviewUri"+movieReviewUri.toString()+" doesn't match our expected result", movieReviewUri.toString(),"content://com.example.android.popularmovies/review/135399");
     }
 
+
+    public void testGetSortOrderFromMovieSortByUri(){
+        String sort_by = MovieEntry.getSortOrderFromMovieSortByUri(MovieEntry.buildMovieSortByUri(SORT_BY_VALUE));
+        assertEquals("popularity",sort_by);
+    }
+
+    public void testGetMovieIdFromMovieDetailUri(){
+        String movie_id = MovieEntry.getMovieIdFromMovieDetailUri(MovieEntry.buildMovieDetailUri(MOVIE_ID));
+        assertEquals(MOVIE_ID.toString(),movie_id);
+    }
+
+    public void testGetMovieIdFromMovieTrailerUri(){
+        String movie_id = TrailerEntry.getMovieIdFromMovieTrailerUri(TrailerEntry.buildMovieTrailerUri(MOVIE_ID));
+        assertEquals(MOVIE_ID.toString(),movie_id);
+    }
+
+    public void testGetMovieIdFromMovieReviewUri(){
+        String movie_id = ReviewEntry.getMovieIdFromMovieReviewUri(ReviewEntry.buildMovieReviewUri(MOVIE_ID));
+        assertEquals(MOVIE_ID.toString(),movie_id);
+    }
+
 }
