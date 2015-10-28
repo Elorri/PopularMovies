@@ -22,9 +22,9 @@ public class TestUriMatcher extends AndroidTestCase {
         assertEquals("Error:",testMatcher.match(MovieEntry.buildMovieDetailUri(135399L)), MovieProvider.MOVIE_DETAIL);
         assertEquals("Error:",testMatcher.match(TrailerEntry.CONTENT_URI), MovieProvider.TRAILER);
         assertEquals("Error:",testMatcher.match(TrailerEntry.buildMovieTrailerUri(135399L)), MovieProvider.TRAILERS_MOVIE);
-        assertEquals("Error:",testMatcher.match(TrailerEntry.buildTrailerDetailUri("559198cac3a3685710000b58")), MovieProvider.TRAILERS_DETAIL);
+        assertEquals("Error:",testMatcher.match(TrailerEntry.buildTrailerDetailUri("559198cac3a3685710000b58")), MovieProvider.TRAILER_DETAIL);
         assertEquals("Error:",testMatcher.match(ReviewEntry.CONTENT_URI), MovieProvider.REVIEW);
         assertEquals("Error:",testMatcher.match(ReviewEntry.buildMovieReviewUri(135399L)), MovieProvider.REVIEWS_MOVIE);
-        assertEquals("Error:",testMatcher.match(ReviewEntry.buildReviewDetailUri("75660928c3a3687ad7002db")), MovieProvider.REVIEWS_DETAIL);
+        assertEquals("Error:",testMatcher.match(ReviewEntry.buildReviewDetailUri("75660928c3a3687ad7002db")), MovieProvider.REVIEW_DETAIL);
     }
 }

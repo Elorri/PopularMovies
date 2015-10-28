@@ -30,13 +30,13 @@ public class MovieProvider extends ContentProvider {
     //will match content://com.example.android.popularmovies/trailer/ (directory)
     static final int TRAILERS_MOVIE = 201;
     //will match content://com.example.android.popularmovies/trailer/135399/ (directory)
-    static final int TRAILERS_DETAIL = 202;
+    static final int TRAILER_DETAIL = 202;
     //will match content://com.example.android.popularmovies/trailer/559198cac3a3685710000b58 (item)
     static final int REVIEW = 300;
     //will match content://com.example.android.popularmovies/review/ (directory)
     static final int REVIEWS_MOVIE = 301;
     //will match content://com.example.android.popularmovies/review/135399/ (directory)
-    static final int REVIEWS_DETAIL = 302;
+    static final int REVIEW_DETAIL = 302;
     //will match content://com.example.android.popularmovies/review/75660928c3a3687ad7002db (item)
 
 
@@ -54,10 +54,10 @@ public class MovieProvider extends ContentProvider {
         matcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_MOVIE + "/*/*", MOVIES_FAVORITE);
         matcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_TRAILER, TRAILER);
         matcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_TRAILER + "/#", TRAILERS_MOVIE);
-        matcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_TRAILER + "/*", TRAILERS_DETAIL);
+        matcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_TRAILER + "/*", TRAILER_DETAIL);
         matcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_REVIEW, REVIEW);
         matcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_REVIEW + "/#", REVIEWS_MOVIE);
-        matcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_REVIEW + "/*", REVIEWS_DETAIL);
+        matcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_REVIEW + "/*", REVIEW_DETAIL);
         return matcher;
     }
 
@@ -118,10 +118,14 @@ public class MovieProvider extends ContentProvider {
                 return TrailerEntry.CONTENT_TYPE;
             case TRAILERS_MOVIE:
                 return TrailerEntry.CONTENT_TYPE;
+            case TRAILER_DETAIL:
+                return TrailerEntry.CONTENT_ITEM_TYPE;
             case REVIEW:
                 return ReviewEntry.CONTENT_TYPE;
             case REVIEWS_MOVIE:
                 return ReviewEntry.CONTENT_TYPE;
+            case REVIEW_DETAIL:
+                return ReviewEntry.CONTENT_ITEM_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
