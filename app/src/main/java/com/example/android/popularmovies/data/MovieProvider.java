@@ -73,6 +73,9 @@ public class MovieProvider extends ContentProvider {
         Cursor cursor;
         String movie_id;
         switch (sUriMatcher.match(uri)) {
+            case MOVIE:
+                cursor = mOpenHelper.getReadableDatabase().query(MovieEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+                break;
             case MOVIES_SORT_BY:
                 sortOrder = MovieEntry.getSortOrderFromMovieSortByUri(uri);
                 cursor = mOpenHelper.getReadableDatabase().query(MovieEntry.TABLE_NAME, projection, null, null, null, null, sortOrder + " DESC");
@@ -84,9 +87,15 @@ public class MovieProvider extends ContentProvider {
                 movie_id = MovieEntry.getMovieIdFromMovieDetailUri(uri);
                 cursor = mOpenHelper.getReadableDatabase().query(MovieEntry.TABLE_NAME, projection, MovieEntry._ID + "=?", new String[]{movie_id}, null, null, null);
                 break;
+            case TRAILER:
+                cursor = mOpenHelper.getReadableDatabase().query(TrailerEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+                break;
             case TRAILERS_MOVIE:
                 movie_id = TrailerEntry.getMovieIdFromMovieTrailerUri(uri);
                 cursor = mOpenHelper.getReadableDatabase().query(TrailerEntry.TABLE_NAME, projection, TrailerEntry.COLUMN_MOVIE_ID + "=?", new String[]{movie_id}, null, null, null);
+                break;
+            case REVIEW:
+                cursor = mOpenHelper.getReadableDatabase().query(ReviewEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
                 break;
             case REVIEWS_MOVIE:
                 movie_id = ReviewEntry.getMovieIdFromMovieReviewUri(uri);
