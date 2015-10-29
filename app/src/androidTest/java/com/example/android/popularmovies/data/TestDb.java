@@ -62,7 +62,7 @@ public class TestDb extends AndroidTestCase {
         assertEquals(true, db.isOpen());
 
         // Second Step: Create ContentValues of what you want to insert
-        ContentValues movieValues =  TestUtilities.createMovieValues();
+        ContentValues movieValues =  TestUtilities.createMovieValuesFavorite();
 
         // Third Step: Insert ContentValues into database and get a row ID back
         long rowId = db.insert(MovieEntry.TABLE_NAME, null, movieValues);
@@ -108,7 +108,7 @@ public class TestDb extends AndroidTestCase {
 
 
         // Second Step: Create ContentValues of what you want to insert
-        ContentValues trailerValues =  TestUtilities.createTrailerValues();
+        ContentValues trailerValues =  TestUtilities.createTrailerValuesFavorite();
 
         // Third Step: Insert ContentValues into database and get a row ID back
         long rowId = db.insert(TrailerEntry.TABLE_NAME, null, trailerValues);
@@ -154,7 +154,7 @@ public class TestDb extends AndroidTestCase {
         assertEquals(true, db.isOpen());
 
         // Second Step: Create ContentValues of what you want to insert
-        ContentValues reviewValues =  TestUtilities.createReviewValues();
+        ContentValues reviewValues =  TestUtilities.createReviewValuesFavorite();
 
         // Third Step: Insert ContentValues into database and get a row ID back
         long rowId = db.insert(ReviewEntry.TABLE_NAME, null, reviewValues);

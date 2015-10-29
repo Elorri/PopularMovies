@@ -23,9 +23,10 @@ public class TestProvider extends AndroidTestCase {
 
 
     /*
-   This helper function deletes all records from both database tables using the database
+   This helper function deletes all records from database tables using the database
    functions only.  This is designed to be used to reset the state of the database until the
    delete functionality is available in the ContentProvider.
+   I have chosen to make my Provider delete fonction delete only non favorite reccords, hence I will keep using this deleteAllRecordsFromDB fonction to clear the db.
  */
     public void deleteAllRecordsFromDB() {
         MoviesDbHelper dbHelper = new MoviesDbHelper(mContext);
@@ -112,7 +113,7 @@ public class TestProvider extends AndroidTestCase {
         MoviesDbHelper dbHelper = new MoviesDbHelper(mContext);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-        ContentValues movieValues = TestUtilities.createMovieValues();
+        ContentValues movieValues = TestUtilities.createMovieValuesFavorite();
         long rowId = db.insert(MovieEntry.TABLE_NAME, null,movieValues );
         assertTrue("Unable to Insert MovieEntry into the Database", rowId != -1);
         db.close();
@@ -136,9 +137,9 @@ public class TestProvider extends AndroidTestCase {
         MoviesDbHelper dbHelper = new MoviesDbHelper(mContext);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-        //Note that COLUMN_FAVORITE equals 1 in createMovieValues() otherwise this test won't pass.
-        ContentValues movieValues = TestUtilities.createMovieValues();
-        long rowId = db.insert(MovieEntry.TABLE_NAME, null,movieValues );
+        //Note that COLUMN_FAVORITE equals 1 in createMovieValuesFavorite() otherwise this test won't pass.
+        ContentValues movieValues = TestUtilities.createMovieValuesFavorite();
+        long rowId = db.insert(MovieEntry.TABLE_NAME, null, movieValues);
         assertTrue("Unable to Insert MovieEntry into the Database", rowId != -1);
         db.close();
 
@@ -160,7 +161,7 @@ public class TestProvider extends AndroidTestCase {
         MoviesDbHelper dbHelper = new MoviesDbHelper(mContext);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-        ContentValues movieValues = TestUtilities.createMovieValues();
+        ContentValues movieValues = TestUtilities.createMovieValuesFavorite();
         long rowId = db.insert(MovieEntry.TABLE_NAME, null,movieValues );
         assertTrue("Unable to Insert MovieEntry into the Database", rowId != -1);
         db.close();
@@ -184,7 +185,7 @@ public class TestProvider extends AndroidTestCase {
         MoviesDbHelper dbHelper = new MoviesDbHelper(mContext);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-        ContentValues trailerValues = TestUtilities.createTrailerValues();
+        ContentValues trailerValues = TestUtilities.createTrailerValuesFavorite();
         long rowId = db.insert(TrailerEntry.TABLE_NAME, null,trailerValues );
         assertTrue("Unable to Insert TrailerEntry into the Database", rowId != -1);
         db.close();
@@ -209,7 +210,7 @@ public class TestProvider extends AndroidTestCase {
         MoviesDbHelper dbHelper = new MoviesDbHelper(mContext);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-        ContentValues reviewValues = TestUtilities.createReviewValues();
+        ContentValues reviewValues = TestUtilities.createReviewValuesFavorite();
         long rowId = db.insert(ReviewEntry.TABLE_NAME, null,reviewValues );
         assertTrue("Unable to Insert ReviewEntry into the Database", rowId != -1);
         db.close();
@@ -229,7 +230,7 @@ public class TestProvider extends AndroidTestCase {
 
 
     public void testMovieInsert() {
-        ContentValues movieValues = TestUtilities.createMovieValues();
+        ContentValues movieValues = TestUtilities.createMovieValuesFavorite();
 
         // Register a content observer for our insert.  This time, directly with the content resolver
         TestUtilities.TestContentObserver tco = TestUtilities.getTestContentObserver();
@@ -255,7 +256,7 @@ public class TestProvider extends AndroidTestCase {
                 null  // sort order
         );
 
-        TestUtilities.validateCursor(" Error :",  movieCursor, movieValues);
+        TestUtilities.validateCursor(" Error :", movieCursor, movieValues);
 
 
     }
@@ -263,7 +264,7 @@ public class TestProvider extends AndroidTestCase {
     public void testReviewInsert() {
         testMovieInsert();
 
-        ContentValues reviewValues = TestUtilities.createReviewValues();
+        ContentValues reviewValues = TestUtilities.createReviewValuesFavorite();
 
         TestUtilities.TestContentObserver tco = TestUtilities.getTestContentObserver();
         mContext.getContentResolver().registerContentObserver(ReviewEntry.CONTENT_URI, true, tco);
@@ -289,7 +290,7 @@ public class TestProvider extends AndroidTestCase {
     public void testTrailerInsert() {
         testMovieInsert();
 
-        ContentValues trailerValues = TestUtilities.createTrailerValues();
+        ContentValues trailerValues = TestUtilities.createTrailerValuesFavorite();
         // The TestContentObserver is a one-shot class
         TestUtilities.TestContentObserver tco = TestUtilities.getTestContentObserver();
         mContext.getContentResolver().registerContentObserver(TrailerEntry.CONTENT_URI, true, tco);
@@ -311,4 +312,203 @@ public class TestProvider extends AndroidTestCase {
 
         TestUtilities.validateCursor("Error:", trailerCursor, trailerValues);
     }
+
+    // Our Provider only delete non favorite record
+    public void testDeleteMovieRecord() {
+
+        //Add 1 record which is not a favorite
+        ContentValues movieValues = TestUtilities.createMovieValues();
+        Uri movieUri = mContext.getContentResolver().insert(MovieEntry.CONTENT_URI, movieValues);
+        long rowId = ContentUris.parseId(movieUri);
+        //Check if the record has been correctly added
+        assertTrue(rowId != -1);
+
+        //delete the record
+        mContext.getContentResolver().delete(
+                MovieEntry.CONTENT_URI,
+                null,
+                null
+        );
+
+        //Query the table
+        Cursor cursor = mContext.getContentResolver().query(
+                MovieEntry.CONTENT_URI,
+                null,
+                null,
+                null,
+                null
+        );
+        //Check if the record has been deleted.
+        assertEquals("Error: Records not deleted from Movie table during delete", 0, cursor.getCount());
+        cursor.close();
+    }
+
+    public void testDeleteMovieFavoriteRecord() {
+
+        //Add 1 record which is not a favorite
+        ContentValues movieValues = TestUtilities.createMovieValuesFavorite();
+        Uri movieUri = mContext.getContentResolver().insert(MovieEntry.CONTENT_URI, movieValues);
+        long rowId = ContentUris.parseId(movieUri);
+        //Check if the record has been correctly added
+        assertTrue(rowId != -1);
+
+        //delete the record
+        mContext.getContentResolver().delete(
+                MovieEntry.CONTENT_URI,
+                null,
+                null
+        );
+
+        //Query the table
+        Cursor cursor = mContext.getContentResolver().query(
+                MovieEntry.CONTENT_URI,
+                null,
+                null,
+                null,
+                null
+        );
+        //Check if the record favorite has not been deleted as expected.
+        assertEquals("Error: Records not deleted from Movie table during delete", 1, cursor.getCount());
+        cursor.close();
+    }
+
+    public void  testDeleteTrailerRecord(){
+        //Add 1 record which is not a favorite
+        ContentValues movieValues = TestUtilities.createMovieValues();
+        Uri movieUri = mContext.getContentResolver().insert(MovieEntry.CONTENT_URI, movieValues);
+        long rowId = ContentUris.parseId(movieUri);
+        //Check if the record has been correctly added
+        assertTrue(rowId != -1);
+
+
+        //Add 1 record which is not a favorite
+        ContentValues trailerValues = TestUtilities.createTrailerValues();
+        Uri trailerUri = mContext.getContentResolver().insert(TrailerEntry.CONTENT_URI, trailerValues);
+        String rowIdStr = TestUtilities.parseId(trailerUri);
+        //Check if the record has been correctly added
+        assertTrue(!rowIdStr.equals("-1"));
+
+        mContext.getContentResolver().delete(
+                TrailerEntry.CONTENT_URI,
+                null,
+                null
+        );
+        Cursor cursor = mContext.getContentResolver().query(
+                TrailerEntry.CONTENT_URI,
+                null,
+                null,
+                null,
+                null
+        );
+
+        assertEquals("Error: Records not deleted from Review table during delete", 0, cursor.getCount());
+        cursor.close();
+
+    }
+
+
+    public void  testDeleteTrailerFavoriteRecord(){
+        //Add 1 record which is not a favorite
+        ContentValues movieValues = TestUtilities.createMovieValuesFavorite();
+        Uri movieUri = mContext.getContentResolver().insert(MovieEntry.CONTENT_URI, movieValues);
+        long rowId = ContentUris.parseId(movieUri);
+        //Check if the record has been correctly added
+        assertTrue(rowId != -1);
+
+
+        //Add 1 record which is not a favorite
+        ContentValues trailerValues = TestUtilities.createTrailerValuesFavorite();
+        Uri trailerUri = mContext.getContentResolver().insert(TrailerEntry.CONTENT_URI, trailerValues);
+        String rowIdStr = TestUtilities.parseId(trailerUri);
+        //Check if the record has been correctly added
+        assertTrue(!rowIdStr.equals("-1"));
+
+        mContext.getContentResolver().delete(
+                TrailerEntry.CONTENT_URI,
+                null,
+                null
+        );
+        Cursor cursor = mContext.getContentResolver().query(
+                TrailerEntry.CONTENT_URI,
+                null,
+                null,
+                null,
+                null
+        );
+        //Check that the record is not deleted because it is linked to a favorite movie
+        assertEquals("Error: Records not deleted from Trailer table during delete", 1, cursor.getCount());
+        cursor.close();
+
+    }
+
+
+    public void  testDeleteReviewRecord(){
+        //Add 1 record which is not a favorite
+        ContentValues movieValues = TestUtilities.createMovieValues();
+        Uri movieUri = mContext.getContentResolver().insert(MovieEntry.CONTENT_URI, movieValues);
+        long rowId = ContentUris.parseId(movieUri);
+        //Check if the record has been correctly added
+        assertTrue(rowId != -1);
+
+
+        //Add 1 record which is not a favorite
+        ContentValues reviewValues = TestUtilities.createReviewValues();
+        Uri reviewUri = mContext.getContentResolver().insert(ReviewEntry.CONTENT_URI, reviewValues);
+        String rowIdStr = TestUtilities.parseId(reviewUri);
+        //Check if the record has been correctly added
+        assertTrue(!rowIdStr.equals("-1"));
+
+        mContext.getContentResolver().delete(
+                ReviewEntry.CONTENT_URI,
+                null,
+                null
+        );
+        Cursor cursor = mContext.getContentResolver().query(
+                ReviewEntry.CONTENT_URI,
+                null,
+                null,
+                null,
+                null
+        );
+
+        assertEquals("Error: Records not deleted from Review table during delete", 0, cursor.getCount());
+        cursor.close();
+
+    }
+
+
+    public void  testDeleteReviewFavoriteRecord(){
+        //Add 1 record which is not a favorite
+        ContentValues movieValues = TestUtilities.createMovieValuesFavorite();
+        Uri movieUri = mContext.getContentResolver().insert(MovieEntry.CONTENT_URI, movieValues);
+        long rowId = ContentUris.parseId(movieUri);
+        //Check if the record has been correctly added
+        assertTrue(rowId != -1);
+
+
+        //Add 1 record which is not a favorite
+        ContentValues reviewValues = TestUtilities.createReviewValuesFavorite();
+        Uri reviewUri = mContext.getContentResolver().insert(ReviewEntry.CONTENT_URI, reviewValues);
+        String rowIdStr = TestUtilities.parseId(reviewUri);
+        //Check if the record has been correctly added
+        assertTrue(!rowIdStr.equals("-1"));
+
+        mContext.getContentResolver().delete(
+                ReviewEntry.CONTENT_URI,
+                null,
+                null
+        );
+        Cursor cursor = mContext.getContentResolver().query(
+                ReviewEntry.CONTENT_URI,
+                null,
+                null,
+                null,
+                null
+        );
+        //Check that the record is not deleted because it is linked to a favorite movie
+        assertEquals("Error: Records not deleted from Review table during delete", 1, cursor.getCount());
+        cursor.close();
+
+    }
+
 }
