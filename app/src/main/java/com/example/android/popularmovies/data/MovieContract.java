@@ -37,6 +37,7 @@ public class MovieContract {
         public static final String FAVORITE_POPULARITY = "popularity.desc";
         public static final String FAVORITE_ON_VALUE = "1";
         public static final String FAVORITE_OFF_VALUE = "0";
+        public static final String FAVORITE_CONSTRAINT = "favorite_ck";
 
         public static Uri buildMovieDetailUri(Long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
