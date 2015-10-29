@@ -1,5 +1,6 @@
 package com.example.android.popularmovies.data;
 
+import android.annotation.TargetApi;
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.UriMatcher;
@@ -226,10 +227,10 @@ public class MovieProvider extends ContentProvider {
 
         switch (match) {
             case MOVIE:
-                rowsUpdated = db.update(MovieEntry.TABLE_NAME, values, selection,selectionArgs);
+                rowsUpdated = db.update(MovieEntry.TABLE_NAME, values, selection, selectionArgs);
                 break;
             case TRAILER:
-                rowsUpdated = db.update(TrailerEntry.TABLE_NAME, values, selection,selectionArgs);
+                rowsUpdated = db.update(TrailerEntry.TABLE_NAME, values, selection, selectionArgs);
                 break;
             case REVIEW:
                 rowsUpdated = db.update(ReviewEntry.TABLE_NAME, values, selection, selectionArgs);
@@ -242,4 +243,50 @@ public class MovieProvider extends ContentProvider {
         }
         return rowsUpdated;
     }
+
+
+    //Our app won't use the bulk insert, but to practice and make sure I understand correctly...
+    //This bulk insert is better than the defaut, because we use only one transaction for all inserts.
+    @Override
+    public int bulkInsert(Uri uri, ContentValues[] values) {
+        final int match = sUriMatcher.match(uri);
+        int returnCount = 0;
+        switch (match) {
+            case MOVIE:
+                returnCount=insertInBulk(MovieEntry.TABLE_NAME, values);
+                getContext().getContentResolver().notifyChange(uri, null);
+                return returnCount;
+            default:
+                return super.bulkInsert(uri, values);
+        }
+    }
+
+    private int insertInBulk(String tableName, ContentValues[] values) {
+        final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+        db.beginTransaction();
+        int returnCount = 0;
+        try {
+            for (ContentValues value : values) {
+                long _id = db.insert(tableName, null, value);
+                if (_id != -1) {
+                    returnCount++;
+                }
+            }
+            db.setTransactionSuccessful();
+            return returnCount;
+        } finally {
+            db.endTransaction();
+        }
+    }
+
+    // You do not need to call this method. This is a method specifically to assist the testing
+    // framework in running smoothly. You can read more at:
+    // http://developer.android.com/reference/android/content/ContentProvider.html#shutdown()
+    @Override
+    @TargetApi(11)
+    public void shutdown() {
+        mOpenHelper.close();
+        super.shutdown();
+    }
+
 }

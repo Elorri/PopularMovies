@@ -19,7 +19,7 @@ import com.example.android.popularmovies.data.MovieContract.TrailerEntry;
 public class TestProvider extends AndroidTestCase {
     private static final Long MOVIE_ID = 135399l;
     public static final String SORT_BY_VALUE="popularity.desc";
-
+    private static final int BULK_INSERT_RECORDS_TO_INSERT = 2;
 
 
     /*
@@ -211,7 +211,7 @@ public class TestProvider extends AndroidTestCase {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         ContentValues reviewValues = TestUtilities.createReviewValuesFavorite();
-        long rowId = db.insert(ReviewEntry.TABLE_NAME, null,reviewValues );
+        long rowId = db.insert(ReviewEntry.TABLE_NAME, null, reviewValues);
         assertTrue("Unable to Insert ReviewEntry into the Database", rowId != -1);
         db.close();
 
@@ -571,7 +571,49 @@ public class TestProvider extends AndroidTestCase {
         //Check that the record is not deleted because it is linked to a favorite movie
         assertEquals("Error: Records not deleted from Trailer table during delete", 0, cursor.getCount());
         cursor.close();
+    }
 
+
+
+    public void testMovieBulkInsert() {
+
+        // Now we can bulkInsert some weather.  In fact, we only implement BulkInsert for weather
+        // entries.  With ContentProviders, you really only have to implement the features you
+        // use, after all.
+        ContentValues[] bulkInsertContentValues = TestUtilities.createBulkInsertMoviesValues();
+
+        // Register a content observer for our bulk insert.
+        TestUtilities.TestContentObserver tco = TestUtilities.getTestContentObserver();
+        mContext.getContentResolver().registerContentObserver(MovieEntry.CONTENT_URI, true, tco);
+
+        int insertCount = mContext.getContentResolver().bulkInsert(MovieEntry.CONTENT_URI, bulkInsertContentValues);
+
+        // Students:  If this fails, it means that you most-likely are not calling the
+        // getContext().getContentResolver().notifyChange(uri, null); in your BulkInsert
+        // ContentProvider method.
+        tco.waitForNotificationOrFail();
+        mContext.getContentResolver().unregisterContentObserver(tco);
+
+        assertEquals(insertCount, BULK_INSERT_RECORDS_TO_INSERT);
+
+        // A cursor is your primary interface to the query results.
+        Cursor cursor = mContext.getContentResolver().query(
+                MovieEntry.CONTENT_URI,
+                null, // leaving "columns" null just returns all the columns.
+                null, // cols for "where" clause
+                null, // values for "where" clause
+                MovieEntry._ID+" DESC" // sort order == by _ID ASCENDING
+        );
+
+        // we should have as many records in the database as we've inserted
+        assertEquals(cursor.getCount(), BULK_INSERT_RECORDS_TO_INSERT);
+
+        // and let's make sure they match the ones we created
+        cursor.moveToFirst();
+        for ( int i = 0; i < BULK_INSERT_RECORDS_TO_INSERT; i++, cursor.moveToNext() ) {
+            TestUtilities.validateCurrentRecord("Error " + i, cursor, bulkInsertContentValues[i]);
+        }
+        cursor.close();
     }
 
 }

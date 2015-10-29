@@ -114,6 +114,14 @@ public class TestUtilities extends AndroidTestCase {
         return TestContentObserver.getTestContentObserver();
     }
 
+    public static ContentValues[] createBulkInsertMoviesValues() {
+        ContentValues[] values=new ContentValues[2];
+        values[0]=createMovieValues();
+        values[1]=createMovieValuesFavorite();
+        return values;
+    }
+
+
 
     /*
       The functions we provide inside of TestProvider use this utility class to test
