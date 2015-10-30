@@ -2,9 +2,9 @@ package com.example.android.popularmovies;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -16,17 +16,18 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.android.popularmovies.data.MovieContract.MovieEntry;
 import com.squareup.picasso.Picasso;
 
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+
 
 /**
  * A placeholder fragment containing a simple view.
@@ -34,14 +35,29 @@ import java.util.Arrays;
 public class MainFragment extends Fragment {
 
 
-    private ArrayList<Movie> mDiscoverMovies;
-    private CustomAdapter mDiscoveryAdapter;
+//    private ArrayList<Movie> mDiscoverMovies;
+//    private CustomAdapter mDiscoveryAdapter;
+    private MoviesAdapter mMoviesAdapter;
     private TmdbAccess tmdbAccess;
     private BroadcastReceiver receiver;
     private String lastSortType;
 
 
     private static final String MOVIE_ARRAY_LIST_TAG = "movie_array_list_tag";
+
+
+    private static final String[] MOVIE_COLUMNS = {
+            MovieEntry._ID,
+            MovieEntry.COLUMN_POSTER_PATH,
+            MovieEntry.COLUMN_TITLE
+    };
+
+    // These indices are tied to MOVIE_COLUMNS.  If MOVIE_COLUMNS changes, these
+    // must change.
+    static final int COL_MOVIE_ID = 0;
+    static final int COL_POSTER_PATH = 1;
+    static final int COL_TITLE = 2;
+
 
     public MainFragment() {
     }
@@ -53,12 +69,26 @@ public class MainFragment extends Fragment {
         setHasOptionsMenu(true);
 
         //if the ArrayListof Movies already exist we use it otherwise we create another one.
-        if ((savedInstanceState == null) || (!savedInstanceState.containsKey(MOVIE_ARRAY_LIST_TAG)))
-            mDiscoverMovies = new ArrayList<Movie>();
-        else
-            mDiscoverMovies = savedInstanceState.getParcelableArrayList(MOVIE_ARRAY_LIST_TAG);
-        mDiscoveryAdapter = new CustomAdapter(getActivity(), mDiscoverMovies);
-        tmdbAccess = new TmdbAccess();
+//        if ((savedInstanceState == null) || (!savedInstanceState.containsKey(MOVIE_ARRAY_LIST_TAG)))
+//            mDiscoverMovies = new ArrayList<Movie>();
+//        else
+//            mDiscoverMovies = savedInstanceState.getParcelableArrayList(MOVIE_ARRAY_LIST_TAG);
+//        mDiscoveryAdapter = new CustomAdapter(getActivity(), mDiscoverMovies);
+//        tmdbAccess = new TmdbAccess();
+
+        Cursor cur = getActivity().getContentResolver().query(
+                MovieEntry.buildMovieSortByUri(MovieEntry.FAVORITE_POPULARITY),
+                null,
+                null,
+                null,
+                null);
+        // The CursorAdapter will take data from our cursor and populate the GridView
+        // However, we cannot use FLAG_AUTO_REQUERY since it is deprecated, so we will end
+        // up with an empty list the first time we run.
+        mMoviesAdapter = new MoviesAdapter(getActivity(), cur, 0,new TmdbAccess());
+
+
+
     }
 
     @Override
@@ -68,16 +98,17 @@ public class MainFragment extends Fragment {
 
         // Get a reference to the ListView, and attach this adapter to it.
         GridView gridView = (GridView) rootView.findViewById(R.id.gridView_discovery);
-        gridView.setAdapter(mDiscoveryAdapter);
-        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Movie movie = mDiscoveryAdapter.getItem(position);
-                Intent intent = new Intent(getActivity(), DetailActivity.class);
-                intent.putExtra(Intent.EXTRA_TEXT, movie);
-                startActivity(intent);
-            }
-        });
+        gridView.setAdapter(mMoviesAdapter);
+//        gridView.setAdapter(mDiscoveryAdapter);
+//        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                Movie movie = mDiscoveryAdapter.getItem(position);
+//                Intent intent = new Intent(getActivity(), DetailActivity.class);
+//                intent.putExtra(Intent.EXTRA_TEXT, movie);
+//                startActivity(intent);
+//            }
+//        });
         return rootView;
     }
 
@@ -131,12 +162,12 @@ public class MainFragment extends Fragment {
             return tmdbAccess.getMoviesSortBy(params[0]);
         }
 
-        @Override
-        protected void onPostExecute(Movie[] result) {
-            if (result != null) {
-                mDiscoveryAdapter.refresh(result);
-            }
-        }
+//        @Override
+//        protected void onPostExecute(Movie[] result) {
+//            if (result != null) {
+//                mDiscoveryAdapter.refresh(result);
+//            }
+//        }
 
     }
 
@@ -194,6 +225,6 @@ public class MainFragment extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelableArrayList(MOVIE_ARRAY_LIST_TAG, mDiscoverMovies);
+//        outState.putParcelableArrayList(MOVIE_ARRAY_LIST_TAG, mDiscoverMovies);
     }
 }
