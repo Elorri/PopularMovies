@@ -68,7 +68,7 @@ public class DetailFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
-        tmdbAccess = new TmdbAccess();
+        tmdbAccess = new TmdbAccess(getContext());
         Intent intent = getActivity().getIntent();
         if (intent != null && intent.hasExtra(Intent.EXTRA_TEXT)) {
             movie = intent.getParcelableExtra(Intent.EXTRA_TEXT);

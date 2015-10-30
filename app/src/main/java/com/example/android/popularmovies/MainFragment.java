@@ -3,12 +3,10 @@ package com.example.android.popularmovies;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -22,6 +20,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.popularmovies.data.MovieContract.MovieEntry;
+import com.example.android.popularmovies.data.Utility;
 import com.squareup.picasso.Picasso;
 
 import java.net.URL;
@@ -77,7 +76,7 @@ public class MainFragment extends Fragment {
 //        tmdbAccess = new TmdbAccess();
 
         Cursor cur = getActivity().getContentResolver().query(
-                MovieEntry.buildMovieSortByUri(MovieEntry.FAVORITE_POPULARITY),
+                MovieEntry.buildMovieSortByUri(Utility.getSortOrderPreferences(getContext())),
                 null,
                 null,
                 null,
@@ -85,7 +84,8 @@ public class MainFragment extends Fragment {
         // The CursorAdapter will take data from our cursor and populate the GridView
         // However, we cannot use FLAG_AUTO_REQUERY since it is deprecated, so we will end
         // up with an empty list the first time we run.
-        mMoviesAdapter = new MoviesAdapter(getActivity(), cur, 0,new TmdbAccess());
+        tmdbAccess=new TmdbAccess(getContext());
+        mMoviesAdapter = new MoviesAdapter(getActivity(), cur, 0,tmdbAccess);
 
 
 
@@ -132,12 +132,11 @@ public class MainFragment extends Fragment {
         receiver = new InternetReceiver(getActivity()) {
             @Override
             protected void refresh() {
-                SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-                String sortType = sharedPrefs.getString(getString(R.string.pref_sort_order_key), getString(R.string.pref_sort_order_popularity));
-                if ((lastSortType==null)||!sortType.equals(lastSortType)) {
+                String sortOrder= Utility.getSortOrderPreferences(getContext());
+                if ((lastSortType==null)||!sortOrder.equals(lastSortType)) {
                     FetchMoviesTask movieTask = new FetchMoviesTask();
-                    movieTask.execute(sortType);
-                    lastSortType=sortType;
+                    movieTask.execute(sortOrder);
+                    lastSortType=sortOrder;
                 }
             }
         };
@@ -155,11 +154,12 @@ public class MainFragment extends Fragment {
     }
 
 
-    public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
+    public class FetchMoviesTask extends AsyncTask<String, Void, Void> {
 
         @Override
-        protected Movie[] doInBackground(String... params) {
-            return tmdbAccess.getMoviesSortBy(params[0]);
+        protected Void doInBackground(String... params) {
+            tmdbAccess.syncMovies(params[0]);
+            return null;
         }
 
 //        @Override
