@@ -210,7 +210,7 @@ public class MainFragment extends Fragment {
             if (getItem(position).getPosterName() == null) { //The poster image doesn't exist. Display the movie title instead
                 if ((convertView == null) || (convertView instanceof ImageView)) {
                     LayoutInflater inflater = LayoutInflater.from(getActivity());
-                    customView = inflater.inflate(R.layout.grid_item_textView, parent, false);
+                    customView = inflater.inflate(R.layout.grid_item_textview, parent, false);
                 } else {
                     customView = convertView;
                 }
@@ -218,7 +218,7 @@ public class MainFragment extends Fragment {
             } else {//The poster image exists, we can display the image
                 if ((convertView == null) || (convertView instanceof TextView)) {
                     LayoutInflater inflater = LayoutInflater.from(getActivity());
-                    customView = inflater.inflate(R.layout.grid_item_imageView, parent, false);
+                    customView = inflater.inflate(R.layout.grid_item_imageview, parent, false);
                 } else {
                     customView = convertView;
                 }
