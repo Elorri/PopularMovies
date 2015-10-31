@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 
 import java.net.URL;
+import java.util.HashSet;
 
 /**
  * {@link MoviesAdapter} exposes a list of movie thumbnail
@@ -21,7 +22,14 @@ import java.net.URL;
 public class MoviesAdapter extends CursorAdapter {
 
     private static final String LOG_TAG = "PopularMovies";
+    private static final int VIEW_TYPE_IMAGE_VIEW = 0;
+    private static final int VIEW_TYPE_TEXT_VIEW = 1;
     TmdbAccess tmdbAccess;
+
+
+    private static final int VIEW_TYPE_COUNT = 2;
+    private HashSet<Integer> textViewPositions=new HashSet();
+    private boolean mIsPosterImage=false;
 
 
     public MoviesAdapter(Context context, Cursor c, int flags, TmdbAccess tmdbAccess) {
@@ -37,22 +45,37 @@ public class MoviesAdapter extends CursorAdapter {
     */
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        View customView;
-        LayoutInflater inflater = LayoutInflater.from(context);
+
         Log.e(LOG_TAG, "new view poster_path :" + cursor.getString(MainFragment.COL_POSTER_PATH)+" - position : "+cursor.getPosition());
         Log.e(LOG_TAG, "new view poster_path : (cursor.getString(MainFragment.COL_POSTER_PATH)==null) " + (cursor.getString(MainFragment.COL_POSTER_PATH)==null));
         Log.e(LOG_TAG, "new view poster_path : COL_TITLE " + cursor.getString(MainFragment.COL_TITLE));
         if (cursor.getString(MainFragment.COL_POSTER_PATH)==null) { //The poster image doesn't exist. Display the movie title instead
+            mIsPosterImage = false;
             Log.e(LOG_TAG, "poster image doesn't exist : " + cursor.getString(MainFragment.COL_POSTER_PATH));
-            customView = inflater.inflate(R.layout.grid_item_layout_default, parent, false);
-            ((TextView) customView).setText(cursor.getString(MainFragment.COL_TITLE));
         } else {//The poster image exists, we can display the image
+            mIsPosterImage = true;
             Log.e(LOG_TAG, "poster image DOES exist : " + cursor.getString(MainFragment.COL_POSTER_PATH));
-            customView = inflater.inflate(R.layout.grid_item_layout, parent, false);
-            URL posterURL = tmdbAccess.constructPosterImageURL(cursor.getString(MainFragment.COL_POSTER_PATH));
-            Picasso.with(context).load(posterURL.toString()).into((ImageView) customView);
         }
-        customView.setTag(parent);
+
+        View customView=null;
+        LayoutInflater inflater = LayoutInflater.from(context);
+        int new_view_position=cursor.getPosition();
+        int viewType = getItemViewType(new_view_position);
+        switch (viewType) {
+            case VIEW_TYPE_TEXT_VIEW: {
+                customView = inflater.inflate(R.layout.grid_item_textView, parent, false);
+                ((TextView) customView).setText(cursor.getString(MainFragment.COL_TITLE));
+                textViewPositions.add(cursor.getPosition());
+                break;
+            }
+            case VIEW_TYPE_IMAGE_VIEW: {
+                customView = inflater.inflate(R.layout.grid_item_imageView, parent, false);
+                URL posterURL = tmdbAccess.constructPosterImageURL(cursor.getString(MainFragment.COL_POSTER_PATH));
+                Picasso.with(context).load(posterURL.toString()).into((ImageView) customView);
+                break;
+            }
+        }
+        customView.setTag(new_view_position);
         return customView;
     }
 
@@ -62,25 +85,53 @@ public class MoviesAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         Log.e(LOG_TAG, "bindView poster_path :" + cursor.getString(MainFragment.COL_POSTER_PATH)+" - position : "+cursor.getPosition());
-        Log.e(LOG_TAG, "bindView poster_path : (cursor.getString(MainFragment.COL_POSTER_PATH)==null) " + (cursor.getString(MainFragment.COL_POSTER_PATH)==null));
+        Log.e(LOG_TAG, "bindView poster_path : (cursor.getString(MainFragment.COL_POSTER_PATH)==null) " + (cursor.getString(MainFragment.COL_POSTER_PATH) == null));
         Log.e(LOG_TAG, "bindView poster_path : COL_TITLE " + cursor.getString(MainFragment.COL_TITLE));
         if (cursor.getString(MainFragment.COL_POSTER_PATH)==null) { //The poster image doesn't exist. Display the movie title instead
+            mIsPosterImage = false;
             Log.e(LOG_TAG, "poster image doesn't exist : " + cursor.getString(MainFragment.COL_POSTER_PATH));
-            if (view instanceof ImageView) {
-                Log.e(LOG_TAG, "in instanceof ImageView : " + cursor.getString(MainFragment.COL_POSTER_PATH));
-                LayoutInflater inflater = LayoutInflater.from(context);
-                view = inflater.inflate(R.layout.grid_item_layout_default, ((ViewGroup)view.getTag()), false); //change the previous ImageView by a new TextView
-            }
-            ((TextView) view).setText(cursor.getString(MainFragment.COL_TITLE));
+//            if (view instanceof ImageView) {
+//                Log.e(LOG_TAG, "in instanceof ImageView : " + cursor.getString(MainFragment.COL_POSTER_PATH));
+//                LayoutInflater inflater = LayoutInflater.from(context);
+//                view = inflater.inflate(R.layout.grid_item_textView, null, false); //change the previous ImageView by a new TextView
+//            }
+
         } else {//The poster image exists, we can display the image
+            mIsPosterImage = true;
             Log.e(LOG_TAG, "poster image DOES exist : " + cursor.getString(MainFragment.COL_POSTER_PATH));
-            if (view instanceof TextView) {
-                Log.e(LOG_TAG, "in instanceof TextView : " + cursor.getString(MainFragment.COL_POSTER_PATH)+" view.getText() : "+((TextView)view).getText());
-                LayoutInflater inflater = LayoutInflater.from(context);
-                view = inflater.inflate(R.layout.grid_item_layout, ((ViewGroup)view.getTag()), false); //change the previous TextView by a new ImageView
-            }
-            URL posterURL = tmdbAccess.constructPosterImageURL(cursor.getString(MainFragment.COL_POSTER_PATH));
-            Picasso.with(context).load(posterURL.toString()).into((ImageView) view);
+//            if (view instanceof TextView) {
+//                Log.e(LOG_TAG, "in instanceof TextView : " + cursor.getString(MainFragment.COL_POSTER_PATH)+" view.getText() : "+((TextView)view).getText());
+//                LayoutInflater inflater = LayoutInflater.from(context);
+//                view = inflater.inflate(R.layout.grid_item_imageView, null, false); //change the previous TextView by a new ImageView
+//            }
+
         }
+
+        int viewType = getItemViewType((int)view.getTag());
+        switch (viewType) {
+            case VIEW_TYPE_TEXT_VIEW: {
+                //customView = inflater.inflate(R.layout.grid_item_textView, parent, false);
+                ((TextView) view).setText(cursor.getString(MainFragment.COL_TITLE));
+                textViewPositions.remove(view.getTag());
+                textViewPositions.add(cursor.getPosition());
+                break;
+            }
+            case VIEW_TYPE_IMAGE_VIEW: {
+                //customView = inflater.inflate(R.layout.grid_item_imageView, parent, false);
+                URL posterURL = tmdbAccess.constructPosterImageURL(cursor.getString(MainFragment.COL_POSTER_PATH));
+                Picasso.with(context).load(posterURL.toString()).into((ImageView) view);
+                break;
+            }
+        }
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return (textViewPositions.contains(position)&&mIsPosterImage) ? VIEW_TYPE_IMAGE_VIEW : VIEW_TYPE_TEXT_VIEW;
+    }
+
+    @Override
+    public int getViewTypeCount() {
+        return VIEW_TYPE_COUNT;
     }
 }
