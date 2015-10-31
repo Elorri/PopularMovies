@@ -2,7 +2,6 @@ package com.example.android.popularmovies;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,27 +37,17 @@ public class MoviesAdapter extends CursorAdapter {
 
     //No need for a ViewHolder class because the view parameter of bindView method gives us the root view, and that's the one we want to set. No need to travel the view tree in this case
 
-    /*
-       These views are reused as needed.
-    */
+
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-
-        Log.e(LOG_TAG, "new view poster_path :" + cursor.getString(MainFragment.COL_POSTER_PATH)+" - position : "+cursor.getPosition());
-        Log.e(LOG_TAG, "new view poster_path : (cursor.getString(MainFragment.COL_POSTER_PATH)==null) " + (cursor.getString(MainFragment.COL_POSTER_PATH)==null));
-        Log.e(LOG_TAG, "new view poster_path : COL_TITLE " + cursor.getString(MainFragment.COL_TITLE));
         if (cursor.getString(MainFragment.COL_POSTER_PATH)==null) { //The poster image doesn't exist. Display the movie title instead
             mIsPosterImage = false;
-            Log.e(LOG_TAG, "poster image doesn't exist : " + cursor.getString(MainFragment.COL_POSTER_PATH));
         } else {//The poster image exists, we can display the image
             mIsPosterImage = true;
-            Log.e(LOG_TAG, "poster image DOES exist : " + cursor.getString(MainFragment.COL_POSTER_PATH));
         }
-
         View customView=null;
         LayoutInflater inflater = LayoutInflater.from(context);
-        int new_view_position=cursor.getPosition();
-        int viewType = getItemViewType(new_view_position);
+        int viewType = getItemViewType(0); //Our getItemViewType does not make use of the position, any int parameter would work, we put 0
         switch (viewType) {
             case VIEW_TYPE_TEXT_VIEW: {
                 customView = inflater.inflate(R.layout.grid_item_textview, parent, false);
@@ -76,53 +65,29 @@ public class MoviesAdapter extends CursorAdapter {
         return customView;
     }
 
-    /*
-     This is where we fill-in the views with the contents of the cursor.
-  */
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        Log.e(LOG_TAG, "bindView poster_path :" + cursor.getString(MainFragment.COL_POSTER_PATH)+" - position : "+cursor.getPosition());
-        Log.e(LOG_TAG, "bindView poster_path : (cursor.getString(MainFragment.COL_POSTER_PATH)==null) " + (cursor.getString(MainFragment.COL_POSTER_PATH) == null));
-        Log.e(LOG_TAG, "bindView poster_path : COL_TITLE " + cursor.getString(MainFragment.COL_TITLE));
         if (cursor.getString(MainFragment.COL_POSTER_PATH)==null) { //The poster image doesn't exist. Display the movie title instead
             mIsPosterImage = false;
-            Log.e(LOG_TAG, "poster image doesn't exist : " + cursor.getString(MainFragment.COL_POSTER_PATH));
-//            if (view instanceof ImageView) {
-//                Log.e(LOG_TAG, "in instanceof ImageView : " + cursor.getString(MainFragment.COL_POSTER_PATH));
-//                LayoutInflater inflater = LayoutInflater.from(context);
-//                view = inflater.inflate(R.layout.grid_item_textView, null, false); //change the previous ImageView by a new TextView
-//            }
-
         } else {//The poster image exists, we can display the image
             mIsPosterImage = true;
-            Log.e(LOG_TAG, "poster image DOES exist : " + cursor.getString(MainFragment.COL_POSTER_PATH));
-//            if (view instanceof TextView) {
-//                Log.e(LOG_TAG, "in instanceof TextView : " + cursor.getString(MainFragment.COL_POSTER_PATH)+" view.getText() : "+((TextView)view).getText());
-//                LayoutInflater inflater = LayoutInflater.from(context);
-//                view = inflater.inflate(R.layout.grid_item_imageView, null, false); //change the previous TextView by a new ImageView
-//            }
-
         }
-
         int viewType = getItemViewType(0); //Our getItemViewType does not make use of the position, any int parameter would work, we put 0
         ViewGroup parent=((ViewGroup)view.getTag());
         switch (viewType) {
             case VIEW_TYPE_TEXT_VIEW: {
                 if (view instanceof ImageView) {
-                    Log.e(LOG_TAG, "in instanceof ImageView : ");
                     LayoutInflater inflater = LayoutInflater.from(context);
                     parent.removeViewInLayout(view);
                     view = inflater.inflate(R.layout.grid_item_textview, parent, false); //change the previous TextView by a new ImageView
-                    Log.e(LOG_TAG, "view after inflate in instanceof ImageView : "+view.getClass().getSimpleName());
                 }
                 ((TextView) view).setText(cursor.getString(MainFragment.COL_TITLE));
                 break;
             }
             case VIEW_TYPE_IMAGE_VIEW: {
                 if (view instanceof TextView) {
-                    Log.e(LOG_TAG, "in instanceof TextView : ");
                     LayoutInflater inflater = LayoutInflater.from(context);
-                    view = inflater.inflate(R.layout.grid_item_imageview, null, false); //change the previous ImageView by a new TextView
+                    view = inflater.inflate(R.layout.grid_item_imageview, parent, false); //change the previous ImageView by a new TextView
                     parent.removeAllViews();
                     parent.addView(view);
                 }
