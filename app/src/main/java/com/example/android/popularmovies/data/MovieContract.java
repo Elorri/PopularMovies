@@ -30,10 +30,11 @@ public class MovieContract {
         public static final String COLUMN_RELEASE_DATE = "release_date";
         public static final String COLUMN_POSTER_PATH = "poster_path";
         public static final String COLUMN_PLOT_SYNOPSIS = "plot_synopsis";
-        public static final String COLUMN_RATE = "rate";
+        public static final String COLUMN_RATE = "vote_average";
         public static final String COLUMN_POPULARITY = "popularity";
         public static final String COLUMN_FAVORITE = "favorite";
 
+        public static final String FAVORITE_RATE = "vote_average.desc";
         public static final String FAVORITE_POPULARITY = "popularity.desc";
         public static final String FAVORITE_ON_VALUE = "1";
         public static final String FAVORITE_OFF_VALUE = "0";

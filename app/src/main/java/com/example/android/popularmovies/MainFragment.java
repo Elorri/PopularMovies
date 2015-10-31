@@ -20,7 +20,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.popularmovies.data.MovieContract.MovieEntry;
-import com.example.android.popularmovies.data.Utility;
 import com.squareup.picasso.Picasso;
 
 import java.net.URL;
@@ -77,7 +76,7 @@ public class MainFragment extends Fragment {
 
         Cursor cur = getActivity().getContentResolver().query(
                 MovieEntry.buildMovieSortByUri(Utility.getSortOrderPreferences(getContext())),
-                null,
+                MOVIE_COLUMNS,
                 null,
                 null,
                 null);
@@ -154,20 +153,29 @@ public class MainFragment extends Fragment {
     }
 
 
-    public class FetchMoviesTask extends AsyncTask<String, Void, Void> {
+    public class FetchMoviesTask extends AsyncTask<String, Void, Cursor> {
+
+        private static final String LOG_TAG = "PopularMovies";
 
         @Override
-        protected Void doInBackground(String... params) {
-            tmdbAccess.syncMovies(params[0]);
-            return null;
+        protected Cursor doInBackground(String... params) {
+            //tmdbAccess.syncMovies(params[0]);
+            Cursor cur = getActivity().getContentResolver().query(
+                    MovieEntry.buildMovieSortByUri(Utility.getSortOrderPreferences(getContext())),
+                    MOVIE_COLUMNS,
+                    null,
+                    null,
+                    null);
+            return cur;
         }
 
-//        @Override
-//        protected void onPostExecute(Movie[] result) {
-//            if (result != null) {
-//                mDiscoveryAdapter.refresh(result);
-//            }
-//        }
+        @Override
+        protected void onPostExecute(Cursor result) {
+            if (result != null) {
+                //mDiscoveryAdapter.refresh(result);
+                mMoviesAdapter.changeCursor(result);
+            }
+        }
 
     }
 

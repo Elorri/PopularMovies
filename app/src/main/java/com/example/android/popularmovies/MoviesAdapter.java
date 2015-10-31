@@ -2,6 +2,7 @@ package com.example.android.popularmovies;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,12 +20,13 @@ import java.net.URL;
  */
 public class MoviesAdapter extends CursorAdapter {
 
+    private static final String LOG_TAG = "PopularMovies";
     TmdbAccess tmdbAccess;
 
 
     public MoviesAdapter(Context context, Cursor c, int flags, TmdbAccess tmdbAccess) {
         super(context, c, flags);
-        this.tmdbAccess=tmdbAccess;
+        this.tmdbAccess = tmdbAccess;
     }
 
 
@@ -37,14 +39,20 @@ public class MoviesAdapter extends CursorAdapter {
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         View customView;
         LayoutInflater inflater = LayoutInflater.from(context);
-        if (cursor.getString(MainFragment.COL_POSTER_PATH).equals(null)) { //The poster image doesn't exist. Display the movie title instead
-                customView = inflater.inflate(R.layout.grid_item_layout_default, parent, false);
+        Log.e(LOG_TAG, "new view poster_path :" + cursor.getString(MainFragment.COL_POSTER_PATH)+" - position : "+cursor.getPosition());
+        Log.e(LOG_TAG, "new view poster_path : (cursor.getString(MainFragment.COL_POSTER_PATH)==null) " + (cursor.getString(MainFragment.COL_POSTER_PATH)==null));
+        Log.e(LOG_TAG, "new view poster_path : COL_TITLE " + cursor.getString(MainFragment.COL_TITLE));
+        if (cursor.getString(MainFragment.COL_POSTER_PATH)==null) { //The poster image doesn't exist. Display the movie title instead
+            Log.e(LOG_TAG, "poster image doesn't exist : " + cursor.getString(MainFragment.COL_POSTER_PATH));
+            customView = inflater.inflate(R.layout.grid_item_layout_default, parent, false);
             ((TextView) customView).setText(cursor.getString(MainFragment.COL_TITLE));
         } else {//The poster image exists, we can display the image
-                customView = inflater.inflate(R.layout.grid_item_layout, parent, false);
+            Log.e(LOG_TAG, "poster image DOES exist : " + cursor.getString(MainFragment.COL_POSTER_PATH));
+            customView = inflater.inflate(R.layout.grid_item_layout, parent, false);
             URL posterURL = tmdbAccess.constructPosterImageURL(cursor.getString(MainFragment.COL_POSTER_PATH));
             Picasso.with(context).load(posterURL.toString()).into((ImageView) customView);
         }
+        customView.setTag(parent);
         return customView;
     }
 
@@ -53,17 +61,24 @@ public class MoviesAdapter extends CursorAdapter {
   */
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        if (cursor.getString(MainFragment.COL_POSTER_PATH).equals(null)) { //The poster image doesn't exist. Display the movie title instead
-            if  (view instanceof ImageView) {
+        Log.e(LOG_TAG, "bindView poster_path :" + cursor.getString(MainFragment.COL_POSTER_PATH)+" - position : "+cursor.getPosition());
+        Log.e(LOG_TAG, "bindView poster_path : (cursor.getString(MainFragment.COL_POSTER_PATH)==null) " + (cursor.getString(MainFragment.COL_POSTER_PATH)==null));
+        Log.e(LOG_TAG, "bindView poster_path : COL_TITLE " + cursor.getString(MainFragment.COL_TITLE));
+        if (cursor.getString(MainFragment.COL_POSTER_PATH)==null) { //The poster image doesn't exist. Display the movie title instead
+            Log.e(LOG_TAG, "poster image doesn't exist : " + cursor.getString(MainFragment.COL_POSTER_PATH));
+            if (view instanceof ImageView) {
+                Log.e(LOG_TAG, "in instanceof ImageView : " + cursor.getString(MainFragment.COL_POSTER_PATH));
                 LayoutInflater inflater = LayoutInflater.from(context);
-                view = inflater.inflate(R.layout.grid_item_layout_default, null, false); //change the previous ImageView by a new TextView
+                view = inflater.inflate(R.layout.grid_item_layout_default, ((ViewGroup)view.getTag()), false); //change the previous ImageView by a new TextView
             }
             ((TextView) view).setText(cursor.getString(MainFragment.COL_TITLE));
         } else {//The poster image exists, we can display the image
+            Log.e(LOG_TAG, "poster image DOES exist : " + cursor.getString(MainFragment.COL_POSTER_PATH));
             if (view instanceof TextView) {
+                Log.e(LOG_TAG, "in instanceof TextView : " + cursor.getString(MainFragment.COL_POSTER_PATH)+" view.getText() : "+((TextView)view).getText());
                 LayoutInflater inflater = LayoutInflater.from(context);
-                view = inflater.inflate(R.layout.grid_item_layout, null, false); //change the previous TextView by a new ImageView
-                 }
+                view = inflater.inflate(R.layout.grid_item_layout, ((ViewGroup)view.getTag()), false); //change the previous TextView by a new ImageView
+            }
             URL posterURL = tmdbAccess.constructPosterImageURL(cursor.getString(MainFragment.COL_POSTER_PATH));
             Picasso.with(context).load(posterURL.toString()).into((ImageView) view);
         }

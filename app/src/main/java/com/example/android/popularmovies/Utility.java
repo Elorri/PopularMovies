@@ -1,10 +1,8 @@
-package com.example.android.popularmovies.data;
+package com.example.android.popularmovies;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-
-import com.example.android.popularmovies.R;
 
 /**
  * Created by Elorri on 30/10/2015.
