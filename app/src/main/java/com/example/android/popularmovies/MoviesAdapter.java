@@ -72,6 +72,7 @@ public class MoviesAdapter extends CursorAdapter {
                 break;
             }
         }
+        customView.setTag(parent);
         return customView;
     }
 
@@ -104,14 +105,27 @@ public class MoviesAdapter extends CursorAdapter {
         }
 
         int viewType = getItemViewType(0); //Our getItemViewType does not make use of the position, any int parameter would work, we put 0
+        ViewGroup parent=((ViewGroup)view.getTag());
         switch (viewType) {
             case VIEW_TYPE_TEXT_VIEW: {
-                //customView = inflater.inflate(R.layout.grid_item_textView, parent, false);
+                if (view instanceof ImageView) {
+                    Log.e(LOG_TAG, "in instanceof ImageView : ");
+                    LayoutInflater inflater = LayoutInflater.from(context);
+                    parent.removeViewInLayout(view);
+                    view = inflater.inflate(R.layout.grid_item_textview, parent, false); //change the previous TextView by a new ImageView
+                    Log.e(LOG_TAG, "view after inflate in instanceof ImageView : "+view.getClass().getSimpleName());
+                }
                 ((TextView) view).setText(cursor.getString(MainFragment.COL_TITLE));
                 break;
             }
             case VIEW_TYPE_IMAGE_VIEW: {
-                //customView = inflater.inflate(R.layout.grid_item_imageView, parent, false);
+                if (view instanceof TextView) {
+                    Log.e(LOG_TAG, "in instanceof TextView : ");
+                    LayoutInflater inflater = LayoutInflater.from(context);
+                    view = inflater.inflate(R.layout.grid_item_imageview, null, false); //change the previous ImageView by a new TextView
+                    parent.removeAllViews();
+                    parent.addView(view);
+                }
                 URL posterURL = tmdbAccess.constructPosterImageURL(cursor.getString(MainFragment.COL_POSTER_PATH));
                 Picasso.with(context).load(posterURL.toString()).into((ImageView) view);
                 break;
