@@ -9,6 +9,7 @@ import android.os.HandlerThread;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
+import com.example.android.popularmovies.Utility;
 import com.example.android.popularmovies.data.MovieContract.MovieEntry;
 import com.example.android.popularmovies.data.MovieContract.TrailerEntry;
 import com.example.android.popularmovies.data.MovieContract.ReviewEntry;
@@ -322,5 +323,14 @@ public class TestUtilities extends AndroidTestCase {
             else
                 Log.e(LOG_TAG, s.substring(i, length));
         }
+    }
+
+
+    public static void testGetShortString(){
+          final String A_LONG_STRING="azertyuiopqsdfghjklmwxcvbn";
+        final String A_SHORT_STRING="azerty";
+
+        assertEquals("azertyuiopqsdfghj...", Utility.getShortString(A_LONG_STRING, 20));
+        assertEquals("azerty", Utility.getShortString(A_SHORT_STRING, 20));
     }
 }

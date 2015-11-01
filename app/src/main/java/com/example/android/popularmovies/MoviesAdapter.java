@@ -43,7 +43,8 @@ public class MoviesAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         URL posterURL = tmdbAccess.constructPosterImageURL(cursor.getString(MainFragment.COL_POSTER_PATH));
-        TextDrawable noPoster = TextDrawable.builder().beginConfig().fontSize((int)context.getResources().getDimension(R.dimen.titleTextSizePx)).endConfig().buildRect(cursor.getString(MainFragment.COL_TITLE), Color.RED);
+        String title=Utility.getShortString(cursor.getString(MainFragment.COL_TITLE), Integer.valueOf(context.getResources().getString(R.string.movie_title_size)));
+        TextDrawable noPoster = TextDrawable.builder().beginConfig().fontSize((int)context.getResources().getDimension(R.dimen.titleTextSizePx)).endConfig().buildRect(title, Color.GREEN);
         Picasso.with(context).load(posterURL.toString()).error(noPoster).into((ImageView) view);
     }
 

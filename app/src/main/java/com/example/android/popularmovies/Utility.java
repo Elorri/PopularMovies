@@ -14,4 +14,11 @@ public class Utility {
         return sharedPrefs.getString(context.getString(R.string.pref_sort_order_key), context.getString(R.string.pref_sort_order_popularity));
 
     }
+
+
+    public static String getShortString(String aString, int size){
+        if(aString.length()>size)
+            return aString.substring(0,size-3)+"...";
+        return aString;
+    }
 }

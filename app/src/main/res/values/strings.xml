@@ -25,4 +25,5 @@
     <string name="rateMax">/10</string>
     <string name="refresh">Refresh</string>
     <string name="action_share">Share</string>
+    <string name="movie_title_size">20</string>
 </resources>
