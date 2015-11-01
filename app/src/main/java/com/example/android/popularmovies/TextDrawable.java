@@ -18,13 +18,13 @@ public class TextDrawable extends Drawable {
         this.text = text;
 
         this.paint = new Paint();
-        paint.setColor(Color.WHITE);
+        paint.setColor(Color.BLACK);
         paint.setTextSize(context.getResources().getDimension(R.dimen.titleTextSize));
         paint.setAntiAlias(true);
         paint.setFakeBoldText(true);
         paint.setShadowLayer(6f, 0, 0, Color.BLACK);
         paint.setStyle(Paint.Style.FILL);
-        paint.setTextAlign(Paint.Align.LEFT);
+        paint.setTextAlign(Paint.Align.CENTER);
     }
 
     @Override
@@ -44,6 +44,7 @@ public class TextDrawable extends Drawable {
 
     @Override
     public int getOpacity() {
-        return PixelFormat.TRANSLUCENT;
+//        return PixelFormat.TRANSLUCENT;
+        return PixelFormat.OPAQUE;
     }
 }
