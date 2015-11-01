@@ -13,6 +13,7 @@ import android.test.AndroidTestCase;
 import com.example.android.popularmovies.data.MovieContract.MovieEntry;
 import com.example.android.popularmovies.data.MovieContract.ReviewEntry;
 import com.example.android.popularmovies.data.MovieContract.TrailerEntry;
+
 /**
  * Created by Elorri on 27/10/2015.
  */
@@ -255,7 +256,6 @@ public class TestProvider extends AndroidTestCase {
                 null, // values for "where" clause
                 null  // sort order
         );
-
         TestUtilities.validateCursor(" Error :", movieCursor, movieValues);
 
 

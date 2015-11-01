@@ -2,12 +2,14 @@ package com.example.android.popularmovies;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.ImageView;
 
+import com.amulyakhare.textdrawable.TextDrawable;
 import com.squareup.picasso.Picasso;
 
 import java.net.URL;
@@ -35,18 +37,14 @@ public class MoviesAdapter extends CursorAdapter {
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         View view = LayoutInflater.from(context).inflate(R.layout.grid_item_imageview, parent, false);
-        URL posterURL = tmdbAccess.constructPosterImageURL(cursor.getString(MainFragment.COL_POSTER_PATH));
-//        TextDrawable noPoster = new TextDrawable(cursor.getString(MainFragment.COL_TITLE), context);
-//        Picasso.with(context).load(posterURL.toString()).error(noPoster).into((ImageView) view);
         return view;
     }
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         URL posterURL = tmdbAccess.constructPosterImageURL(cursor.getString(MainFragment.COL_POSTER_PATH));
-        TextDrawable noPoster = new TextDrawable(cursor.getString(MainFragment.COL_TITLE), context);
+        TextDrawable noPoster = TextDrawable.builder().beginConfig().fontSize((int)context.getResources().getDimension(R.dimen.titleTextSizePx)).endConfig().buildRect(cursor.getString(MainFragment.COL_TITLE), Color.RED);
         Picasso.with(context).load(posterURL.toString()).error(noPoster).into((ImageView) view);
-
     }
 
 

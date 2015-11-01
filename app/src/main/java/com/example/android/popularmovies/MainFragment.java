@@ -85,9 +85,6 @@ public class MainFragment extends Fragment {
         // up with an empty list the first time we run.
         tmdbAccess=new TmdbAccess(getContext());
         mMoviesAdapter = new MoviesAdapter(getActivity(), cur, 0,tmdbAccess);
-
-
-
     }
 
     @Override
@@ -159,7 +156,7 @@ public class MainFragment extends Fragment {
 
         @Override
         protected Cursor doInBackground(String... params) {
-            //tmdbAccess.syncMovies(params[0]);
+            tmdbAccess.syncMovies(params[0]);
             Cursor cur = getActivity().getContentResolver().query(
                     MovieEntry.buildMovieSortByUri(Utility.getSortOrderPreferences(getContext())),
                     MOVIE_COLUMNS,
