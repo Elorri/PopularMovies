@@ -1,7 +1,6 @@
 package com.example.android.popularmovies;
 
 import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
@@ -11,23 +10,16 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.GridView;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.example.android.popularmovies.data.MovieContract.MovieEntry;
-import com.squareup.picasso.Picasso;
-
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 
 /**
@@ -36,17 +28,12 @@ import java.util.Arrays;
 public class MainFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
 
-    //    private ArrayList<Movie> mDiscoverMovies;
-//    private CustomAdapter mDiscoveryAdapter;
     private MoviesAdapter mMoviesAdapter;
     private TmdbAccess tmdbAccess;
     private BroadcastReceiver receiver;
     private String lastSortType;
 
     private static final int MAIN_LOADER = 0;
-
-
-    private static final String MOVIE_ARRAY_LIST_TAG = "movie_array_list_tag";
 
 
     private static final String[] MOVIE_COLUMNS = {
@@ -68,17 +55,9 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        Log.e("PopularMovies", "onCreate " + getClass().getSimpleName());
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-
-        //if the ArrayListof Movies already exist we use it otherwise we create another one.
-//        if ((savedInstanceState == null) || (!savedInstanceState.containsKey(MOVIE_ARRAY_LIST_TAG)))
-//            mDiscoverMovies = new ArrayList<Movie>();
-//        else
-//            mDiscoverMovies = savedInstanceState.getParcelableArrayList(MOVIE_ARRAY_LIST_TAG);
-//        mDiscoveryAdapter = new CustomAdapter(getActivity(), mDiscoverMovies);
-//        tmdbAccess = new TmdbAccess();
-
 
         // The CursorAdapter will take data from our cursor and populate the GridView
         // However, we cannot use FLAG_AUTO_REQUERY since it is deprecated, so we will end
@@ -89,7 +68,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
+        Log.e("PopularMovies", "onCreateView " + getClass().getSimpleName());
         View rootView = inflater.inflate(R.layout.fragment_discovery, container, false);
 
         // Get a reference to the ListView, and attach this adapter to it.
@@ -111,6 +90,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
+        Log.e("PopularMovies", "onActivityCreated " + getClass().getSimpleName());
         getLoaderManager().initLoader(MAIN_LOADER, null, this);
         super.onActivityCreated(savedInstanceState);
     }
@@ -125,6 +105,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_refresh) {
+            syncDB();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -135,20 +116,25 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         receiver = new InternetReceiver(getActivity()) {
             @Override
             protected void refresh() {
-                String sortOrder = Utility.getSortOrderPreferences(getContext());
-                if ((lastSortType == null) || !sortOrder.equals(lastSortType)) {
-                    FetchMoviesTask movieTask = new FetchMoviesTask();
-                    movieTask.execute(sortOrder);
-                    lastSortType = sortOrder;
-                }
+                syncDB();
             }
-        };
 
+        };
+        getLoaderManager().restartLoader(MAIN_LOADER, null, this);
         IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
         getActivity().registerReceiver(receiver, filter);
         super.onStart();
     }
 
+
+    public void syncDB() {
+        String sortOrder = Utility.getSortOrderPreferences(getContext());
+        if ((lastSortType == null) || !sortOrder.equals(lastSortType)) {
+            FetchMoviesTask movieTask = new FetchMoviesTask();
+            movieTask.execute(sortOrder);
+            lastSortType = sortOrder;
+        }
+    }
 
     @Override
     public void onStop() {
@@ -158,6 +144,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        Log.e("PopularMovies", "onCreateLoader " + getClass().getSimpleName());
         return new CursorLoader(getActivity(),
                 MovieEntry.buildMovieSortByUri(Utility.getSortOrderPreferences(getContext())),
                 MOVIE_COLUMNS,
@@ -168,11 +155,13 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        Log.e("PopularMovies", "onLoadFinished " + getClass().getSimpleName());
         mMoviesAdapter.swapCursor(data);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
+        Log.e("PopularMovies", "onLoaderReset " + getClass().getSimpleName());
         mMoviesAdapter.swapCursor(null);
     }
 
@@ -203,60 +192,4 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
     }
 
-
-    public class CustomAdapter extends ArrayAdapter<Movie> {
-
-        public CustomAdapter(Context context, ArrayList<Movie> thumbIds) {
-            //We pass '0' for the 'int resource' layout, because the layout we are going to inflate can vary. Will be R.layout.grid_item_layout_default or R.layout.grid_item_layout
-            super(context, 0, thumbIds);
-        }
-
-        public void refresh(Movie[] results) {
-            clear();
-            addAll(Arrays.asList(results));
-            // no need to call notifyDataSetChanged() because it's already call in addAll
-        }
-
-        public int getCount() {
-            return super.getCount();
-        }
-
-        public Movie getItem(int position) {
-            return super.getItem(position);
-        }
-
-        public long getItemId(int position) {
-            return 0;
-        }
-
-        public View getView(int position, View convertView, ViewGroup parent) {
-            View customView;
-            if (getItem(position).getPosterName() == null) { //The poster image doesn't exist. Display the movie title instead
-                if ((convertView == null) || (convertView instanceof ImageView)) {
-                    LayoutInflater inflater = LayoutInflater.from(getActivity());
-                    customView = inflater.inflate(R.layout.grid_item_textview, parent, false);
-                } else {
-                    customView = convertView;
-                }
-                ((TextView) customView).setText(getItem(position).getTitle());
-            } else {//The poster image exists, we can display the image
-                if ((convertView == null) || (convertView instanceof TextView)) {
-                    LayoutInflater inflater = LayoutInflater.from(getActivity());
-                    customView = inflater.inflate(R.layout.grid_item_imageview, parent, false);
-                } else {
-                    customView = convertView;
-                }
-                URL posterURL = tmdbAccess.constructPosterImageURL(getItem(position).getPosterName());
-                Picasso.with(getActivity()).load(posterURL.toString()).into((ImageView) customView);
-            }
-            return customView;
-        }
-
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-//        outState.putParcelableArrayList(MOVIE_ARRAY_LIST_TAG, mDiscoverMovies);
-    }
 }

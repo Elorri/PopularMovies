@@ -245,8 +245,7 @@ public class MovieProvider extends ContentProvider {
     }
 
 
-    //Our app won't use the bulk insert, but to practice and make sure I understand correctly...
-    //This bulk insert is better than the defaut, because we use only one transaction for all inserts.
+    //This bulk insert is better than the default, because we use only one transaction for all inserts.
     @Override
     public int bulkInsert(Uri uri, ContentValues[] values) {
         final int match = sUriMatcher.match(uri);
