@@ -13,9 +13,6 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -33,7 +30,6 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     private MoviesAdapter mMoviesAdapter;
     private TmdbAccess tmdbAccess;
     private BroadcastReceiver receiver;
-    private String lastSortType;
 
     private static final int MOVIES_LOADER = 0;
 
@@ -51,8 +47,6 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     static final int COL_TITLE = 2;
 
 
-    public MainFragment() {
-    }
 
 
     @Override
@@ -71,7 +65,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.e("PopularMovies", "onCreateView " + getClass().getSimpleName());
-        View rootView = inflater.inflate(R.layout.fragment_discovery, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         // Get a reference to the ListView, and attach this adapter to it.
         GridView gridView = (GridView) rootView.findViewById(R.id.gridView_discovery);
@@ -99,44 +93,31 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     }
 
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.fragment_main, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_refresh) {
-            syncDB();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
 
     @Override
     public void onStart() {
+        String sortOrder=Utility.getSortOrderPreferences(getContext());
+        updateUI(sortOrder);
+        super.onStart();
+    }
+
+    public void updateUI(final String sortOrder){
         receiver = new InternetReceiver(getActivity()) {
             @Override
             protected void refresh() {
-                syncDB();
+                syncDB(sortOrder);
             }
 
         };
         getLoaderManager().restartLoader(MOVIES_LOADER, null, this);
         IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
         getActivity().registerReceiver(receiver, filter);
-        super.onStart();
     }
 
 
-    public void syncDB() {
-        String sortOrder = Utility.getSortOrderPreferences(getContext());
-        if ((lastSortType == null) || !sortOrder.equals(lastSortType)) {
+    public void syncDB(String sortOrder) {
             FetchMoviesTask movieTask = new FetchMoviesTask();
             movieTask.execute(sortOrder);
-            lastSortType = sortOrder;
-        }
     }
 
     @Override

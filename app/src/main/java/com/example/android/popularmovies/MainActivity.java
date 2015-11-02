@@ -8,10 +8,24 @@ import android.view.MenuItem;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String DETAILFRAGMENT_TAG = "detail_fragment";
+    private boolean mTwoPane;
+    private String mSortOrder;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (findViewById(R.id.detail_fragment_container) != null) {
+            mTwoPane = true;
+            if (savedInstanceState == null) {
+                getSupportFragmentManager().beginTransaction().replace(R.id
+                        .detail_fragment_container, new DetailFragment(), DETAILFRAGMENT_TAG).commit();
+            }
+        } else {
+            mTwoPane = false;
+        }
     }
 
 
@@ -36,5 +50,24 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        String sortOrder = Utility.getSortOrderPreferences(this);
+        if (sortOrder != null && !sortOrder.equals(mSortOrder)) {
+            MainFragment mainFragment = (MainFragment) getSupportFragmentManager().findFragmentById(R.id.main_fragment);
+            if (null != mainFragment) {
+                mainFragment.updateUI(sortOrder);
+            }
+            DetailFragment detailFragment = (DetailFragment) getSupportFragmentManager().findFragmentByTag(DETAILFRAGMENT_TAG);
+            if (null != detailFragment) {
+                detailFragment.updateUI(sortOrder);
+            }
+            mSortOrder = sortOrder;
+        }
     }
 }
