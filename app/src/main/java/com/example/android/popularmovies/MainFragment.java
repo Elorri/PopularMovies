@@ -8,6 +8,9 @@ import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -30,15 +33,17 @@ import java.util.Arrays;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainFragment extends Fragment {
+public class MainFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
 
-//    private ArrayList<Movie> mDiscoverMovies;
+    //    private ArrayList<Movie> mDiscoverMovies;
 //    private CustomAdapter mDiscoveryAdapter;
     private MoviesAdapter mMoviesAdapter;
     private TmdbAccess tmdbAccess;
     private BroadcastReceiver receiver;
     private String lastSortType;
+
+    private static final int MAIN_LOADER = 0;
 
 
     private static final String MOVIE_ARRAY_LIST_TAG = "movie_array_list_tag";
@@ -74,17 +79,12 @@ public class MainFragment extends Fragment {
 //        mDiscoveryAdapter = new CustomAdapter(getActivity(), mDiscoverMovies);
 //        tmdbAccess = new TmdbAccess();
 
-        Cursor cur = getActivity().getContentResolver().query(
-                MovieEntry.buildMovieSortByUri(Utility.getSortOrderPreferences(getContext())),
-                MOVIE_COLUMNS,
-                null,
-                null,
-                null);
+
         // The CursorAdapter will take data from our cursor and populate the GridView
         // However, we cannot use FLAG_AUTO_REQUERY since it is deprecated, so we will end
         // up with an empty list the first time we run.
-        tmdbAccess=new TmdbAccess(getContext());
-        mMoviesAdapter = new MoviesAdapter(getActivity(), cur, 0,tmdbAccess);
+        tmdbAccess = new TmdbAccess(getContext());
+        mMoviesAdapter = new MoviesAdapter(getActivity(), null, 0, tmdbAccess);
     }
 
     @Override
@@ -95,6 +95,7 @@ public class MainFragment extends Fragment {
         // Get a reference to the ListView, and attach this adapter to it.
         GridView gridView = (GridView) rootView.findViewById(R.id.gridView_discovery);
         gridView.setAdapter(mMoviesAdapter);
+
 //        gridView.setAdapter(mDiscoveryAdapter);
 //        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 //            @Override
@@ -106,6 +107,12 @@ public class MainFragment extends Fragment {
 //            }
 //        });
         return rootView;
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        getLoaderManager().initLoader(MAIN_LOADER, null, this);
+        super.onActivityCreated(savedInstanceState);
     }
 
 
@@ -128,11 +135,11 @@ public class MainFragment extends Fragment {
         receiver = new InternetReceiver(getActivity()) {
             @Override
             protected void refresh() {
-                String sortOrder= Utility.getSortOrderPreferences(getContext());
-                if ((lastSortType==null)||!sortOrder.equals(lastSortType)) {
+                String sortOrder = Utility.getSortOrderPreferences(getContext());
+                if ((lastSortType == null) || !sortOrder.equals(lastSortType)) {
                     FetchMoviesTask movieTask = new FetchMoviesTask();
                     movieTask.execute(sortOrder);
-                    lastSortType=sortOrder;
+                    lastSortType = sortOrder;
                 }
             }
         };
@@ -149,6 +156,26 @@ public class MainFragment extends Fragment {
         super.onStop();
     }
 
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return new CursorLoader(getActivity(),
+                MovieEntry.buildMovieSortByUri(Utility.getSortOrderPreferences(getContext())),
+                MOVIE_COLUMNS,
+                null,
+                null,
+                null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        mMoviesAdapter.swapCursor(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mMoviesAdapter.swapCursor(null);
+    }
+
 
     public class FetchMoviesTask extends AsyncTask<String, Void, Cursor> {
 
@@ -157,22 +184,22 @@ public class MainFragment extends Fragment {
         @Override
         protected Cursor doInBackground(String... params) {
             tmdbAccess.syncMovies(params[0]);
-            Cursor cur = getActivity().getContentResolver().query(
-                    MovieEntry.buildMovieSortByUri(Utility.getSortOrderPreferences(getContext())),
-                    MOVIE_COLUMNS,
-                    null,
-                    null,
-                    null);
-            return cur;
+//            Cursor cur = getActivity().getContentResolver().query(
+//                    MovieEntry.buildMovieSortByUri(Utility.getSortOrderPreferences(getContext())),
+//                    MOVIE_COLUMNS,
+//                    null,
+//                    null,
+//                    null);
+            return null;
         }
 
-        @Override
-        protected void onPostExecute(Cursor result) {
-            if (result != null) {
-                //mDiscoveryAdapter.refresh(result);
-                mMoviesAdapter.changeCursor(result);
-            }
-        }
+//        @Override
+//        protected void onPostExecute(Cursor result) {
+//            if (result != null) {
+//                //mDiscoveryAdapter.refresh(result);
+//                mMoviesAdapter.changeCursor(result);
+//            }
+//        }
 
     }
 
