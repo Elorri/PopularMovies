@@ -1,8 +1,7 @@
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    >
+    xmlns:tools="http://schemas.android.com/tools">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -19,7 +18,8 @@
             android:paddingLeft="@dimen/titlePaddingLeft"
             android:paddingTop="@dimen/titlePaddingTop"
             android:textColor="@android:color/white"
-            android:textSize="@dimen/detailTitleTextSize" />
+            android:textSize="@dimen/detailTitleTextSize"
+            tools:text="Mad Max: Fury Road"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -44,6 +44,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="@dimen/releaseYearTextSize"
+                    tools:text="2015"
                     />
 
                 <TextView
@@ -52,7 +53,8 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/releaseYear"
                     android:textSize="@dimen/durationTextSize"
-                    android:textStyle="italic" />
+                    android:textStyle="italic"
+                    tools:text="120"/>
 
                 <TextView
                     android:id="@+id/voteAverage"
@@ -60,7 +62,15 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/duration"
                     android:textColor="@android:color/black"
-                    android:textSize="@dimen/voteAverageTextSize" />
+                    android:textSize="@dimen/voteAverageTextSize"
+                    tools:text="7.6"/>
+                <Switch
+                    android:id="@+id/favorite"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/voteAverage"
+                    android:text="Favorite"
+                     />
             </RelativeLayout>
         </LinearLayout>
 
@@ -70,7 +80,8 @@
             android:layout_height="wrap_content"
             android:paddingLeft="@dimen/overviewPaddingLeft"
             android:paddingRight="@dimen/overviewPaddingRight"
-            android:paddingBottom="@dimen/overviewPaddingBottom"/>
+            android:paddingBottom="@dimen/overviewPaddingBottom"
+            tools:text="An apocalyptic story set in the furthest reaches of our planet, in a stark desert landscape where humanity is broken, and most everyone is crazed fighting for the necessities of life. Within this world exist two rebels on the run who just might be able to restore order. There's Max, a man of action and a man of few words, who seeks peace of mind following the loss of his wife and child in the aftermath of the chaos. And Furiosa, a woman of action and a woman who believes her path to survival may be achieved if she can make it across the desert back to her childhood homeland."/>
 
     </LinearLayout>
 </ScrollView>

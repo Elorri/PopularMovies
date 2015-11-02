@@ -16,9 +16,14 @@ public class Utility {
     }
 
 
-    public static String getShortString(String aString, int size){
-        if(aString.length()>size)
-            return aString.substring(0,size-3)+"...";
+    public static String getShortString(String aString, int size) {
+        if (aString.length() > size)
+            return aString.substring(0, size - 3) + "...";
         return aString;
+    }
+
+    public static boolean isFavorite(String favoriteDbString) {
+        if (favoriteDbString.equals("1")) return true;
+        return false;
     }
 }

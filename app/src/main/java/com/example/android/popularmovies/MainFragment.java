@@ -35,7 +35,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     private BroadcastReceiver receiver;
     private String lastSortType;
 
-    private static final int MAIN_LOADER = 0;
+    private static final int MOVIES_LOADER = 0;
 
 
     private static final String[] MOVIE_COLUMNS = {
@@ -94,7 +94,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         Log.e("PopularMovies", "onActivityCreated " + getClass().getSimpleName());
-        getLoaderManager().initLoader(MAIN_LOADER, null, this);
+        getLoaderManager().initLoader(MOVIES_LOADER, null, this);
         super.onActivityCreated(savedInstanceState);
     }
 
@@ -123,7 +123,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
             }
 
         };
-        getLoaderManager().restartLoader(MAIN_LOADER, null, this);
+        getLoaderManager().restartLoader(MOVIES_LOADER, null, this);
         IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
         getActivity().registerReceiver(receiver, filter);
         super.onStart();
