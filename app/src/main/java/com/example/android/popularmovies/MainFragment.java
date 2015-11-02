@@ -1,9 +1,6 @@
 package com.example.android.popularmovies;
 
-import android.content.BroadcastReceiver;
-import android.content.IntentFilter;
 import android.database.Cursor;
-import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -34,7 +31,6 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
     private MoviesAdapter mMoviesAdapter;
     private TmdbAccess tmdbAccess;
-    private BroadcastReceiver receiver;
 
     private static final int MOVIES_LOADER = 0;
 
@@ -106,17 +102,9 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     }
 
     public void updateUI(final String sortOrder){
-        receiver = new InternetReceiver(getActivity()) {
-            @Override
-            protected void refresh() {
-                syncDB(sortOrder);
-            }
-
-        };
+        syncDB(sortOrder);
         getLoaderManager().restartLoader(MOVIES_LOADER, null, this);
-        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
-        getActivity().registerReceiver(receiver, filter);
-    }
+     }
 
 
     public void syncDB(String sortOrder) {
@@ -124,11 +112,6 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
             movieTask.execute(sortOrder);
     }
 
-    @Override
-    public void onStop() {
-        getActivity().unregisterReceiver(receiver);
-        super.onStop();
-    }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
