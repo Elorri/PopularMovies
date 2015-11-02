@@ -1,10 +1,10 @@
 package com.example.android.popularmovies;
 
 import android.content.BroadcastReceiver;
-import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -25,6 +25,11 @@ import com.example.android.popularmovies.data.MovieContract.MovieEntry;
  * A placeholder fragment containing a simple view.
  */
 public class MainFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+
+
+    public interface Callback {
+          void onItemSelected(Uri uri);
+    }
 
 
     private MoviesAdapter mMoviesAdapter;
@@ -76,9 +81,8 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Cursor cursor = (Cursor) parent.getItemAtPosition(position);
                 if (cursor != null) {
-                    Intent intent = new Intent(getActivity(), DetailActivity.class);
-                    intent.setData(MovieEntry.buildMovieDetailUri(cursor.getLong(COL_MOVIE_ID)));
-                    startActivity(intent);
+                    Uri uri = MovieEntry.buildMovieDetailUri(cursor.getLong(COL_MOVIE_ID));
+                    ((Callback)getActivity()).onItemSelected(uri);
                 }
             }
         });

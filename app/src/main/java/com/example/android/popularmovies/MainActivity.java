@@ -1,12 +1,13 @@
 package com.example.android.popularmovies;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MainFragment.Callback{
 
     private static final String DETAILFRAGMENT_TAG = "detail_fragment";
     private boolean mTwoPane;
@@ -68,6 +69,25 @@ public class MainActivity extends AppCompatActivity {
                 detailFragment.updateUI(sortOrder);
             }
             mSortOrder = sortOrder;
+        }
+    }
+
+    @Override
+    public void onItemSelected(Uri uri) {
+        if(mTwoPane){
+            Bundle arguments = new Bundle();
+            arguments.putParcelable(DetailFragment.DETAIL_URI, uri);
+
+            DetailFragment fragment = new DetailFragment();
+            fragment.setArguments(arguments);
+
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.detail_fragment_container, fragment, DETAILFRAGMENT_TAG)
+                    .commit();
+        }else{
+            Intent intent = new Intent(this, DetailActivity.class);
+            intent.setData(uri);
+            startActivity(intent);
         }
     }
 }
