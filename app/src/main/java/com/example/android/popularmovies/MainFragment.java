@@ -1,6 +1,7 @@
 package com.example.android.popularmovies;
 
 import android.content.BroadcastReceiver;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
@@ -17,6 +18,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.GridView;
 
 import com.example.android.popularmovies.data.MovieContract.MovieEntry;
@@ -75,16 +77,17 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         GridView gridView = (GridView) rootView.findViewById(R.id.gridView_discovery);
         gridView.setAdapter(mMoviesAdapter);
 
-//        gridView.setAdapter(mDiscoveryAdapter);
-//        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                Movie movie = mDiscoveryAdapter.getItem(position);
-//                Intent intent = new Intent(getActivity(), DetailActivity.class);
-//                intent.putExtra(Intent.EXTRA_TEXT, movie);
-//                startActivity(intent);
-//            }
-//        });
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Cursor cursor = (Cursor) parent.getItemAtPosition(position);
+                if (cursor != null) {
+                    Intent intent = new Intent(getActivity(), DetailActivity.class);
+                    intent.setData(MovieEntry.buildMovieDetailUri(cursor.getLong(COL_MOVIE_ID)));
+                    startActivity(intent);
+                }
+            }
+        });
         return rootView;
     }
 
