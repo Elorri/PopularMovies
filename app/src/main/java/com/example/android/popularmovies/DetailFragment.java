@@ -1,10 +1,7 @@
 package com.example.android.popularmovies;
 
-import android.content.BroadcastReceiver;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.database.Cursor;
-import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -37,7 +34,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private TmdbAccess tmdbAccess;
 
     private ImageView mPosterImage;
-    ;
     private TextView mTitle;
     private TextView mPlotSynopsis;
     private TextView mVoteAverage;
@@ -45,7 +41,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private TextView mDuration;
     private Switch mFavorite;
 
-    private BroadcastReceiver receiver;
 
     private static final int MOVIE_LOADER = 0;
 
@@ -113,25 +108,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     }
 
 
-    @Override
-    public void onStart() {
-        receiver = new InternetReceiver(getActivity()) {
-            @Override
-            protected void refresh() {
-                //Picasso.with(getActivity()).load(tmdbAccess.constructPosterImageURL(mMovie.getPosterName()).toString()).into(mPosterImage);
-            }
-        };
-
-        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
-        getActivity().registerReceiver(receiver, filter);
-        super.onStart();
-    }
-
-    @Override
-    public void onStop() {
-        getActivity().unregisterReceiver(receiver);
-        super.onStop();
-    }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -144,21 +120,14 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Log.e("PopularMovies", "onCreateLoader " + getClass().getSimpleName());
-//        Bundle arguments = getArguments();
-//        Uri uri=null;
-//        if (arguments != null) {
-//            uri = arguments.getParcelable(DetailFragment.DETAIL_URI);
-//        }
         Uri uri = getArguments().getParcelable(DetailFragment.DETAIL_URI);
-        //if(uri!=null){
         return new CursorLoader(getActivity(),
                 (Uri) getArguments().getParcelable(DETAIL_URI),
                 MOVIE_COLUMNS,
                 null,
                 null,
                 null);
-//        }
-//        return null;
+
     }
 
     @Override
