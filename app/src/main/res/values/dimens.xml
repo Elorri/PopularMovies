@@ -19,4 +19,6 @@
     <dimen name="overviewPaddingBottom">26dp</dimen>
     <dimen name="titlePaddingLeft">8dp</dimen>
     <dimen name="titleTextSizePx">30px</dimen>
+
+    <dimen name="actionBarSettingsHeight">56</dimen>
 </resources>
