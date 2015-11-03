@@ -26,4 +26,9 @@ public class Utility {
         if (favoriteDbString.equals("1")) return true;
         return false;
     }
+
+
+    public static int convert(int n) {
+        return Integer.valueOf(String.valueOf(n), 16);
+    }
 }

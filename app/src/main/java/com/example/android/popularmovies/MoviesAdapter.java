@@ -3,6 +3,7 @@ package com.example.android.popularmovies;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,8 @@ import android.widget.CursorAdapter;
 import android.widget.ImageView;
 
 import com.amulyakhare.textdrawable.TextDrawable;
+import com.amulyakhare.textdrawable.util.ColorGenerator;
+import com.example.android.popularmovies.data.MovieContract.MovieEntry;
 import com.squareup.picasso.Picasso;
 
 import java.net.URL;
@@ -22,7 +25,8 @@ public class MoviesAdapter extends CursorAdapter {
 
     private static final String LOG_TAG = "PopularMovies";
 
-    TmdbAccess tmdbAccess;
+    private TmdbAccess tmdbAccess;
+    private Uri mUriFirstItem;
 
 
     public MoviesAdapter(Context context, Cursor c, int flags, TmdbAccess tmdbAccess) {
@@ -42,11 +46,24 @@ public class MoviesAdapter extends CursorAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
+        if(cursor.getPosition()==0)mUriFirstItem= MovieEntry.buildMovieDetailUri(Long.parseLong(cursor
+                .getString(MainFragment.COL_MOVIE_ID)));
         URL posterURL = tmdbAccess.constructPosterImageURL(cursor.getString(MainFragment.COL_POSTER_PATH));
         String title=Utility.getShortString(cursor.getString(MainFragment.COL_TITLE), Integer.valueOf(context.getResources().getString(R.string.movie_title_size)));
-        TextDrawable noPoster = TextDrawable.builder().beginConfig().fontSize((int)context.getResources().getDimension(R.dimen.titleTextSizePx)).endConfig().buildRect(title, Color.GREEN);
+
+
+        ColorGenerator generator = ColorGenerator.MATERIAL; // or use DEFAULT
+        int noPosterColor = generator.getRandomColor();
+        TextDrawable noPoster = TextDrawable.builder()
+                .beginConfig()
+                .fontSize((int) context.getResources().getDimension(R.dimen.titleTextSizePx))
+                .textColor(Color.BLACK)
+                .endConfig().buildRect(title, noPosterColor);
         Picasso.with(context).load(posterURL.toString()).error(noPoster).into((ImageView) view);
     }
 
 
+    public Uri getmUriFirstItem() {
+        return mUriFirstItem;
+    }
 }

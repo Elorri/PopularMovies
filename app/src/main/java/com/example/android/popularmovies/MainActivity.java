@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Call
     }
 
     @Override
-    public void onItemSelected(Uri uri) {
+    public void onItemSelected(Uri uri, boolean firstDisplay) {
         if(mTwoPane){
             Bundle arguments = new Bundle();
             arguments.putParcelable(DetailFragment.DETAIL_URI, uri);
@@ -85,9 +85,11 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Call
                     .replace(R.id.detail_fragment_container, fragment, DETAILFRAGMENT_TAG)
                     .commit();
         }else{
-            Intent intent = new Intent(this, DetailActivity.class);
-            intent.setData(uri);
-            startActivity(intent);
+            if(firstDisplay==false) {
+                Intent intent = new Intent(this, DetailActivity.class);
+                intent.setData(uri);
+                startActivity(intent);
+            }
         }
     }
 }

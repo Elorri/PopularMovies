@@ -13,7 +13,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/titleMarginBottom"
-            android:background="@color/titleBackground"
+            android:background="@color/primary"
             android:paddingBottom="@dimen/titlePaddingBottom"
             android:paddingLeft="@dimen/titlePaddingLeft"
             android:paddingTop="@dimen/titlePaddingTop"

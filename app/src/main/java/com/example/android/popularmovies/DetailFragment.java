@@ -31,6 +31,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     private static final String LOG_TAG = DetailFragment.class.getSimpleName();
     public static final String DETAIL_URI = "URI";
+    private static Uri mUri;
     private TmdbAccess tmdbAccess;
 
     private ImageView mPosterImage;
@@ -108,7 +109,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     }
 
 
-
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         Log.e("PopularMovies", "onActivityCreated " + getClass().getSimpleName());
@@ -120,14 +120,18 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Log.e("PopularMovies", "onCreateLoader " + getClass().getSimpleName());
-        Uri uri = getArguments().getParcelable(DetailFragment.DETAIL_URI);
-        return new CursorLoader(getActivity(),
-                (Uri) getArguments().getParcelable(DETAIL_URI),
-                MOVIE_COLUMNS,
-                null,
-                null,
-                null);
-
+        Bundle arguments = getArguments();
+        if (arguments != null) {
+            mUri = arguments.getParcelable(DETAIL_URI);
+            if (mUri != null)
+                return new CursorLoader(getActivity(),
+                        mUri,
+                        MOVIE_COLUMNS,
+                        null,
+                        null,
+                        null);
+        }
+        return null;
     }
 
     @Override
@@ -151,6 +155,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     }
 
     public void updateUI(String sortOrder) {
-        getLoaderManager().restartLoader(MOVIE_LOADER, null, this);
+        if (mUri != null) {
+            getLoaderManager().restartLoader(MOVIE_LOADER, null, this);
+        }
     }
 }

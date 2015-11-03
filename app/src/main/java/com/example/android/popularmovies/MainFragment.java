@@ -4,6 +4,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -28,7 +29,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
 
     public interface Callback {
-          void onItemSelected(Uri uri);
+          void onItemSelected(Uri uri, boolean firstDisplay);
     }
 
 
@@ -81,7 +82,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
                 Cursor cursor = (Cursor) parent.getItemAtPosition(position);
                 if (cursor != null) {
                     Uri uri = MovieEntry.buildMovieDetailUri(cursor.getLong(COL_MOVIE_ID));
-                    ((Callback) getActivity()).onItemSelected(uri);
+                    ((Callback) getActivity()).onItemSelected(uri, false);
                 }
             }
         });
@@ -154,6 +155,15 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         Log.e("PopularMovies", "onLoadFinished " + getClass().getSimpleName());
         mMoviesAdapter.swapCursor(data);
+        //To avoid 'java.lang.IllegalStateException: Can not perform this action inside of onLoadFinished'
+        Handler handler=new Handler();
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                ((Callback) getActivity()).onItemSelected(mMoviesAdapter.getmUriFirstItem(), true);
+            }
+        });
+
     }
 
     @Override
