@@ -64,7 +64,7 @@
                     android:textColor="@android:color/black"
                     android:textSize="@dimen/voteAverageTextSize"
                     tools:text="7.6"/>
-                <Switch
+                <android.support.v7.widget.SwitchCompat
                     android:id="@+id/favorite"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
