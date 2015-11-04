@@ -2,7 +2,6 @@ package com.example.android.popularmovies;
 
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -11,9 +10,6 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -90,28 +86,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         return rootView;
     }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.activity_main, menu);
-    }
 
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-
-        if (id == R.id.refresh) {
-            onSettingsChange(Utility.getSortOrderPreferences(getContext()));
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -122,22 +97,14 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
 
 
-    @Override
-    public void onStart() {
-        String sortOrder=Utility.getSortOrderPreferences(getContext());
-        onSettingsChange(sortOrder);
-        super.onStart();
-    }
 
-    public void onSettingsChange(final String sortOrder){
-        syncDB(sortOrder);
+    public void onSettingsChange(){
+        syncDB();
         getLoaderManager().restartLoader(MOVIES_LOADER, null, this);
      }
 
 
-    public void syncDB(String sortOrder) {
-//            FetchMoviesTask movieTask = new FetchMoviesTask();
-//            movieTask.execute(sortOrder);
+    public void syncDB() {
         MoviesSyncAdapter.syncImmediately(getActivity());
     }
 
@@ -174,31 +141,5 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         mMoviesAdapter.swapCursor(null);
     }
 
-
-    public class FetchMoviesTask extends AsyncTask<String, Void, Cursor> {
-
-        private static final String LOG_TAG = "PopularMovies";
-
-        @Override
-        protected Cursor doInBackground(String... params) {
-            tmdbAccess.syncMovies(params[0]);
-//            Cursor cur = getActivity().getContentResolver().query(
-//                    MovieEntry.buildMovieSortByUri(Utility.getSortOrderPreferences(getContext())),
-//                    MOVIE_COLUMNS,
-//                    null,
-//                    null,
-//                    null);
-            return null;
-        }
-
-//        @Override
-//        protected void onPostExecute(Cursor result) {
-//            if (result != null) {
-//                //mDiscoveryAdapter.refresh(result);
-//                mMoviesAdapter.changeCursor(result);
-//            }
-//        }
-
-    }
 
 }

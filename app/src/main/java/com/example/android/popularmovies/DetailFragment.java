@@ -154,7 +154,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public void onLoaderReset(Loader<Cursor> loader) {
     }
 
-    public void onSettingsChange(String sortOrder) {
+    public void onSettingsChange() {
         if (mUri != null) {
             getLoaderManager().restartLoader(MOVIE_LOADER, null, this);
         }

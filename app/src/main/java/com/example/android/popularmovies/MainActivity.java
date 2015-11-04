@@ -65,11 +65,11 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Call
         if (sortOrder != null && !sortOrder.equals(mSortOrder)) {
             MainFragment mainFragment = (MainFragment) getSupportFragmentManager().findFragmentById(R.id.main_fragment);
             if (null != mainFragment) {
-                mainFragment.onSettingsChange(sortOrder);
+                mainFragment.onSettingsChange();
             }
             DetailFragment detailFragment = (DetailFragment) getSupportFragmentManager().findFragmentByTag(DETAILFRAGMENT_TAG);
             if (null != detailFragment) {
-                detailFragment.onSettingsChange(sortOrder);
+                detailFragment.onSettingsChange();
             }
             mSortOrder = sortOrder;
         }
