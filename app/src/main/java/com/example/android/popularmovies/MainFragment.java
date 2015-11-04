@@ -115,17 +115,26 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         return isConnected;
     }
 
+    private Uri buildMoviesUri() {
+        String sortBy=Utility.getSortOrderPreferences(getContext());
+        if (sortBy.equals(getString(R.string.pref_sort_order_favorite)))
+            return MovieEntry.buildMoviesFavoriteUri();
+        return MovieEntry.buildMoviesSortByUri(sortBy);
+    }
+
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Log.e("PopularMovies", "onCreateLoader " + getClass().getSimpleName());
         return new CursorLoader(getActivity(),
-                MovieEntry.buildMovieSortByUri(Utility.getSortOrderPreferences(getContext())),
+                buildMoviesUri(),
                 MOVIE_COLUMNS,
                 null,
                 null,
                 null);
     }
+
+
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {

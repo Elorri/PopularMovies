@@ -44,13 +44,14 @@ public class MovieContract {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
-        public static Uri buildMovieSortByUri(String sort_by) {
+        public static Uri buildMoviesSortByUri(String sort_by) {
             return CONTENT_URI.buildUpon().appendPath(sort_by).build();
         }
 
-        public static Uri buildMovieFavoriteUri() {
+        public static Uri buildMoviesFavoriteUri() {
             return CONTENT_URI.buildUpon().appendPath(COLUMN_FAVORITE).appendPath(FAVORITE_POPULARITY).build();
         }
+
 
         public static String getSortOrderFromMovieSortByUri(Uri uri) {
             String sortOrder=uri.getPathSegments().get(1);

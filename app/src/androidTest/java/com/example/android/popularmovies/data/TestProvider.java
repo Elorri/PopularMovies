@@ -76,11 +76,11 @@ public class TestProvider extends AndroidTestCase {
     public void testGetType() {
         //content://com.example.android.popularmovies/movie/popularity.desc/ (directory)
         //content://com.example.android.popularmovies/movie/rate.desc/ (directory)
-        String type = mContext.getContentResolver().getType(MovieEntry.buildMovieSortByUri("popularity.desc"));
+        String type = mContext.getContentResolver().getType(MovieEntry.buildMoviesSortByUri("popularity.desc"));
         assertEquals("Error: ", MovieEntry.CONTENT_TYPE, type);
 
         //content://com.example.android.popularmovies/movie/favorite/popularity.desc/ (directory)
-        type = mContext.getContentResolver().getType(MovieEntry.buildMovieFavoriteUri());
+        type = mContext.getContentResolver().getType(MovieEntry.buildMoviesFavoriteUri());
         assertEquals("Error: ", MovieEntry.CONTENT_TYPE, type);
 
         //content://com.example.android.popularmovies/movie/135399 (item)
@@ -121,7 +121,7 @@ public class TestProvider extends AndroidTestCase {
 
         // Test the sort_by content provider query
         Cursor cursor = mContext.getContentResolver().query(
-                MovieEntry.buildMovieSortByUri(SORT_BY_VALUE),
+                MovieEntry.buildMoviesSortByUri(SORT_BY_VALUE),
                 null,
                 null,
                 null,
@@ -146,7 +146,7 @@ public class TestProvider extends AndroidTestCase {
 
         // Test the sort_by content provider query
         Cursor cursor = mContext.getContentResolver().query(
-                MovieEntry.buildMovieFavoriteUri(),
+                MovieEntry.buildMoviesFavoriteUri(),
                 null,
                 null,
                 null,

@@ -18,8 +18,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.android.popularmovies.data.MovieContract;
 import com.squareup.picasso.Picasso;
@@ -27,7 +29,7 @@ import com.squareup.picasso.Picasso;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, CompoundButton.OnCheckedChangeListener {
 
     private static final String LOG_TAG = DetailFragment.class.getSimpleName();
     public static final String DETAIL_URI = "URI";
@@ -104,6 +106,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         mReleaseDate = (TextView) rootView.findViewById(R.id.releaseYear);
         mDuration = (TextView) rootView.findViewById(R.id.duration);
         mFavorite = (SwitchCompat) rootView.findViewById(R.id.favorite);
+        mFavorite.setOnCheckedChangeListener(this);
 
         return rootView;
     }
@@ -158,5 +161,10 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         if (mUri != null) {
             getLoaderManager().restartLoader(MOVIE_LOADER, null, this);
         }
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        Toast.makeText(getContext(), "Switch checked ? "+isChecked, Toast.LENGTH_SHORT).show();
     }
 }

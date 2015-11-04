@@ -263,7 +263,7 @@ public class TestUtilities extends AndroidTestCase {
     public void testShowMovieSortByQuery() {
         // Test the sort_by content provider query
         Cursor cursor = mContext.getContentResolver().query(
-                MovieEntry.buildMovieSortByUri(MovieEntry.FAVORITE_RATE),
+                MovieEntry.buildMoviesSortByUri(MovieEntry.FAVORITE_RATE),
                 MOVIE_COLUMNS,
                 null,
                 null,

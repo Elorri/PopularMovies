@@ -14,11 +14,13 @@
     <string name="pref_sort_order_label">Sort order</string>
     <string name="pref_sort_order_label_popularity">Popularity</string>
     <string name="pref_sort_order_label_rate">Rate</string>
+    <string name="pref_sort_order_label_favorite">Favorite</string>
     <!-- keys -->
     <string name="pref_sort_order_key" translatable="false">sortOrder</string>
     <!-- values -->
     <string name="pref_sort_order_popularity" translatable="false">popularity.desc</string>
     <string name="pref_sort_order_rate" translatable="false">vote_average.desc</string>
+    <string name="pref_sort_order_favorite" translatable="false">favorite</string>
 
     <!-- strings diplayed on the UI -->
     <string name="min">min</string>
