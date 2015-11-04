@@ -1,6 +1,9 @@
 package com.example.android.popularmovies;
 
+import android.content.Context;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -26,7 +29,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
 
     public interface Callback {
-          void onItemSelected(Uri uri, boolean firstDisplay);
+        void onItemSelected(Uri uri, boolean firstDisplay);
     }
 
 
@@ -47,8 +50,6 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     static final int COL_MOVIE_ID = 0;
     static final int COL_POSTER_PATH = 1;
     static final int COL_TITLE = 2;
-
-
 
 
     @Override
@@ -87,7 +88,6 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     }
 
 
-
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         Log.e("PopularMovies", "onActivityCreated " + getClass().getSimpleName());
@@ -96,16 +96,23 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     }
 
 
-
-
-    public void onSettingsChange(){
-        syncDB();
+    public void onSettingsChange() {
+        if (isConnected())
+            syncDB();
         getLoaderManager().restartLoader(MOVIES_LOADER, null, this);
-     }
+    }
 
 
     public void syncDB() {
         MoviesSyncAdapter.syncImmediately(getActivity());
+    }
+
+    private boolean isConnected() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getContext()
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+        return isConnected;
     }
 
 
@@ -125,7 +132,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         Log.e("PopularMovies", "onLoadFinished " + getClass().getSimpleName());
         mMoviesAdapter.swapCursor(data);
         //To avoid 'java.lang.IllegalStateException: Can not perform this action inside of onLoadFinished'
-        Handler handler=new Handler();
+        Handler handler = new Handler();
         handler.post(new Runnable() {
             @Override
             public void run() {
