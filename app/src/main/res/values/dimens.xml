@@ -20,5 +20,5 @@
     <dimen name="titlePaddingLeft">8dp</dimen>
     <dimen name="titleTextSizePx">30px</dimen>
 
-    <dimen name="actionBarSettingsHeight">56</dimen>
+    <dimen name="actionBarSettingsHeight">56dp</dimen>
 </resources>

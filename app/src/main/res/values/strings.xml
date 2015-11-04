@@ -26,4 +26,12 @@
     <string name="refresh">Refresh</string>
     <string name="action_share">Share</string>
     <string name="movie_title_size">20</string>
+
+
+    <!-- SyncAdapter related -->
+    <!-- that the account is specific to our PopularMoviesApp-->
+    <string name="sync_account_type">popularmovies.android.example.com</string>
+    <!-- the content_authority is also define in MovieContract, a change here should be followed by a change there -->
+    <string name="content_authority">com.example.android.popularmovies</string>
+
 </resources>

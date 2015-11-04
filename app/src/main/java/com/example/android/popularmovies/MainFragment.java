@@ -20,6 +20,7 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 
 import com.example.android.popularmovies.data.MovieContract.MovieEntry;
+import com.example.android.popularmovies.sync.MoviesSyncAdapter;
 
 
 /**
@@ -105,7 +106,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
 
         if (id == R.id.refresh) {
-            updateUI(Utility.getSortOrderPreferences(getContext()));
+            onSettingsChange(Utility.getSortOrderPreferences(getContext()));
             return true;
         }
 
@@ -124,19 +125,20 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     @Override
     public void onStart() {
         String sortOrder=Utility.getSortOrderPreferences(getContext());
-        updateUI(sortOrder);
+        onSettingsChange(sortOrder);
         super.onStart();
     }
 
-    public void updateUI(final String sortOrder){
+    public void onSettingsChange(final String sortOrder){
         syncDB(sortOrder);
         getLoaderManager().restartLoader(MOVIES_LOADER, null, this);
      }
 
 
     public void syncDB(String sortOrder) {
-            FetchMoviesTask movieTask = new FetchMoviesTask();
-            movieTask.execute(sortOrder);
+//            FetchMoviesTask movieTask = new FetchMoviesTask();
+//            movieTask.execute(sortOrder);
+        MoviesSyncAdapter.syncImmediately(getActivity());
     }
 
 

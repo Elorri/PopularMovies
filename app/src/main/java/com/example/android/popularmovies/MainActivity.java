@@ -7,6 +7,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.example.android.popularmovies.sync.MoviesSyncAdapter;
+
 public class MainActivity extends AppCompatActivity implements MainFragment.Callback{
 
     private static final String DETAILFRAGMENT_TAG = "detail_fragment";
@@ -27,6 +29,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Call
         } else {
             mTwoPane = false;
         }
+        MoviesSyncAdapter.initializeSyncAdapter(this);
     }
 
 
@@ -62,11 +65,11 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Call
         if (sortOrder != null && !sortOrder.equals(mSortOrder)) {
             MainFragment mainFragment = (MainFragment) getSupportFragmentManager().findFragmentById(R.id.main_fragment);
             if (null != mainFragment) {
-                mainFragment.updateUI(sortOrder);
+                mainFragment.onSettingsChange(sortOrder);
             }
             DetailFragment detailFragment = (DetailFragment) getSupportFragmentManager().findFragmentByTag(DETAILFRAGMENT_TAG);
             if (null != detailFragment) {
-                detailFragment.updateUI(sortOrder);
+                detailFragment.onSettingsChange(sortOrder);
             }
             mSortOrder = sortOrder;
         }

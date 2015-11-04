@@ -32,7 +32,7 @@ public class TmdbAccess {
 
 
 
-    TmdbAccess(Context context){
+    public TmdbAccess(Context context){
         this.context=context;
     }
 

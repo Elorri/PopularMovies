@@ -10,6 +10,7 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.ShareActionProvider;
+import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -18,7 +19,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import com.example.android.popularmovies.data.MovieContract;
@@ -40,7 +40,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private TextView mVoteAverage;
     private TextView mReleaseDate;
     private TextView mDuration;
-    private Switch mFavorite;
+    private SwitchCompat mFavorite;
 
 
     private static final int MOVIE_LOADER = 0;
@@ -103,7 +103,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         mVoteAverage = (TextView) rootView.findViewById(R.id.voteAverage);
         mReleaseDate = (TextView) rootView.findViewById(R.id.releaseYear);
         mDuration = (TextView) rootView.findViewById(R.id.duration);
-        mFavorite = (Switch) rootView.findViewById(R.id.favorite);
+        mFavorite = (SwitchCompat) rootView.findViewById(R.id.favorite);
 
         return rootView;
     }
@@ -154,7 +154,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public void onLoaderReset(Loader<Cursor> loader) {
     }
 
-    public void updateUI(String sortOrder) {
+    public void onSettingsChange(String sortOrder) {
         if (mUri != null) {
             getLoaderManager().restartLoader(MOVIE_LOADER, null, this);
         }
