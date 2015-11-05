@@ -15,10 +15,6 @@ import com.example.android.popularmovies.R;
 import com.example.android.popularmovies.TmdbAccess;
 import com.example.android.popularmovies.Utility;
 
-import com.example.android.popularmovies.data.MovieContract.TrailerEntry;
-import com.example.android.popularmovies.data.MovieContract.ReviewEntry;
-import com.example.android.popularmovies.data.MovieContract.MovieEntry;
-
 public class MoviesSyncAdapter extends AbstractThreadedSyncAdapter {
 
     // Interval at which to sync with the Tmdb network, in seconds.
@@ -123,8 +119,6 @@ public class MoviesSyncAdapter extends AbstractThreadedSyncAdapter {
      * @param context The context used to access the account service
      */
     public static void syncImmediately(Context context) {
-        deleteUnfavorites(context);
-
         //If user has selected 'favorite' settings no need to sync.
         if (!Utility.getSortOrderPreferences(context).equals(context.getString(R.string
                 .pref_sort_order_favorite))) {
@@ -132,13 +126,7 @@ public class MoviesSyncAdapter extends AbstractThreadedSyncAdapter {
         }
     }
 
-    private static void deleteUnfavorites(Context context) {
-        //Need to delete Trailer and Reviews entry first to avoid foreign key conflict
-        //Need to delete Trailer and Reviews, because 'on delete cascade does not seems to work'
-        context.getContentResolver().delete(TrailerEntry.CONTENT_URI, null, null);
-        context.getContentResolver().delete(ReviewEntry.CONTENT_URI, null, null);
-        context.getContentResolver().delete(MovieEntry.CONTENT_URI, null, null);
-    }
+
 
     private static void syncDB(Context context) {
         Bundle bundle = new Bundle();

@@ -1,9 +1,10 @@
 package com.example.android.popularmovies;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -18,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
+import com.example.android.popularmovies.data.MovieContract;
 import com.example.android.popularmovies.data.MovieContract.MovieEntry;
 import com.example.android.popularmovies.sync.MoviesSyncAdapter;
 
@@ -32,7 +34,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         void onItemSelected(Uri uri, boolean firstDisplay);
     }
 
-
+    private BroadcastReceiver receiver;
     private MoviesAdapter mMoviesAdapter;
     private TmdbAccess tmdbAccess;
 
@@ -89,6 +91,29 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
 
     @Override
+    public void onStart() {
+        receiver = new InternetReceiver(getActivity()) {
+            @Override
+            protected void refresh() {
+                syncDB();
+            }
+        };
+
+        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        getActivity().registerReceiver(receiver, filter);
+        super.onStart();
+    }
+
+    @Override
+    public void onStop() {
+        getActivity().unregisterReceiver(receiver);
+        super.onStop();
+    }
+
+
+
+
+    @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         Log.e("PopularMovies", "onActivityCreated " + getClass().getSimpleName());
         getLoaderManager().initLoader(MOVIES_LOADER, null, this);
@@ -97,7 +122,10 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
 
     public void onSettingsChange() {
-        if (isConnected())
+        //Offline 'popularity.desc' and 'vote_average.desc' sort order will display the display
+        // the favorites in the order chosen.
+        deleteUnfavorites(getContext());
+        if (((InternetReceiver)receiver).isConnected())
             syncDB();
         getLoaderManager().restartLoader(MOVIES_LOADER, null, this);
     }
@@ -107,13 +135,14 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         MoviesSyncAdapter.syncImmediately(getActivity());
     }
 
-    private boolean isConnected() {
-        ConnectivityManager connectivityManager = (ConnectivityManager) getContext()
-                .getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
-        boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
-        return isConnected;
+    private static void deleteUnfavorites(Context context) {
+        //Need to delete Trailer and Reviews entry first to avoid foreign key conflict
+        //Need to delete Trailer and Reviews, because 'on delete cascade does not seems to work'
+        context.getContentResolver().delete(MovieContract.TrailerEntry.CONTENT_URI, null, null);
+        context.getContentResolver().delete(MovieContract.ReviewEntry.CONTENT_URI, null, null);
+        context.getContentResolver().delete(MovieEntry.CONTENT_URI, null, null);
     }
+
 
     private Uri buildMoviesUri() {
         String sortBy=Utility.getSortOrderPreferences(getContext());
