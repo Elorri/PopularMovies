@@ -2,12 +2,19 @@ package com.example.android.popularmovies;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.util.Log;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  * Created by Elorri on 30/10/2015.
  */
 public class Utility {
+
+    private static final String LOG_TAG = Utility.class.getSimpleName();
 
     public static String getSortOrderPreferences(Context context) {
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -35,5 +42,22 @@ public class Utility {
     public static int getDbFavoriteValue(boolean mFavoriteValue) {
         if (mFavoriteValue) return 1;
         return 0;
+    }
+
+    public static URL constructYoutubeThumbnailTrailerURL(String key) {
+        try {
+            final String BASE_URL = "http://img.youtube.com/vi/";
+            final String DEFAULT_PARAM = "default.jpg";
+
+            Uri builtUri = Uri.parse(BASE_URL).buildUpon()
+                    .appendPath(key)
+                    .appendPath(DEFAULT_PARAM)
+                    .build();
+            return new URL(builtUri.toString());
+
+        } catch (MalformedURLException e) {
+            Log.e(LOG_TAG, "Error " + e);
+            return null;
+        }
     }
 }

@@ -94,7 +94,7 @@ public class MovieProvider extends ContentProvider {
                 break;
             case TRAILERS_MOVIE:
                 movie_id = TrailerEntry.getMovieIdFromMovieTrailerUri(uri);
-                cursor = mOpenHelper.getReadableDatabase().query(TrailerEntry.TABLE_NAME, projection, TrailerEntry.COLUMN_MOVIE_ID + "=?", new String[]{movie_id}, null, null, null);
+                cursor = mOpenHelper.getReadableDatabase().query(TrailerEntry.TABLE_NAME, projection, TrailerEntry.COLUMN_MOVIE_ID + "=?", new String[]{movie_id}, null, null, TrailerEntry.COLUMN_NAME+" desc");
                 break;
             case REVIEW:
                 cursor = mOpenHelper.getReadableDatabase().query(ReviewEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);

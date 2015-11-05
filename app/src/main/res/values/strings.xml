@@ -35,5 +35,7 @@
     <string name="sync_account_type">popularmovies.android.example.com</string>
     <!-- the content_authority is also define in MovieContract, a change here should be followed by a change there -->
     <string name="content_authority">com.example.android.popularmovies</string>
+    <string name="trailersLabel">Trailers :</string>
+    <string name="reviewsLabel">Reviews</string>
 
 </resources>

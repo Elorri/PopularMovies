@@ -25,8 +25,6 @@ public class TestUtilities extends AndroidTestCase {
     private static final String LOG_TAG = "PopularMovies";
 
 
-
-
     static void validateCursor(String error, Cursor valueCursor, ContentValues expectedValues) {
         assertTrue("Empty cursor returned. " + error, valueCursor.moveToFirst());
         validateCurrentRecord(error, valueCursor, expectedValues);
@@ -197,8 +195,6 @@ public class TestUtilities extends AndroidTestCase {
     }
 
 
-
-
     public static void echo(String s) {
         int length = s.length();
 
@@ -211,11 +207,13 @@ public class TestUtilities extends AndroidTestCase {
     }
 
 
-    public static void testGetShortString(){
-          final String A_LONG_STRING="azertyuiopqsdfghjklmwxcvbn";
-        final String A_SHORT_STRING="azerty";
+    public static void testGetShortString() {
+        final String A_LONG_STRING = "azertyuiopqsdfghjklmwxcvbn";
+        final String A_SHORT_STRING = "azerty";
 
         assertEquals("azertyuiopqsdfghj...", Utility.getShortString(A_LONG_STRING, 20));
         assertEquals("azerty", Utility.getShortString(A_SHORT_STRING, 20));
     }
+
+
 }

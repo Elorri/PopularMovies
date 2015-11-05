@@ -24,6 +24,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.popularmovies.data.MovieContract.MovieEntry;
+import com.example.android.popularmovies.data.MovieContract.TrailerEntry;
+import com.example.android.popularmovies.data.MovieContract.ReviewEntry;
+
 import com.squareup.picasso.Picasso;
 
 /**
@@ -68,6 +71,39 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     static final int COL_RATE = 6;
     static final int COL_POPULARITY = 7;
     static final int COL_FAVORITE = 8;
+
+    private static final String[] TRAILER_COLUMNS = {
+            TrailerEntry._ID,
+            TrailerEntry.COLUMN_KEY,
+            TrailerEntry.COLUMN_NAME,
+            TrailerEntry.COLUMN_TYPE,
+            TrailerEntry.COLUMN_MOVIE_ID
+    };
+
+    // These indices are tied to TRAILER_COLUMNS.  If MOVIE_COLUMNS changes, these
+// must change.
+    static final int TRAILER_ID = 0;
+    static final int COL_KEY = 1;
+    static final int COL_NAME = 2;
+    static final int COL_TYPE = 3;
+    static final int COL_MOVIE_ID_T = 4;
+
+
+    private static final String[] REVIEWS_COLUMNS = {
+            ReviewEntry._ID,
+            ReviewEntry.COLUMN_AUTHOR,
+            ReviewEntry.COLUMN_CONTENT,
+            ReviewEntry.COLUMN_MOVIE_ID
+    };
+
+    // These indices are tied to REVIEWS_COLUMNS.  If MOVIE_COLUMNS changes, these
+// must change.
+    static final int REVIEWS_ID = 0;
+    static final int COL_AUTHOR = 1;
+    static final int COL_CONTENT = 2;
+    static final int COL_MOVIE_ID_R = 3;
+    
+    
 
     private long mId;
     private String mTitleValue;
