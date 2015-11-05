@@ -1,5 +1,6 @@
 package com.example.android.popularmovies;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -21,9 +22,8 @@ import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.example.android.popularmovies.data.MovieContract;
+import com.example.android.popularmovies.data.MovieContract.MovieEntry;
 import com.squareup.picasso.Picasso;
 
 /**
@@ -48,22 +48,37 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private static final int MOVIE_LOADER = 0;
 
     private static final String[] MOVIE_COLUMNS = {
-            MovieContract.MovieEntry.COLUMN_TITLE,
-            MovieContract.MovieEntry.COLUMN_DURATION,
-            MovieContract.MovieEntry.COLUMN_RELEASE_DATE,
-            MovieContract.MovieEntry.COLUMN_POSTER_PATH,
-            MovieContract.MovieEntry.COLUMN_PLOT_SYNOPSIS,
-            MovieContract.MovieEntry.COLUMN_RATE,
-            MovieContract.MovieEntry.COLUMN_FAVORITE
+            MovieEntry._ID,
+            MovieEntry.COLUMN_TITLE,
+            MovieEntry.COLUMN_DURATION,
+            MovieEntry.COLUMN_RELEASE_DATE,
+            MovieEntry.COLUMN_POSTER_PATH,
+            MovieEntry.COLUMN_PLOT_SYNOPSIS,
+            MovieEntry.COLUMN_RATE,
+            MovieEntry.COLUMN_POPULARITY,
+            MovieEntry.COLUMN_FAVORITE
     };
 
-    static final int COL_TITLE = 0;
-    static final int COL_DURATION = 1;
-    static final int COL_RELEASE_DATE = 2;
-    static final int COL_POSTER_PATH = 3;
-    static final int COL_PLOT_SYNOPSIS = 4;
-    static final int COL_RATE = 5;
-    static final int COL_FAVORITE = 6;
+    static final int COL_ID = 0;
+    static final int COL_TITLE = 1;
+    static final int COL_DURATION = 2;
+    static final int COL_RELEASE_DATE = 3;
+    static final int COL_POSTER_PATH = 4;
+    static final int COL_PLOT_SYNOPSIS = 5;
+    static final int COL_RATE = 6;
+    static final int COL_POPULARITY = 7;
+    static final int COL_FAVORITE = 8;
+
+    private long mId;
+    private String mTitleValue;
+    private int mDurationValue;
+    private  String mReleaseDateValue;
+    private String mPosterPathValue;
+    private String mPlotSynopsisValue;
+    private Double mRateValue;
+    private String mPopularityValue;
+    private boolean mFavoriteValue;
+
 
 
     public DetailFragment() {
@@ -141,17 +156,31 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (data != null && data.moveToFirst()) {
             Log.e("PopularMovies", "mTitle : " + mTitle);
-            mTitle.setText(data.getString(COL_TITLE));
-            mDuration.setText(data.getString(COL_DURATION) + " " + getString(R.string.min));
-            mReleaseDate.setText(data.getString(COL_RELEASE_DATE).split("-")[0]); //To extract the year from the date
-            Picasso.with(getActivity()).load(tmdbAccess.constructPosterImageURL(data.getString(COL_POSTER_PATH)).toString()).into(mPosterImage);
-            mPlotSynopsis.setText(data.getString(COL_PLOT_SYNOPSIS));
-            mVoteAverage.setText(data.getString(COL_RATE) + getString(R.string.rateMax));
-            mFavorite.setChecked(Utility.isFavorite(data.getString(COL_FAVORITE)));
+            mId=data.getLong(COL_ID);
+            mTitleValue=data.getString(COL_TITLE);
+            mDurationValue=data.getInt(COL_DURATION) ;
+            mReleaseDateValue=data.getString(COL_RELEASE_DATE).split("-")[0];//To extract the
+            // year  from the date
+            mPosterPathValue=data.getString(COL_POSTER_PATH);
+            mPlotSynopsisValue=data.getString(COL_PLOT_SYNOPSIS);
+            mRateValue=data.getDouble(COL_RATE) ;
+           mPopularityValue=data.getString(COL_POPULARITY);
+            mFavoriteValue=Utility.isFavorite(data.getInt(COL_FAVORITE));
 
+
+            mTitle.setText(mTitleValue);
+            mDuration.setText(mDurationValue+ " " + getString(R.string.min));
+            mReleaseDate.setText(mReleaseDateValue);
+            Picasso.with(getActivity()).load(tmdbAccess.constructPosterImageURL(mPosterPathValue)
+                    .toString()).into(mPosterImage);
+            mPlotSynopsis.setText(mPlotSynopsisValue);
+            mVoteAverage.setText(mRateValue+ getString(R.string.rateMax));
+            mFavorite.setChecked(mFavoriteValue);
 
         }
     }
+
+
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
@@ -163,8 +192,23 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         }
     }
 
+
+
+
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        Toast.makeText(getContext(), "Switch checked ? "+isChecked, Toast.LENGTH_SHORT).show();
+        ContentValues movieValues = new ContentValues();
+        movieValues.put(MovieEntry._ID, mId);
+        movieValues.put(MovieEntry.COLUMN_TITLE, mTitleValue);
+        movieValues.put(MovieEntry.COLUMN_DURATION, mDurationValue);
+        movieValues.put(MovieEntry.COLUMN_RELEASE_DATE, mReleaseDateValue);
+        movieValues.put(MovieEntry.COLUMN_POSTER_PATH, mPosterPathValue);
+        movieValues.put(MovieEntry.COLUMN_PLOT_SYNOPSIS,mPlotSynopsisValue);
+        movieValues.put(MovieEntry.COLUMN_RATE, mRateValue);
+        movieValues.put(MovieEntry.COLUMN_POPULARITY, mPopularityValue);
+        movieValues.put(MovieEntry.COLUMN_FAVORITE, Utility.getDbFavoriteValue(isChecked));
+
+        getContext().getContentResolver().update(MovieEntry.CONTENT_URI,movieValues,MovieEntry
+                ._ID+"=?", new String[]{Long.toString(mId)});
     }
 }

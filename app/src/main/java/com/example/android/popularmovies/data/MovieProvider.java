@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.example.android.popularmovies.data.MovieContract.MovieEntry;
 import com.example.android.popularmovies.data.MovieContract.ReviewEntry;
@@ -220,7 +221,11 @@ public class MovieProvider extends ContentProvider {
 
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        //This app won't use the update but since we have to implement the method, we will let the class calling the content provider specifying thedifferent parameters.
+        // The only update our app will do is switch the favorite to 1 or 0. Since only the
+        // class which call the ContentProvider knows the value selectionArgs, we let this class
+        // fill all arguments.
+        //This app won't use others updates but since we have to implement the method, we will
+        // let the class calling the content provider specifying the different parameters.
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         final int match = sUriMatcher.match(uri);
         int rowsUpdated;
@@ -266,6 +271,19 @@ public class MovieProvider extends ContentProvider {
         int returnCount = 0;
         try {
             for (ContentValues value : values) {
+                //Check if the movie already exist and is a favorite
+                Cursor cursor=db.query(MovieEntry.TABLE_NAME, new String[]{MovieEntry
+                            .COLUMN_FAVORITE},
+                        MovieEntry._ID+"=? and "+MovieEntry.COLUMN_FAVORITE+"=?",
+                        new String[]{value.get(MovieEntry._ID).toString(), MovieEntry
+                                .FAVORITE_ON_VALUE}, null,
+                        null,
+                        null);
+                if (cursor.moveToFirst()) {//Set favorite on on the record we want to insert
+                    value.put(MovieEntry.COLUMN_FAVORITE, MovieEntry.FAVORITE_ON_VALUE);
+                    Log.e("PopularMovies", "Movie already exist");
+                }
+                Log.e("PopularMovies","after if");
                 long _id = db.insert(tableName, null, value);
                 if (_id != -1) {
                     returnCount++;

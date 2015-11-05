@@ -22,13 +22,18 @@ public class Utility {
         return aString;
     }
 
-    public static boolean isFavorite(String favoriteDbString) {
-        if (favoriteDbString.equals("1")) return true;
+    public static boolean isFavorite(int value) {
+        if (value == 1) return true;
         return false;
     }
 
 
     public static int convert(int n) {
         return Integer.valueOf(String.valueOf(n), 16);
+    }
+
+    public static int getDbFavoriteValue(boolean mFavoriteValue) {
+        if (mFavoriteValue) return 1;
+        return 0;
     }
 }
