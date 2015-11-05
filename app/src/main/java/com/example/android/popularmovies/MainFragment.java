@@ -1,10 +1,9 @@
 package com.example.android.popularmovies;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -34,7 +33,6 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         void onItemSelected(Uri uri, boolean firstDisplay);
     }
 
-    private BroadcastReceiver receiver;
     private MoviesAdapter mMoviesAdapter;
     private TmdbAccess tmdbAccess;
 
@@ -90,27 +88,6 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     }
 
 
-    @Override
-    public void onStart() {
-        receiver = new InternetReceiver(getActivity()) {
-            @Override
-            protected void refresh() {
-                syncDB();
-            }
-        };
-
-        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
-        getActivity().registerReceiver(receiver, filter);
-        super.onStart();
-    }
-
-    @Override
-    public void onStop() {
-        getActivity().unregisterReceiver(receiver);
-        super.onStop();
-    }
-
-
 
 
     @Override
@@ -125,7 +102,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         //Offline 'popularity.desc' and 'vote_average.desc' sort order will display the display
         // the favorites in the order chosen.
         deleteUnfavorites(getContext());
-        if (((InternetReceiver)receiver).isConnected())
+        if (isConnected())
             syncDB();
         getLoaderManager().restartLoader(MOVIES_LOADER, null, this);
     }
@@ -133,6 +110,15 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
     public void syncDB() {
         MoviesSyncAdapter.syncImmediately(getActivity());
+    }
+
+
+    public boolean isConnected() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getContext().getSystemService
+                (Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+        return isConnected;
     }
 
     private static void deleteUnfavorites(Context context) {
