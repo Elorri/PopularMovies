@@ -25,6 +25,63 @@ public class TestUtilities extends AndroidTestCase {
     private static final String LOG_TAG = "PopularMovies";
 
 
+
+    private static final String[] MOVIE_COLUMNS = {
+            MovieContract.MovieEntry._ID,
+            MovieContract.MovieEntry.COLUMN_TITLE,
+            MovieContract.MovieEntry.COLUMN_DURATION,
+            MovieContract.MovieEntry.COLUMN_RELEASE_DATE,
+            MovieContract.MovieEntry.COLUMN_POSTER_PATH,
+            MovieContract.MovieEntry.COLUMN_PLOT_SYNOPSIS,
+            MovieContract.MovieEntry.COLUMN_RATE,
+            MovieContract.MovieEntry.COLUMN_POPULARITY,
+            MovieContract.MovieEntry.COLUMN_FAVORITE
+    };
+
+    static final int MOVIE_ID_IDX = 0;
+    static final int COL_TITLE = 1;
+    static final int COL_DURATION = 2;
+    static final int COL_RELEASE_DATE = 3;
+    static final int COL_POSTER_PATH = 4;
+    static final int COL_PLOT_SYNOPSIS = 5;
+    static final int COL_RATE = 6;
+    static final int COL_POPULARITY = 7;
+    static final int COL_FAVORITE = 8;
+
+
+    private static final String[] TRAILER_COLUMNS = {
+            MovieContract.TrailerEntry._ID,
+            MovieContract.TrailerEntry.COLUMN_KEY,
+            MovieContract.TrailerEntry.COLUMN_NAME,
+            MovieContract.TrailerEntry.COLUMN_TYPE,
+            MovieContract.TrailerEntry.COLUMN_MOVIE_ID
+    };
+
+    // These indices are tied to TRAILER_COLUMNS.  If MOVIE_COLUMNS changes, these
+// must change.
+    static final int TRAILER_ID = 0;
+    static final int COL_KEY = 1;
+    static final int COL_NAME = 2;
+    static final int COL_TYPE = 3;
+    static final int COL_MOVIE_ID_T = 4;
+
+
+    private static final String[] REVIEWS_COLUMNS = {
+            MovieContract.ReviewEntry._ID,
+            MovieContract.ReviewEntry.COLUMN_AUTHOR,
+            MovieContract.ReviewEntry.COLUMN_CONTENT,
+            MovieContract.ReviewEntry.COLUMN_MOVIE_ID
+    };
+
+    // These indices are tied to REVIEWS_COLUMNS.  If MOVIE_COLUMNS changes, these
+// must change.
+    static final int REVIEWS_ID = 0;
+    static final int COL_AUTHOR = 1;
+    static final int COL_CONTENT = 2;
+    static final int COL_MOVIE_ID_R = 3;
+
+
+
     static void validateCursor(String error, Cursor valueCursor, ContentValues expectedValues) {
         assertTrue("Empty cursor returned. " + error, valueCursor.moveToFirst());
         validateCurrentRecord(error, valueCursor, expectedValues);
@@ -65,7 +122,7 @@ public class TestUtilities extends AndroidTestCase {
         trailerValues.put(MovieContract.TrailerEntry.COLUMN_KEY, "FRDdRto_3SA");
         trailerValues.put(MovieContract.TrailerEntry.COLUMN_NAME, "Trailers From Hell");
         trailerValues.put(MovieContract.TrailerEntry.COLUMN_TYPE, "Featurette");
-        trailerValues.put(MovieContract.TrailerEntry.COLUMN_MOVIE_ID, MOVIE_ID_FAVORITE);
+        trailerValues.put(MovieContract.TrailerEntry.COLUMN_MOVIE_ID, 135400l);
         return trailerValues;
     }
 
@@ -213,6 +270,86 @@ public class TestUtilities extends AndroidTestCase {
 
         assertEquals("azertyuiopqsdfghj...", Utility.getShortString(A_LONG_STRING, 20));
         assertEquals("azerty", Utility.getShortString(A_SHORT_STRING, 20));
+    }
+
+
+
+    //Useful method to help import the data in a local db for testing. Android studio free version doesn't allow to visualize db file.
+    public void testShowMovieTable() {
+
+        // Test the sort_by content provider query
+        Cursor cursor = mContext.getContentResolver().query(
+                MovieContract.MovieEntry.CONTENT_URI,
+                MOVIE_COLUMNS,
+                null,
+                null,
+                null
+        );
+
+
+        int i = 0;
+        while (cursor.moveToNext()) {
+            Log.e(LOG_TAG, i + ("$" + cursor.getInt(MOVIE_ID_IDX) + "|" + cursor.getString(COL_TITLE) + "|" + cursor.getInt(COL_DURATION) + "|" + cursor.getInt(COL_RELEASE_DATE) + "|" + cursor.getString(COL_POSTER_PATH) + "|" + cursor.getString(COL_PLOT_SYNOPSIS) + "|" + cursor.getDouble(COL_RATE) + "|" + cursor.getString(COL_POPULARITY)
+                    + "|" + cursor.getInt(COL_FAVORITE)));
+            i++;
+        }
+        Log.e(LOG_TAG, i + "record displayed");
+    }
+
+    //Useful method to help import the data in a local db for testing. Android studio free version doesn't allow to visualize db file.
+    public void testShowMovieSortByQuery() {
+        // Test the sort_by content provider query
+        Cursor cursor = mContext.getContentResolver().query(
+                MovieContract.MovieEntry.buildMoviesSortByUri(MovieContract.MovieEntry.FAVORITE_RATE),
+                MOVIE_COLUMNS,
+                null,
+                null,
+                null
+        );
+        int i = 0;
+        while (cursor.moveToNext()) {
+            Log.e(LOG_TAG, i + ("$" + cursor.getInt(MOVIE_ID_IDX) + "|" + cursor.getString(COL_TITLE) + "|" + cursor.getInt(COL_DURATION) + "|" + cursor.getInt(COL_RELEASE_DATE) + "|" + cursor.getString(COL_POSTER_PATH) + "|" + cursor.getString(COL_PLOT_SYNOPSIS) + "|" + cursor.getDouble(COL_RATE) + "|" + cursor.getString(COL_POPULARITY)
+                    + "|" + cursor.getInt(COL_FAVORITE)));
+            i++;
+        }
+        Log.e(LOG_TAG, i + "record displayed");
+    }
+
+
+    public void testShowReviewTable() {
+        // Test the sort_by content provider query
+        Cursor cursor = mContext.getContentResolver().query(
+                MovieContract.ReviewEntry.CONTENT_URI,
+                REVIEWS_COLUMNS,
+                null,
+                null,
+                null
+        );
+        int i = 0;
+        while (cursor.moveToNext()) {
+            Log.e(LOG_TAG, i + ("$" + cursor.getString(cursor.getColumnIndex(MovieContract.ReviewEntry._ID)) + "|" + cursor.getString(cursor.getColumnIndex(MovieContract.ReviewEntry.COLUMN_AUTHOR)) + "|" + cursor.getString(cursor.getColumnIndex(MovieContract.ReviewEntry.COLUMN_CONTENT)) + "|" + cursor.getInt(cursor.getColumnIndex(MovieContract.ReviewEntry.COLUMN_MOVIE_ID))));
+            i++;
+        }
+        Log.e(LOG_TAG, i + "record displayed");
+    }
+
+
+    public void testShowTrailerTable() {
+        // Test the sort_by content provider query
+        Cursor cursor = mContext.getContentResolver().query(
+                MovieContract.TrailerEntry.CONTENT_URI,
+                TRAILER_COLUMNS,
+                null,
+                null,
+                null
+        );
+        int i = 0;
+        while (cursor.moveToNext()) {
+            Log.d(LOG_TAG, i + ("$" + cursor.getString(cursor.getColumnIndex(MovieContract.TrailerEntry._ID))
+                    + "|" + cursor.getString(cursor.getColumnIndex(MovieContract.TrailerEntry.COLUMN_KEY)) + "|" + cursor.getString(cursor.getColumnIndex(MovieContract.TrailerEntry.COLUMN_NAME)) + "|" + cursor.getString(cursor.getColumnIndex(MovieContract.TrailerEntry.COLUMN_TYPE)) + "|" + cursor.getInt(cursor.getColumnIndex(MovieContract.TrailerEntry.COLUMN_MOVIE_ID))));
+            i++;
+        }
+        Log.d(LOG_TAG, i + "record displayed");
     }
 
 

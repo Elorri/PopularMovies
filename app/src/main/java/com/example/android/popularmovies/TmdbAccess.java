@@ -6,6 +6,8 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.example.android.popularmovies.data.MovieContract.MovieEntry;
+import com.example.android.popularmovies.data.MovieContract.TrailerEntry;
+import com.example.android.popularmovies.data.MovieContract.ReviewEntry;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -186,19 +188,132 @@ public class TmdbAccess {
         JSONArray moviesArray = moviesJson.getJSONArray(RESULTS);
 
 
-        ContentValues[] moviesList = new ContentValues[moviesArray.length()];
-        for (int i = 0; i < moviesArray.length(); i++) {
+        //ContentValues[] moviesList = new ContentValues[moviesArray.length()];
+        int i = 0;
+        for (; i < moviesArray.length(); i++) {
 
             // Get the JSON object representing the movie
             JSONObject aMovie = moviesArray.getJSONObject(i);
 
             // Create Movie Object
-            String id = aMovie.getString(ID);
-            moviesList[i] = getMovieById(id);
+            String movieId = aMovie.getString(ID);
+           ContentValues aMovieValue = getMovieById(movieId);
+
+            //We insert each movie one by one and we insert trailers and reviews in bulk. We
+            // can't insert movies in bulk because of the foreign key constraint on trailers and
+            // reviews.
+            context.getContentResolver().insert(MovieEntry.CONTENT_URI, aMovieValue);
+            syncTrailers(movieId);
+            syncReviews(movieId);
         }
-        int inserted=context.getContentResolver().bulkInsert(MovieEntry.CONTENT_URI, moviesList);
-        Log.d(LOG_TAG, "Sync task complete. "+inserted+" reccords inserted");
+        //int inserted=context.getContentResolver().bulkInsert(MovieEntry.CONTENT_URI, moviesList);
+        Log.d(LOG_TAG, "Inserted "+i+" movies. Sync completed");
     }
+
+    private void syncTrailers(String movieId) {
+        URL url = constructTrailersListQuery(movieId);
+        String trailersJsonStr = getJsonString(url);
+        try {
+            syncTrailersFromJson(trailersJsonStr, movieId);
+        } catch (JSONException e) {
+            Log.e(LOG_TAG, e.getMessage(), e);
+            e.printStackTrace();
+        }
+    }
+
+    private void syncReviews(String movieId) {
+        URL url = constructReviewsListQuery(movieId);
+        String reviewsJsonStr = getJsonString(url);
+        try {
+            syncReviewsFromJson(reviewsJsonStr, movieId);
+        } catch (JSONException e) {
+            Log.e(LOG_TAG, e.getMessage(), e);
+            e.printStackTrace();
+        }
+    }
+
+    private URL constructTrailersListQuery(String movieId) {
+            try {
+                final String BASE_URL = "http://api.themoviedb.org/3/movie/";
+                final String TRAILERS_QUERY_PARAM = "videos";
+                final String KEY_PARAM = "api_key";
+
+                Uri builtUri = Uri.parse(BASE_URL).buildUpon()
+                        .appendPath(movieId)
+                        .appendPath(TRAILERS_QUERY_PARAM)
+                        .appendQueryParameter(KEY_PARAM, API_KEY)
+                        .build();
+                Log.e(LOG_TAG, builtUri.toString());
+                return new URL(builtUri.toString());
+            } catch (MalformedURLException e) {
+                Log.e(LOG_TAG, "Error " + e);
+                return null;
+            }
+    }
+
+    private URL constructReviewsListQuery(String movieId) {
+        try {
+            final String BASE_URL = "http://api.themoviedb.org/3/movie/";
+            final String REVIEWS_QUERY_PARAM = "reviews";
+            final String KEY_PARAM = "api_key";
+
+            Uri builtUri = Uri.parse(BASE_URL).buildUpon()
+                    .appendPath(movieId)
+                    .appendPath(REVIEWS_QUERY_PARAM)
+                    .appendQueryParameter(KEY_PARAM, API_KEY)
+                    .build();
+            Log.e(LOG_TAG, builtUri.toString());
+            return new URL(builtUri.toString());
+        } catch (MalformedURLException e) {
+            Log.e(LOG_TAG, "Error " + e);
+            return null;
+        }
+    }
+
+    private void syncTrailersFromJson(String trailersJsonStr, String movieId) throws JSONException {
+
+
+        // These are the names of the JSON objects that need to be extracted.
+        final String RESULTS = "results";
+
+        JSONObject trailersJson = new JSONObject(trailersJsonStr);
+        JSONArray trailersArray = trailersJson.getJSONArray(RESULTS);
+
+
+        ContentValues[] trailersList = new ContentValues[trailersArray.length()];
+        for (int i = 0; i < trailersArray.length(); i++) {
+
+            // Get the JSON object representing the trailer
+            JSONObject aTrailer = trailersArray.getJSONObject(i);
+            trailersList[i] = getOneTrailerFromJson(aTrailer, movieId);
+        }
+        int inserted=context.getContentResolver().bulkInsert(TrailerEntry.CONTENT_URI,
+                trailersList);
+        Log.d(LOG_TAG, "Inserted "+inserted+" trailers.");
+    }
+
+    private void syncReviewsFromJson(String reviewsJsonStr, String movieId) throws JSONException {
+
+
+        // These are the names of the JSON objects that need to be extracted.
+        final String RESULTS = "results";
+
+        JSONObject reviewsJson = new JSONObject(reviewsJsonStr);
+        JSONArray reviewsArray = reviewsJson.getJSONArray(RESULTS);
+
+
+        ContentValues[] reviewsList = new ContentValues[reviewsArray.length()];
+        for (int i = 0; i < reviewsArray.length(); i++) {
+
+            // Get the JSON object representing the review
+            JSONObject aReview = reviewsArray.getJSONObject(i);
+            reviewsList[i] = getOneReviewFromJson(aReview, movieId);
+        }
+        int inserted=context.getContentResolver().bulkInsert(ReviewEntry.CONTENT_URI, reviewsList);
+        Log.d(LOG_TAG, "Inserted "+inserted+" reviews.");
+    }
+
+
 
     private ContentValues getOneMovieFromJson(String theMovieJsonStr) throws JSONException {
 
@@ -244,72 +359,47 @@ public class TmdbAccess {
 
 
 
-//    private ContentValues getOneReviewFromJson(String theReviewJsonStr) throws JSONException {
-//
-//        // These are the names of the JSON objects that need to be extracted.
-//        final String ID = "id";
-//        final String TITLE="title";
-//        final String POSTER_PATH = "poster_path";
-//        final String OVERVIEW = "overview";
-//        final String VOTE_AVERAGE = "vote_average";
-//        final String RELEASE_DATE = "release_date";
-//        final String DURATION = "runtime";
-//
-//        JSONObject movieJson = new JSONObject(theMovieJsonStr);
-//
-//        String id = movieJson.getString(ID);
-//        String title =movieJson.getString(TITLE);
-//        String posterPath = movieJson.getString(POSTER_PATH);
-//        String posterName = null;
-//        if (!posterPath.equals("null"))
-//            posterName = posterPath.split("/")[1]; //To remove the unwanted '/' given by the api
-//        String releaseDate =movieJson.getString(RELEASE_DATE);
-//        String duration =movieJson.getString(DURATION);
-//        String voteAverage =movieJson.getString(VOTE_AVERAGE);
-//        String overview =movieJson.getString(OVERVIEW);
-//
-//
-//        ContentValues movieValues = new ContentValues();
-//        reviewValues.put(ReviewEntry._ID,_id);
-//        reviewValues.put(ReviewEntry.COLUMN_AUTHOR,author);
-//        reviewValues.put(ReviewEntry.COLUMN_CONTENT,content);
-//        reviewValues.put(ReviewEntry.COLUMN_MOVIE_ID,movie_id);
-//        return movieValues;
-//    }
-//
-//    private ContentValues getTrailerFromJson(String theTrailerJsonStr) throws JSONException {
-//
-//        // These are the names of the JSON objects that need to be extracted.
-//        final String ID = "id";
-//        final String TITLE="title";
-//        final String POSTER_PATH = "poster_path";
-//        final String OVERVIEW = "overview";
-//        final String VOTE_AVERAGE = "vote_average";
-//        final String RELEASE_DATE = "release_date";
-//        final String DURATION = "runtime";
-//
-//        JSONObject movieJson = new JSONObject(theMovieJsonStr);
-//
-//        String id = movieJson.getString(ID);
-//        String title =movieJson.getString(TITLE);
-//        String posterPath = movieJson.getString(POSTER_PATH);
-//        String posterName = null;
-//        if (!posterPath.equals("null"))
-//            posterName = posterPath.split("/")[1]; //To remove the unwanted '/' given by the api
-//        String releaseDate =movieJson.getString(RELEASE_DATE);
-//        String duration =movieJson.getString(DURATION);
-//        String voteAverage =movieJson.getString(VOTE_AVERAGE);
-//        String overview =movieJson.getString(OVERVIEW);
-//
-//
-//        ContentValues movieValues = new ContentValues();
-//        trailerValues.put(TrailerEntry._ID,_id);
-//        trailerValues.put(TrailerEntry.COLUMN_KEY,key);
-//        trailerValues.put(TrailerEntry.COLUMN_NAME,name);
-//        trailerValues.put(TrailerEntry.COLUMN_TYPE,type);
-//        trailerValues.put(TrailerEntry.COLUMN_MOVIE_ID,movie_id);
-//        return movieValues;
-//    }
 
 
+    private ContentValues getOneTrailerFromJson(JSONObject aTrailer, String movieId) throws JSONException {
+
+        // These are the names of the JSON objects that need to be extracted.
+        final String _ID = "id";
+        final String KEY="key";
+        final String NAME = "name";
+        final String TYPE = "type";
+
+        String id = aTrailer.getString(_ID);
+        String key =aTrailer.getString(KEY);
+        String name = aTrailer.getString(NAME);
+        String type =aTrailer.getString(TYPE);
+
+        ContentValues trailerValues = new ContentValues();
+        trailerValues.put(TrailerEntry._ID,id);
+        trailerValues.put(TrailerEntry.COLUMN_KEY,key);
+        trailerValues.put(TrailerEntry.COLUMN_NAME,name);
+        trailerValues.put(TrailerEntry.COLUMN_TYPE,type);
+        trailerValues.put(TrailerEntry.COLUMN_MOVIE_ID,movieId);
+        return trailerValues;
+    }
+
+    private ContentValues getOneReviewFromJson(JSONObject aReview, String movieId) throws
+            JSONException {
+
+        // These are the names of the JSON objects that need to be extracted.
+        final String _ID = "id";
+        final String AUTHOR="author";
+        final String CONTENT = "content";
+
+        String _id = aReview.getString(_ID);
+        String author =aReview.getString(AUTHOR);
+        String content = aReview.getString(CONTENT);
+
+        ContentValues reviewValues = new ContentValues();
+        reviewValues.put(ReviewEntry._ID,_id);
+        reviewValues.put(ReviewEntry.COLUMN_AUTHOR,author);
+        reviewValues.put(ReviewEntry.COLUMN_CONTENT,content);
+        reviewValues.put(ReviewEntry.COLUMN_MOVIE_ID,movieId);
+        return reviewValues;
+    }
 }

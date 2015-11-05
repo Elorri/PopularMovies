@@ -8,7 +8,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.example.android.popularmovies.data.MovieContract.MovieEntry;
 import com.example.android.popularmovies.data.MovieContract.ReviewEntry;
@@ -153,6 +152,7 @@ public class MovieProvider extends ContentProvider {
 
         switch (match) {
             case MOVIE:
+                values=createCorrectContentValue(db, values);
                 _id = db.insert(MovieEntry.TABLE_NAME, null, values);
                 if (_id > 0)
                     returnUri = MovieEntry.buildMovieDetailUri(_id);
@@ -250,6 +250,7 @@ public class MovieProvider extends ContentProvider {
     }
 
 
+
     //This bulk insert is better than the default, because we use only one transaction for all inserts.
     @Override
     public int bulkInsert(Uri uri, ContentValues[] values) {
@@ -258,6 +259,14 @@ public class MovieProvider extends ContentProvider {
         switch (match) {
             case MOVIE:
                 returnCount=insertInBulk(MovieEntry.TABLE_NAME, values);
+                getContext().getContentResolver().notifyChange(uri, null);
+                return returnCount;
+            case TRAILER:
+                returnCount=insertInBulk(TrailerEntry.TABLE_NAME, values);
+                getContext().getContentResolver().notifyChange(uri, null);
+                return returnCount;
+            case REVIEW:
+                returnCount=insertInBulk(ReviewEntry.TABLE_NAME, values);
                 getContext().getContentResolver().notifyChange(uri, null);
                 return returnCount;
             default:
@@ -271,19 +280,7 @@ public class MovieProvider extends ContentProvider {
         int returnCount = 0;
         try {
             for (ContentValues value : values) {
-                //Check if the movie already exist and is a favorite
-                Cursor cursor=db.query(MovieEntry.TABLE_NAME, new String[]{MovieEntry
-                            .COLUMN_FAVORITE},
-                        MovieEntry._ID+"=? and "+MovieEntry.COLUMN_FAVORITE+"=?",
-                        new String[]{value.get(MovieEntry._ID).toString(), MovieEntry
-                                .FAVORITE_ON_VALUE}, null,
-                        null,
-                        null);
-                if (cursor.moveToFirst()) {//Set favorite on on the record we want to insert
-                    value.put(MovieEntry.COLUMN_FAVORITE, MovieEntry.FAVORITE_ON_VALUE);
-                    Log.e("PopularMovies", "Movie already exist");
-                }
-                Log.e("PopularMovies","after if");
+                value=createCorrectContentValue(db, value);
                 long _id = db.insert(tableName, null, value);
                 if (_id != -1) {
                     returnCount++;
@@ -294,6 +291,22 @@ public class MovieProvider extends ContentProvider {
         } finally {
             db.endTransaction();
         }
+    }
+
+    private ContentValues createCorrectContentValue(SQLiteDatabase writableDb, ContentValues
+            value) {
+        //Check if the movie already exist and is a favorite
+        Cursor cursor=writableDb.query(MovieEntry.TABLE_NAME, new String[]{MovieEntry
+                        .COLUMN_FAVORITE},
+                MovieEntry._ID+"=? and "+MovieEntry.COLUMN_FAVORITE+"=?",
+                new String[]{value.get(MovieEntry._ID).toString(), MovieEntry
+                        .FAVORITE_ON_VALUE}, null,
+                null,
+                null);
+        if (cursor.moveToFirst()) {//Set favorite on on the record we want to insert
+            value.put(MovieEntry.COLUMN_FAVORITE, MovieEntry.FAVORITE_ON_VALUE);
+        }
+        return value;
     }
 
     // You do not need to call this method. This is a method specifically to assist the testing

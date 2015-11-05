@@ -40,6 +40,7 @@ public class TrailersAdapter extends CursorAdapter {
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
+        Log.e("PopularMovies", "newView " + this.getClass().getSimpleName());
         View view = LayoutInflater.from(context).inflate(R.layout.trailer_item, parent, false);
         ViewHolder viewHolder = new ViewHolder(view);
         view.setTag(viewHolder);
@@ -48,15 +49,13 @@ public class TrailersAdapter extends CursorAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-
-        Log.e("PopularMovies", Utility.constructYoutubeThumbnailTrailerURL("FRDdRto_3SA")
-                .toString());
+        Log.e("PopularMovies", "bindView " + cursor.getString
+                (DetailFragment.COL_KEY) + " " + cursor.getString(DetailFragment.COL_NAME) + this.getClass().getSimpleName());
 
         ViewHolder viewHolder = (ViewHolder) view.getTag();
         URL thumbnailTrailerURL = Utility.constructYoutubeThumbnailTrailerURL(cursor.getString
                 (DetailFragment.COL_KEY));
         Picasso.with(context).load(thumbnailTrailerURL.toString()).into(viewHolder.trailerImgView);
-        viewHolder.trailerTitleView.setText(cursor.getString(DetailFragment.COL_NAME)+
-                "("+cursor.getString(DetailFragment.COL_TYPE)+")");
+        viewHolder.trailerTitleView.setText(cursor.getString(DetailFragment.COL_NAME));
     }
 }

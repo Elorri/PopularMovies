@@ -15,7 +15,8 @@
     <dimen name="posterNamePaddingRight">26dp</dimen>
     <dimen name="releaseYearTextSize">28sp</dimen>
     <dimen name="voteAverageTextSize">12sp</dimen>
-    <dimen name="durationTextSize">16dp</dimen>
+    <dimen name="durationTextSize">16sp</dimen>
+    <dimen name="overviewTextSize">16sp</dimen>
     <dimen name="overviewPaddingBottom">26dp</dimen>
     <dimen name="titlePaddingLeft">8dp</dimen>
     <dimen name="titleTextSizePx">30px</dimen>
@@ -31,5 +32,12 @@
     <dimen name="reviewAuthorPaddingBottom">12dp</dimen>
     <dimen name="reviewAuthorPaddingLeft">26dp</dimen>
     <dimen name="reviewAuthorPaddingRight">8dp</dimen>
+    <dimen name="thummnailMarginBottom">16dp</dimen>
+    <dimen name="thummnailMarginLeft">16dp</dimen>
+    <dimen name="thummnailMarginRight">26dp</dimen>
+    <dimen name="thummnailMarginTop">16dp</dimen>
+    <dimen name="itemMarginTop">16dp</dimen>
+    <dimen name="itemMarginBottom">16dp</dimen>
+    <dimen name="itemMarginLeft">8dp</dimen>
 
 </resources>

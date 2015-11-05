@@ -78,6 +78,7 @@
             android:id="@+id/overview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textSize="@dimen/overviewTextSize"
             android:paddingLeft="@dimen/overviewPaddingLeft"
             android:paddingRight="@dimen/overviewPaddingRight"
             android:paddingBottom="@dimen/overviewPaddingBottom"
@@ -91,16 +92,18 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingLeft="@dimen/titlePaddingLeft"
             android:text="@string/trailersLabel"
-            android:textAppearance="?android:textAppearanceMedium"
+            android:textAppearance="?android:textAppearanceLarge"
             android:paddingBottom="@dimen/trailerReviewPaddingBottom"
             />
 
         <ListView
            android:id="@+id/trailer_list"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="300dp"
             android:divider="@null" />
+
 
         <View android:layout_width="match_parent" android:layout_height="1dp"
               android:background="@android:color/darker_gray"
@@ -112,7 +115,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/reviewsLabel"
-            android:textAppearance="?android:textAppearanceMedium"
+            android:paddingLeft="@dimen/titlePaddingLeft"
+            android:textAppearance="?android:textAppearanceLarge"
             android:paddingBottom="@dimen/trailerReviewPaddingBottom"/>
 
         <ListView
