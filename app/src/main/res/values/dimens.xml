@@ -29,7 +29,7 @@
     <dimen name="trailerImgWidth">120dp</dimen>
     <dimen name="trailerImgHeight">90dp</dimen>
     <dimen name="trailerReviewPaddingBottom">16dp</dimen>
-    <dimen name="reviewAuthorPaddingBottom">12dp</dimen>
+    <dimen name="reviewAuthorPaddingBottom">8dp</dimen>
     <dimen name="reviewAuthorPaddingLeft">26dp</dimen>
     <dimen name="reviewAuthorPaddingRight">8dp</dimen>
     <dimen name="thummnailMarginBottom">16dp</dimen>

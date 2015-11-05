@@ -117,7 +117,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private boolean mFavoriteValue;
     private ListView mTrailerListView;
     private ListView mReviewListView;
-    private TrailersAdapter mTrailerAdapter;
+    private DetailAdapter mTrailerAdapter;
 
 
     public DetailFragment() {
@@ -149,7 +149,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
+        View rootView = inflater.inflate(R.layout.detail_fragment, container, false);
 
         tmdbAccess = new TmdbAccess(getContext());
         mTitle = (TextView) rootView.findViewById(R.id.title);
@@ -163,7 +163,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         mTrailerListView = (ListView) rootView.findViewById(R.id.trailer_list);
         mReviewListView = (ListView) rootView.findViewById(R.id.review_list);
 
-        mTrailerAdapter = new TrailersAdapter(getActivity(), null, 0);
+        mTrailerAdapter = new DetailAdapter(getActivity(), null, 0);
         mTrailerListView.setAdapter(mTrailerAdapter);
 
 

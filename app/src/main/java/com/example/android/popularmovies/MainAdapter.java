@@ -18,10 +18,10 @@ import com.squareup.picasso.Picasso;
 import java.net.URL;
 
 /**
- * {@link MoviesAdapter} exposes a list of movie thumbnail
+ * {@link MainAdapter} exposes a list of movie thumbnail
  * from a {@link android.database.Cursor} to a {@link android.widget.GridView}.
  */
-public class MoviesAdapter extends CursorAdapter {
+public class MainAdapter extends CursorAdapter {
 
     private static final String LOG_TAG = "PopularMovies";
 
@@ -29,7 +29,7 @@ public class MoviesAdapter extends CursorAdapter {
     private Uri mUriFirstItem;
 
 
-    public MoviesAdapter(Context context, Cursor c, int flags, TmdbAccess tmdbAccess) {
+    public MainAdapter(Context context, Cursor c, int flags, TmdbAccess tmdbAccess) {
         super(context, c, flags);
         this.tmdbAccess = tmdbAccess;
     }
@@ -40,7 +40,7 @@ public class MoviesAdapter extends CursorAdapter {
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        View view = LayoutInflater.from(context).inflate(R.layout.thumbnail_item, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.main_item, parent, false);
         return view;
     }
 

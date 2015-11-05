@@ -33,7 +33,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         void onItemSelected(Uri uri, boolean firstDisplay);
     }
 
-    private MoviesAdapter mMoviesAdapter;
+    private MainAdapter mMainAdapter;
     private TmdbAccess tmdbAccess;
 
     private static final int MOVIES_LOADER = 0;
@@ -62,17 +62,17 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         // However, we cannot use FLAG_AUTO_REQUERY since it is deprecated, so we will end
         // up with an empty list the first time we run.
         tmdbAccess = new TmdbAccess(getContext());
-        mMoviesAdapter = new MoviesAdapter(getActivity(), null, 0, tmdbAccess);
+        mMainAdapter = new MainAdapter(getActivity(), null, 0, tmdbAccess);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.e("PopularMovies", "onCreateView " + getClass().getSimpleName());
-        View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+        View rootView = inflater.inflate(R.layout.main_fragment, container, false);
 
         // Get a reference to the ListView, and attach this adapter to it.
         GridView gridView = (GridView) rootView.findViewById(R.id.gridView_discovery);
-        gridView.setAdapter(mMoviesAdapter);
+        gridView.setAdapter(mMainAdapter);
 
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -154,13 +154,13 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         Log.e("PopularMovies", "onLoadFinished " + getClass().getSimpleName());
-        mMoviesAdapter.swapCursor(data);
+        mMainAdapter.swapCursor(data);
         //To avoid 'java.lang.IllegalStateException: Can not perform this action inside of onLoadFinished'
         Handler handler = new Handler();
         handler.post(new Runnable() {
             @Override
             public void run() {
-                ((Callback) getActivity()).onItemSelected(mMoviesAdapter.getmUriFirstItem(), true);
+                ((Callback) getActivity()).onItemSelected(mMainAdapter.getmUriFirstItem(), true);
             }
         });
 
@@ -169,7 +169,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         Log.e("PopularMovies", "onLoaderReset " + getClass().getSimpleName());
-        mMoviesAdapter.swapCursor(null);
+        mMainAdapter.swapCursor(null);
     }
 
 

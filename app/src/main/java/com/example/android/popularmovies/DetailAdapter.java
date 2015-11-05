@@ -15,10 +15,10 @@ import com.squareup.picasso.Picasso;
 import java.net.URL;
 
 /**
- * {@link TrailersAdapter} exposes a list of trailer
+ * {@link DetailAdapter} exposes a list of trailer
  * from a {@link android.database.Cursor} to a {@link android.widget.ListView}.
  */
-public class TrailersAdapter extends CursorAdapter {
+public class DetailAdapter extends CursorAdapter {
 
     /**
      * Cache of the children views for a forecast list item.
@@ -34,14 +34,14 @@ public class TrailersAdapter extends CursorAdapter {
     }
 
 
-    public TrailersAdapter(Context context, Cursor c, int flags) {
+    public DetailAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
     }
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         Log.e("PopularMovies", "newView " + this.getClass().getSimpleName());
-        View view = LayoutInflater.from(context).inflate(R.layout.trailer_item, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.detail_trailer_item, parent, false);
         ViewHolder viewHolder = new ViewHolder(view);
         view.setTag(viewHolder);
         return view;
