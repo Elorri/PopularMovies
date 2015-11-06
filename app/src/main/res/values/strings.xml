@@ -37,5 +37,7 @@
     <string name="content_authority">com.example.android.popularmovies</string>
     <string name="trailersLabel">Trailers</string>
     <string name="reviewsLabel">Reviews</string>
+    <string name="detail_label_trailer">Trailers</string>
+    <string name="detail_label_review">Reviews</string>
 
 </resources>

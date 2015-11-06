@@ -11,7 +11,6 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.ShareActionProvider;
-import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -19,33 +18,24 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.CompoundButton;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.example.android.popularmovies.data.MovieContract.MovieEntry;
 import com.example.android.popularmovies.data.MovieContract.ReviewEntry;
 import com.example.android.popularmovies.data.MovieContract.TrailerEntry;
-import com.squareup.picasso.Picasso;
 
 /**
  * A placeholder fragment containing a simple view.
  */
-public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, CompoundButton.OnCheckedChangeListener {
+public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> ,
+        CompoundButton.OnCheckedChangeListener{
 
     private static final String LOG_TAG = DetailFragment.class.getSimpleName();
     public static final String DETAIL_URI = "URI";
     private static Uri mUri;
-    private TmdbAccess tmdbAccess;
 
-    private ImageView mPosterImage;
-    private TextView mTitle;
-    private TextView mPlotSynopsis;
-    private TextView mVoteAverage;
-    private TextView mReleaseDate;
-    private TextView mDuration;
-    private SwitchCompat mFavorite;
 
 
     private static final int MOVIE_LOADER = 0;
@@ -106,18 +96,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     static final int COL_MOVIE_ID_R = 3;
 
 
-    private long mId;
-    private String mTitleValue;
-    private int mDurationValue;
-    private String mReleaseDateValue;
-    private String mPosterPathValue;
-    private String mPlotSynopsisValue;
-    private Double mRateValue;
-    private String mPopularityValue;
-    private boolean mFavoriteValue;
-    private ListView mTrailerListView;
-    private ListView mReviewListView;
-    private DetailAdapter mTrailerAdapter;
+
+    private DetailAdapter mDetailAdapter;
+    private ListView mDetailListView;
 
 
     public DetailFragment() {
@@ -151,20 +132,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.detail_fragment, container, false);
 
-        tmdbAccess = new TmdbAccess(getContext());
-        mTitle = (TextView) rootView.findViewById(R.id.title);
-        mPosterImage = (ImageView) rootView.findViewById(R.id.posterImage);
-        mPlotSynopsis = (TextView) rootView.findViewById(R.id.overview);
-        mVoteAverage = (TextView) rootView.findViewById(R.id.voteAverage);
-        mReleaseDate = (TextView) rootView.findViewById(R.id.releaseYear);
-        mDuration = (TextView) rootView.findViewById(R.id.duration);
-        mFavorite = (SwitchCompat) rootView.findViewById(R.id.favorite);
-        mFavorite.setOnCheckedChangeListener(this);
-        mTrailerListView = (ListView) rootView.findViewById(R.id.trailer_list);
-        mReviewListView = (ListView) rootView.findViewById(R.id.review_list);
 
-        mTrailerAdapter = new DetailAdapter(getActivity(), null, 0);
-        mTrailerListView.setAdapter(mTrailerAdapter);
+        mDetailAdapter = new DetailAdapter(getActivity(), null, 0);
+        mDetailListView.setAdapter(mDetailAdapter);
 
 
         return rootView;
@@ -238,31 +208,11 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         if (data != null && data.moveToFirst()) {
             switch (loader.getId()) {
                 case MOVIE_LOADER:
-                    Log.e("PopularMovies", "MOVIE_LOADER "+" "+this.getClass().getSimpleName());
-                    mId = data.getLong(COL_ID);
-                    mTitleValue = data.getString(COL_TITLE);
-                    mDurationValue = data.getInt(COL_DURATION);
-                    mReleaseDateValue = data.getString(COL_RELEASE_DATE).split("-")[0];//To extract the
-                    // year  from the date
-                    mPosterPathValue = data.getString(COL_POSTER_PATH);
-                    mPlotSynopsisValue = data.getString(COL_PLOT_SYNOPSIS);
-                    mRateValue = data.getDouble(COL_RATE);
-                    mPopularityValue = data.getString(COL_POPULARITY);
-                    mFavoriteValue = Utility.isFavorite(data.getInt(COL_FAVORITE));
 
-
-                    mTitle.setText(mTitleValue);
-                    mDuration.setText(mDurationValue + " " + getString(R.string.min));
-                    mReleaseDate.setText(mReleaseDateValue);
-                    Picasso.with(getActivity()).load(tmdbAccess.constructPosterImageURL(mPosterPathValue)
-                            .toString()).into(mPosterImage);
-                    mPlotSynopsis.setText(mPlotSynopsisValue);
-                    mVoteAverage.setText(mRateValue + getString(R.string.rateMax));
-                    mFavorite.setChecked(mFavoriteValue);
                     break;
                 case TRAILER_LOADER:
                     Log.e("PopularMovies", "TRAILER_LOADER "+" "+this.getClass().getSimpleName());
-                    mTrailerAdapter.swapCursor(data);
+                    mDetailAdapter.swapCursor(data);
                     break;
                 case REVIEW_LOADER:
                     Log.e("PopularMovies", "REVIEW_LOADER"+this.getClass().getSimpleName());
@@ -282,7 +232,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             case MOVIE_LOADER:
                 break;
             case TRAILER_LOADER:
-                mTrailerAdapter.swapCursor(null);
+                mDetailAdapter.swapCursor(null);
                 break;
             case REVIEW_LOADER:
                 // do some more stuff here
@@ -299,20 +249,5 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     }
 
 
-    @Override
-    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        ContentValues movieValues = new ContentValues();
-        movieValues.put(MovieEntry._ID, mId);
-        movieValues.put(MovieEntry.COLUMN_TITLE, mTitleValue);
-        movieValues.put(MovieEntry.COLUMN_DURATION, mDurationValue);
-        movieValues.put(MovieEntry.COLUMN_RELEASE_DATE, mReleaseDateValue);
-        movieValues.put(MovieEntry.COLUMN_POSTER_PATH, mPosterPathValue);
-        movieValues.put(MovieEntry.COLUMN_PLOT_SYNOPSIS, mPlotSynopsisValue);
-        movieValues.put(MovieEntry.COLUMN_RATE, mRateValue);
-        movieValues.put(MovieEntry.COLUMN_POPULARITY, mPopularityValue);
-        movieValues.put(MovieEntry.COLUMN_FAVORITE, Utility.getDbFavoriteValue(isChecked));
 
-        getContext().getContentResolver().update(MovieEntry.CONTENT_URI, movieValues, MovieEntry
-                ._ID + "=?", new String[]{Long.toString(mId)});
-    }
 }

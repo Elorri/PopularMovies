@@ -64,7 +64,7 @@ public class TmdbAccess {
         }
     }
 
-    public URL constructPosterImageURL(String posterName) {
+    public static URL constructPosterImageURL(String posterName) {
         try {
             final String BASE_URL = "http://image.tmdb.org/t/p/";
             final String SIZE = "w185";
