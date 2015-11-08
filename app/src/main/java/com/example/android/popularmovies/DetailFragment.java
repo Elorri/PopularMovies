@@ -1,8 +1,8 @@
 package com.example.android.popularmovies;
 
-import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.MergeCursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -18,8 +18,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.CompoundButton;
 import android.widget.ListView;
 
 import com.example.android.popularmovies.data.MovieContract.MovieEntry;
@@ -29,8 +27,7 @@ import com.example.android.popularmovies.data.MovieContract.TrailerEntry;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> ,
-        CompoundButton.OnCheckedChangeListener{
+public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
 
     private static final String LOG_TAG = DetailFragment.class.getSimpleName();
     public static final String DETAIL_URI = "URI";
@@ -208,7 +205,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         if (data != null && data.moveToFirst()) {
             switch (loader.getId()) {
                 case MOVIE_LOADER:
-
+new MergeCursor()
                     break;
                 case TRAILER_LOADER:
                     Log.e("PopularMovies", "TRAILER_LOADER "+" "+this.getClass().getSimpleName());

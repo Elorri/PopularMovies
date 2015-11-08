@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.CursorAdapter;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.android.popularmovies.data.MovieContract;
@@ -23,14 +22,17 @@ import java.net.URL;
  * {@link DetailAdapter} exposes a list of trailer
  * from a {@link android.database.Cursor} to a {@link android.widget.ListView}.
  */
-public class DetailAdapter extends CursorAdapter  {
+public class DetailAdapter extends CursorAdapter  implements CompoundButton.OnCheckedChangeListener{
 
     private static final int VIEW_TYPE_COUNT = 4;
+
     private static final int ITEM_DESC = 0;
     private static final int ITEM_LABEL = 1;
     private static final int ITEM_TRAILER = 2;
     private static final int ITEM_REVIEW = 3;
+
     private int TRAILER_POSITION=1;
+    private int review_position;
 
 
     private long mId;
@@ -42,7 +44,7 @@ public class DetailAdapter extends CursorAdapter  {
     private Double mRateValue;
     private String mPopularityValue;
     private boolean mFavoriteValue;
-
+    private Context mContext;
 
 
     /**
@@ -76,7 +78,6 @@ public class DetailAdapter extends CursorAdapter  {
                     releasedateTextView= (TextView) view.findViewById(R.id.releaseYear);
                     durationTextView= (TextView) view.findViewById(R.id.duration);
                     favoriteSwitchCompat= (SwitchCompat) view.findViewById(R.id.favorite);
-                    favoriteSwitchCompat.setOnCheckedChangeListener(this);
                     break;
                 }
                 case ITEM_LABEL: {
@@ -100,6 +101,7 @@ public class DetailAdapter extends CursorAdapter  {
 
     public DetailAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
+        mContext=context;
     }
 
     @Override
@@ -154,22 +156,29 @@ public class DetailAdapter extends CursorAdapter  {
 
 
                 viewHolder.titleTextView.setText(mTitleValue);
-                viewHolder.durationTextView.setText(mDurationValue + " " + getString(R.string.min));
+                viewHolder.durationTextView.setText(mDurationValue + " " + context.getString(R
+                        .string.min));
                 viewHolder.releasedateTextView.setText(mReleaseDateValue);
                 Picasso.with(context).load(TmdbAccess.constructPosterImageURL(mPosterPathValue)
-                        .toString()).into(mPosterImage);
+                        .toString()).into(viewHolder.posterimageImageView);
                 viewHolder.plotsynopsisTextView.setText(mPlotSynopsisValue);
-                viewHolder.voteaverageTextView.setText(mRateValue + getString(R.string.rateMax));
+                viewHolder.voteaverageTextView.setText(mRateValue + context.getString(R.string
+                        .rateMax));
                 viewHolder.favoriteSwitchCompat.setChecked(mFavoriteValue);
+                viewHolder.favoriteSwitchCompat.setOnCheckedChangeListener(this);
                 break;
             }
             case ITEM_LABEL: {
-                if (cursor.getPosition() == TRAILER_POSITION)
+                if (cursor.getPosition() == TRAILER_POSITION){
                     viewHolder.labelTextview.setText(context.getString(R.string.detail_label_trailer));
+                    review_position=TRAILER_POSITION+1;
+                }
                 viewHolder.labelTextview.setText(context.getString(R.string.detail_label_review));
                 break;
             }
             case ITEM_TRAILER: {
+                cursor.getCount()
+                review_position=review_position++;
                 URL thumbnailTrailerURL = Utility.constructYoutubeThumbnailTrailerURL(cursor.getString
                         (DetailFragment.COL_KEY));
                 Picasso.with(context).load(thumbnailTrailerURL.toString()).into(viewHolder.trailerImgView);
@@ -182,7 +191,6 @@ public class DetailAdapter extends CursorAdapter  {
                 break;
             }
         }
-
     }
 
 
@@ -209,7 +217,7 @@ public class DetailAdapter extends CursorAdapter  {
         movieValues.put(MovieContract.MovieEntry.COLUMN_POPULARITY, mPopularityValue);
         movieValues.put(MovieContract.MovieEntry.COLUMN_FAVORITE, Utility.getDbFavoriteValue(isChecked));
 
-        getContentResolver().update(MovieContract.MovieEntry.CONTENT_URI,
+        mContext.getContentResolver().update(MovieContract.MovieEntry.CONTENT_URI,
                 movieValues, MovieContract.MovieEntry
                 ._ID + "=?", new String[]{Long.toString(mId)});
     }
