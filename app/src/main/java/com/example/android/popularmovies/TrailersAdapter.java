@@ -2,6 +2,7 @@ package com.example.android.popularmovies;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,6 +27,7 @@ public class TrailersAdapter extends CursorAdapter {
     public static class ViewHolder {
         public final ImageView trailerImgView;
         public final TextView trailerTitleView;
+        public Uri youtubeVideoURI;
 
         public ViewHolder(View view) {
             trailerImgView = (ImageView) view.findViewById(R.id.trailer_img);
@@ -53,7 +55,9 @@ public class TrailersAdapter extends CursorAdapter {
                 (DetailFragment.COL_KEY) + " " + cursor.getString(DetailFragment.COL_NAME) + this.getClass().getSimpleName());
 
         ViewHolder viewHolder = (ViewHolder) view.getTag();
-        URL thumbnailTrailerURL = Utility.constructYoutubeThumbnailTrailerURL(cursor.getString
+        viewHolder.youtubeVideoURI = Utility.buildYoutubeVideoURI(cursor.getString
+                (DetailFragment.COL_KEY));
+        URL thumbnailTrailerURL = Utility.buildYoutubeThumbnailTrailerURL(cursor.getString
                 (DetailFragment.COL_KEY));
         Picasso.with(context).load(thumbnailTrailerURL.toString()).into(viewHolder.trailerImgView);
         viewHolder.trailerTitleView.setText(cursor.getString(DetailFragment.COL_NAME));

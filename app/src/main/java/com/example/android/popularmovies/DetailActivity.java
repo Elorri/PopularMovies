@@ -1,10 +1,12 @@
 package com.example.android.popularmovies;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 public class DetailActivity extends AppCompatActivity {
 
@@ -45,5 +47,13 @@ public class DetailActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+
+
+    public void openVideoReaderApp(View view) {
+        TrailersAdapter.ViewHolder viewHolder = (TrailersAdapter.ViewHolder) view.getTag();
+        Uri uri=viewHolder.youtubeVideoURI;
+        Utility.openYoutube(uri,getPackageManager(),this);
     }
 }

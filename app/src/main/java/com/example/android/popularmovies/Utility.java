@@ -1,7 +1,10 @@
 package com.example.android.popularmovies;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -15,6 +18,16 @@ import java.net.URL;
 public class Utility {
 
     private static final String LOG_TAG = Utility.class.getSimpleName();
+
+
+    public static void openYoutube(Uri uri,PackageManager packageManager,Activity activity){
+        Intent intent=new Intent(Intent.ACTION_VIEW).setData(uri);
+        if(intent.resolveActivity(packageManager)!=null){
+            activity.startActivity(intent);
+        }else {
+            Log.d(LOG_TAG, "Couldn't call " + uri.toString() + ", no receiving apps installed!");
+        }
+    }
 
     public static String getSortOrderPreferences(Context context) {
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -44,7 +57,7 @@ public class Utility {
         return 0;
     }
 
-    public static URL constructYoutubeThumbnailTrailerURL(String key) {
+    public static URL buildYoutubeThumbnailTrailerURL(String key) {
         try {
             final String BASE_URL = "http://img.youtube.com/vi/";
             final String DEFAULT_PARAM = "default.jpg";
@@ -59,5 +72,16 @@ public class Utility {
             Log.e(LOG_TAG, "Error " + e);
             return null;
         }
+    }
+
+    public static Uri buildYoutubeVideoURI(String key) {
+        final String BASE_URL = "https://www.youtube.com/watch";
+        final String QUERY_PARAM = "v";
+
+        Uri builtUri = Uri.parse(BASE_URL).buildUpon()
+                .appendQueryParameter(QUERY_PARAM, key)
+                .build();
+        return builtUri;
+
     }
 }

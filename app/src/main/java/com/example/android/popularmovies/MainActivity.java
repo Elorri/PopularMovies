@@ -4,14 +4,17 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.example.android.popularmovies.sync.MoviesSyncAdapter;
 
 public class MainActivity extends AppCompatActivity implements MainFragment.Callback{
 
     private static final String DETAILFRAGMENT_TAG = "detail_fragment";
+    private final String LOG_TAG = getClass().getSimpleName();
     private boolean mTwoPane;
     private String mSortOrder;
 
@@ -95,4 +98,12 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Call
             }
         }
     }
+
+    public void openVideoReaderApp(View view) {
+        TrailersAdapter.ViewHolder viewHolder = (TrailersAdapter.ViewHolder) view.getTag();
+        Uri uri=viewHolder.youtubeVideoURI;
+        Utility.openYoutube(uri,getPackageManager(),this);
+
+    }
+
 }
