@@ -9,7 +9,6 @@ import android.database.MergeCursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.example.android.popularmovies.data.MovieContract.MovieEntry;
 import com.example.android.popularmovies.data.MovieContract.ReviewEntry;
@@ -168,8 +167,6 @@ public class MovieProvider extends ContentProvider {
                 cursor = mOpenHelper.getReadableDatabase().query(ReviewEntry.TABLE_NAME, projection, ReviewEntry.COLUMN_MOVIE_ID + "=?", new String[]{movieId}, null, null, null);
                 break;
             case TRAILERS_REVIEWS_MOVIE:
-                Log.e("PopularMovies", "TRAILERS_REVIEWS_MOVIE provider ");
-
                 movieId = MovieEntry.getMovieIdFromMovieTrailersReviewsUri(uri);
 
                 Cursor[] cursors = new Cursor[CURSOR_TYPE_COUNT];
@@ -195,12 +192,7 @@ public class MovieProvider extends ContentProvider {
                         null,
                         null);
                 mCursorsCount[2]=cursors[2].getCount();
-                Log.e("PopularMovies", "mCursorsCount[0] " + mCursorsCount[0]);
-                Log.e("PopularMovies", "mCursorsCount[1] " + mCursorsCount[1]);
-                Log.e("PopularMovies", "mCursorsCount[2] " + mCursorsCount[2]);
-
                 cursor = new MergeCursor(cursors);
-                Log.e("PopularMovies", "mergedCursor " + cursor.getCount());
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);

@@ -4,7 +4,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.v7.widget.SwitchCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -97,12 +96,8 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton.OnChe
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        Log.e("PopularMovies", "newView " + this.getClass().getSimpleName());
         // Choose the layout type
         int viewType = getItemViewType(cursor.getPosition());
-        Log.d("PopularMovies", "cursor count " + cursor.getCount());
-        Log.d("PopularMovies", "position " + cursor.getPosition());
-        Log.d("PopularMovies", "viewType " + viewType);
         int layoutId = -1;
         switch (viewType) {
             case ITEM_DESC: {
@@ -132,16 +127,10 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton.OnChe
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        Log.e("PopularMovies", "bindView " + this.getClass().getSimpleName());
-
         ViewHolder viewHolder = (ViewHolder) view.getTag();
         int viewType = getItemViewType(cursor.getPosition());
-        Log.d("PopularMovies", "cursor count " + cursor.getCount());
-        Log.d("PopularMovies", "cursor position " + cursor.getPosition());
-        Log.d("PopularMovies", "viewType " + viewType);
         switch (viewType) {
             case ITEM_DESC: {
-                Log.d("PopularMovies", "case 0 ");
                 mId = cursor.getLong(MovieProvider.COL_ID);
                 mTitleValue = cursor.getString(MovieProvider.COL_TITLE);
                 mDurationValue = cursor.getInt(MovieProvider.COL_DURATION);
@@ -167,32 +156,16 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton.OnChe
                 break;
             }
 
-            case ITEM_TRAILER_LABEL: {
-                Log.d("PopularMovies", "case 1 ");
-                URL thumbnailTrailerURL = Utility.constructYoutubeThumbnailTrailerURL(cursor.getString
-                        (MovieProvider.COL_KEY));
-                Log.d("PopularMovies", "URL " + thumbnailTrailerURL.toString());
-                Picasso.with(context).load(thumbnailTrailerURL.toString()).into(viewHolder.trailerImgView);
-                viewHolder.trailerTitleView.setText(cursor.getString(MovieProvider.COL_NAME));
-                break;
-            }
+            case ITEM_TRAILER_LABEL:
             case ITEM_TRAILER: {
-                Log.d("PopularMovies", "case 2 ");
                 URL thumbnailTrailerURL = Utility.constructYoutubeThumbnailTrailerURL(cursor.getString
                         (MovieProvider.COL_KEY));
-                Log.d("PopularMovies", "URL " + thumbnailTrailerURL.toString());
                 Picasso.with(context).load(thumbnailTrailerURL.toString()).into(viewHolder.trailerImgView);
                 viewHolder.trailerTitleView.setText(cursor.getString(MovieProvider.COL_NAME));
                 break;
             }
-            case ITEM_REVIEW_LABEL: {
-                Log.d("PopularMovies", "case 3 ");
-                viewHolder.reviewAuthorTextView.setText(cursor.getString(MovieProvider.COL_AUTHOR));
-                viewHolder.reviewContentTextView.setText(cursor.getString(MovieProvider.COL_CONTENT));
-                break;
-            }
+            case ITEM_REVIEW_LABEL:
             case ITEM_REVIEW: {
-                Log.d("PopularMovies", "case 4 ");
                 viewHolder.reviewAuthorTextView.setText(cursor.getString(MovieProvider.COL_AUTHOR));
                 viewHolder.reviewContentTextView.setText(cursor.getString(MovieProvider.COL_CONTENT));
                 break;
@@ -223,7 +196,6 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton.OnChe
 
     @Override
     public int getViewTypeCount() {
-        Log.e("PopularMovies", "VIEW_TYPE_COUNT " + VIEW_TYPE_COUNT);
         return VIEW_TYPE_COUNT;
     }
 
