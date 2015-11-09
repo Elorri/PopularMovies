@@ -75,7 +75,7 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton.OnChe
         private TextView reviewContentTextView;
 
 
-        public ViewHolder(View view, int viewType) {
+        public ViewHolder(View view) {
 
             titleTextView = (TextView) view.findViewById(R.id.title);
             posterimageImageView = (ImageView) view.findViewById(R.id.posterImage);
@@ -128,7 +128,7 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton.OnChe
             }
         }
         View view = LayoutInflater.from(context).inflate(layoutId, parent, false);
-        ViewHolder viewHolder = new ViewHolder(view, viewType);
+        ViewHolder viewHolder = new ViewHolder(view);
         view.setTag(viewHolder);
         return view;
     }
