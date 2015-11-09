@@ -1,10 +1,8 @@
 package com.example.android.popularmovies;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -20,10 +18,10 @@ public class Utility {
     private static final String LOG_TAG = Utility.class.getSimpleName();
 
 
-    public static void openYoutube(Uri uri,PackageManager packageManager,Activity activity){
+    public static void openYoutube(Uri uri,Context context){
         Intent intent=new Intent(Intent.ACTION_VIEW).setData(uri);
-        if(intent.resolveActivity(packageManager)!=null){
-            activity.startActivity(intent);
+        if(intent.resolveActivity(context.getPackageManager())!=null){
+            context.startActivity(intent);
         }else {
             Log.d(LOG_TAG, "Couldn't call " + uri.toString() + ", no receiving apps installed!");
         }

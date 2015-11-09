@@ -118,6 +118,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private ListView mTrailerListView;
     private ListView mReviewListView;
     private TrailersAdapter mTrailerAdapter;
+    private ShareActionProvider mShareActionProvider;
 
 
     public DetailFragment() {
@@ -126,11 +127,17 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        Log.e(LOG_TAG,"onCreateOptionsMenu "+getClass().getSimpleName());
         inflater.inflate(R.menu.fragment_detail, menu);
         MenuItem menuItem = menu.findItem(R.id.action_share);
-        ShareActionProvider mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menuItem);
+        mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menuItem);
+        setShareActionProvider();
+    }
+
+    private void setShareActionProvider() {
+        Log.e(LOG_TAG,"setShareActionProvider "+getClass().getSimpleName());
         if (mShareActionProvider != null) {
-            mShareActionProvider.setShareIntent(createShareIntent());
+           // mShareActionProvider.setShareIntent(createShareIntent());
         } else {
             Log.d(LOG_TAG, "Share Action Provider is null?");
         }
@@ -140,8 +147,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
         shareIntent.setType("text/plain");
-        shareIntent.putExtra(Intent.EXTRA_TEXT,
-                "will be the first video URL here");
+        Log.e(LOG_TAG, "mTrailerAdapter.getmFirstTrailerUri() "+mTrailerAdapter.getmFirstTrailerUri());
+        shareIntent.putExtra(Intent.EXTRA_TEXT, mTrailerAdapter.getmFirstTrailerUri().toString());
         return shareIntent;
     }
 
@@ -263,6 +270,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                 case TRAILER_LOADER:
                     Log.e("PopularMovies", "TRAILER_LOADER "+" "+this.getClass().getSimpleName());
                     mTrailerAdapter.swapCursor(data);
+                    setShareActionProvider();
                     break;
                 case REVIEW_LOADER:
                     Log.e("PopularMovies", "REVIEW_LOADER"+this.getClass().getSimpleName());
@@ -278,6 +286,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
+        Log.e(LOG_TAG,"onLoaderReset "+getClass().getSimpleName());
         switch (loader.getId()) {
             case MOVIE_LOADER:
                 break;
