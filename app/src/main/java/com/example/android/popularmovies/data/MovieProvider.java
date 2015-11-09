@@ -31,15 +31,15 @@ public class MovieProvider extends ContentProvider {
             MovieEntry.COLUMN_FAVORITE
     };
 
-    static final int COL_ID = 0;
-    static final int COL_TITLE = 1;
-    static final int COL_DURATION = 2;
-    static final int COL_RELEASE_DATE = 3;
-    static final int COL_POSTER_PATH = 4;
-    static final int COL_PLOT_SYNOPSIS = 5;
-    static final int COL_RATE = 6;
-    static final int COL_POPULARITY = 7;
-    static final int COL_FAVORITE = 8;
+    public static final int COL_ID = 0;
+    public static final int COL_TITLE = 1;
+    public static final int COL_DURATION = 2;
+    public static final int COL_RELEASE_DATE = 3;
+    public static final int COL_POSTER_PATH = 4;
+    public static final int COL_PLOT_SYNOPSIS = 5;
+    public static final int COL_RATE = 6;
+    public static final int COL_POPULARITY = 7;
+    public  static final int COL_FAVORITE = 8;
 
     private static final String[] TRAILER_COLUMNS = {
             TrailerEntry._ID,
@@ -51,11 +51,11 @@ public class MovieProvider extends ContentProvider {
 
     // These indices are tied to TRAILER_COLUMNS.  If MOVIE_COLUMNS changes, these
 // must change.
-    static final int TRAILER_ID = 0;
-    static final int COL_KEY = 1;
-    static final int COL_NAME = 2;
-    static final int COL_TYPE = 3;
-    static final int COL_MOVIE_ID_T = 4;
+    public static final int TRAILER_ID = 0;
+    public static final int COL_KEY = 1;
+    public static final int COL_NAME = 2;
+    public static final int COL_TYPE = 3;
+    public static final int COL_MOVIE_ID_T = 4;
 
 
     private static final String[] REVIEWS_COLUMNS = {
@@ -67,10 +67,10 @@ public class MovieProvider extends ContentProvider {
 
     // These indices are tied to REVIEWS_COLUMNS.  If MOVIE_COLUMNS changes, these
 // must change.
-    static final int REVIEWS_ID = 0;
-    static final int COL_AUTHOR = 1;
-    static final int COL_CONTENT = 2;
-    static final int COL_MOVIE_ID_R = 3;
+    public  static final int REVIEWS_ID = 0;
+    public static final int COL_AUTHOR = 1;
+    public  static final int COL_CONTENT = 2;
+    public  static final int COL_MOVIE_ID_R = 3;
 
 
     static final int MOVIE = 100;
@@ -101,10 +101,10 @@ public class MovieProvider extends ContentProvider {
     private static final UriMatcher sUriMatcher = buildUriMatcher();
     private static final String LOG_TAG = MovieProvider.class.getSimpleName();
     private MoviesDbHelper mOpenHelper;
-    private int DETAIL_CURSORS = 3;
 
-    public static int[] cursorsCount; //This will be helpful to determine our DetailAdapter item
-    // type
+    //This will be helpful to determine our DetailAdapter item type
+    public static int VIEW_TYPE_COUNT = 3;
+    public static int[] mCursorsCount;
 
     static UriMatcher buildUriMatcher() {
         // All paths added to the UriMatcher have a corresponding code to return when a match is
@@ -169,30 +169,29 @@ public class MovieProvider extends ContentProvider {
             case TRAILERS_REVIEWS_MOVIE:
                 movieId = MovieEntry.getMovieIdFromMovieTrailersReviewsUri(uri);
 
-                Cursor[] cursors = new Cursor[DETAIL_CURSORS];
-                 cursorsCount= new int[DETAIL_CURSORS]; //This will be helful to determine
-                // our DetailAdapter item type
+                Cursor[] cursors = new Cursor[VIEW_TYPE_COUNT];
+                 mCursorsCount = new int[VIEW_TYPE_COUNT];
                 cursors[0] = query(
                         MovieEntry.buildMovieDetailUri(Long.valueOf(movieId)),
                         MOVIE_COLUMNS,
                         null,
                         null,
                         null);
-                cursorsCount[0]=cursors[0].getCount();
+                mCursorsCount[0]=cursors[0].getCount();
                 cursors[1] = query(
                         TrailerEntry.buildMovieTrailerUri(Long.valueOf(movieId)),
                         TRAILER_COLUMNS,
                         null,
                         null,
                         null);
-                cursorsCount[1]=cursors[1].getCount();
+                mCursorsCount[1]=cursors[1].getCount();
                 cursors[2] = query(
                         ReviewEntry.buildMovieReviewUri(Long.valueOf(movieId)),
                         REVIEWS_COLUMNS,
                         null,
                         null,
                         null);
-                cursorsCount[2]=cursors[2].getCount();
+                mCursorsCount[2]=cursors[2].getCount();
                 cursor = new MergeCursor(cursors);
                 break;
             default:

@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.popularmovies.data.MovieContract;
+import com.example.android.popularmovies.data.MovieProvider;
 import com.squareup.picasso.Picasso;
 
 import java.net.URL;
@@ -22,17 +23,18 @@ import java.net.URL;
  * {@link DetailAdapter} exposes a list of trailer
  * from a {@link android.database.Cursor} to a {@link android.widget.ListView}.
  */
-public class DetailAdapter extends CursorAdapter  implements CompoundButton.OnCheckedChangeListener{
+public class DetailAdapter extends CursorAdapter implements CompoundButton.OnCheckedChangeListener {
 
-    private static final int VIEW_TYPE_COUNT = 4;
+   private static final int DESC_ITEM_COUNT = MovieProvider.mCursorsCount[0];
+    private static final int TRAILER_ITEM_COUNT = MovieProvider.mCursorsCount[1];
+    private static final  int REVIEW_ITEM_COUNT = MovieProvider.mCursorsCount[2];
+
 
     private static final int ITEM_DESC = 0;
-    private static final int ITEM_LABEL = 1;
-    private static final int ITEM_TRAILER = 2;
-    private static final int ITEM_REVIEW = 3;
+    private static final int ITEM_TRAILER = 1;
+    private static final int ITEM_REVIEW = 2;
 
-    private int TRAILER_POSITION=1;
-    private int review_position;
+    private int next_item_type;
 
 
     private long mId;
@@ -69,39 +71,29 @@ public class DetailAdapter extends CursorAdapter  implements CompoundButton.OnCh
 
 
         public ViewHolder(View view, int viewType) {
-            switch (viewType) {
-                case ITEM_DESC: {
-                    titleTextView= (TextView) view.findViewById(R.id.title);
-                    posterimageImageView= (ImageView) view.findViewById(R.id.posterImage);
-                    plotsynopsisTextView= (TextView) view.findViewById(R.id.overview);
-                    voteaverageTextView= (TextView) view.findViewById(R.id.voteAverage);
-                    releasedateTextView= (TextView) view.findViewById(R.id.releaseYear);
-                    durationTextView= (TextView) view.findViewById(R.id.duration);
-                    favoriteSwitchCompat= (SwitchCompat) view.findViewById(R.id.favorite);
-                    break;
-                }
-                case ITEM_LABEL: {
+                    titleTextView = (TextView) view.findViewById(R.id.title);
+                    posterimageImageView = (ImageView) view.findViewById(R.id.posterImage);
+                    plotsynopsisTextView = (TextView) view.findViewById(R.id.overview);
+                    voteaverageTextView = (TextView) view.findViewById(R.id.voteAverage);
+                    releasedateTextView = (TextView) view.findViewById(R.id.releaseYear);
+                    durationTextView = (TextView) view.findViewById(R.id.duration);
+                    favoriteSwitchCompat = (SwitchCompat) view.findViewById(R.id.favorite);
+
                     labelTextview = (TextView) view.findViewById(R.id.detail_label_textview);
-                    break;
-                }
-                case ITEM_TRAILER: {
+
                     trailerImgView = (ImageView) view.findViewById(R.id.trailer_img);
                     trailerTitleView = (TextView) view.findViewById(R.id.trailer_title);
-                    break;
-                }
-                case ITEM_REVIEW: {
+
                     reviewAuthorTextView = (TextView) view.findViewById(R.id.review_author);
                     reviewContentTextView = (TextView) view.findViewById(R.id.review_content);
-                    break;
-                }
-            }
+
         }
     }
 
 
     public DetailAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
-        mContext=context;
+        mContext = context;
     }
 
     @Override
@@ -115,15 +107,15 @@ public class DetailAdapter extends CursorAdapter  implements CompoundButton.OnCh
                 layoutId = R.layout.detail_desc_item;
                 break;
             }
-            case ITEM_LABEL: {
-                layoutId = R.layout.detail_label_item;
-                break;
-            }
             case ITEM_TRAILER: {
+                if(cursor.getPosition()==DESC_ITEM_COUNT)
+                    layoutId = R.layout.detail_label_item;
                 layoutId = R.layout.detail_trailer_item;
                 break;
             }
             case ITEM_REVIEW: {
+                if(cursor.getPosition()==DESC_ITEM_COUNT+TRAILER_ITEM_COUNT)
+                    layoutId = R.layout.detail_label_item;
                 layoutId = R.layout.detail_review_item;
                 break;
             }
@@ -142,17 +134,17 @@ public class DetailAdapter extends CursorAdapter  implements CompoundButton.OnCh
         int viewType = getItemViewType(cursor.getPosition());
         switch (viewType) {
             case ITEM_DESC: {
-                Log.e("PopularMovies", "MOVIE_LOADER "+" "+this.getClass().getSimpleName());
-                mId = cursor.getLong(DetailFragment.COL_ID);
-                mTitleValue = cursor.getString(DetailFragment.COL_TITLE);
-                mDurationValue = cursor.getInt(DetailFragment.COL_DURATION);
-                mReleaseDateValue = cursor.getString(DetailFragment.COL_RELEASE_DATE).split("-")[0];//To extract the
+                Log.e("PopularMovies", "MOVIE_LOADER " + " " + this.getClass().getSimpleName());
+                mId = cursor.getLong(MovieProvider.COL_ID);
+                mTitleValue = cursor.getString(MovieProvider.COL_TITLE);
+                mDurationValue = cursor.getInt(MovieProvider.COL_DURATION);
+                mReleaseDateValue = cursor.getString(MovieProvider.COL_RELEASE_DATE).split("-")[0];//To extract the
                 // year  from the date
-                mPosterPathValue = cursor.getString(DetailFragment.COL_POSTER_PATH);
-                mPlotSynopsisValue = cursor.getString(DetailFragment.COL_PLOT_SYNOPSIS);
-                mRateValue = cursor.getDouble(DetailFragment.COL_RATE);
-                mPopularityValue = cursor.getString(DetailFragment.COL_POPULARITY);
-                mFavoriteValue = Utility.isFavorite(cursor.getInt(DetailFragment.COL_FAVORITE));
+                mPosterPathValue = cursor.getString(MovieProvider.COL_POSTER_PATH);
+                mPlotSynopsisValue = cursor.getString(MovieProvider.COL_PLOT_SYNOPSIS);
+                mRateValue = cursor.getDouble(MovieProvider.COL_RATE);
+                mPopularityValue = cursor.getString(MovieProvider.COL_POPULARITY);
+                mFavoriteValue = Utility.isFavorite(cursor.getInt(MovieProvider.COL_FAVORITE));
 
 
                 viewHolder.titleTextView.setText(mTitleValue);
@@ -168,25 +160,21 @@ public class DetailAdapter extends CursorAdapter  implements CompoundButton.OnCh
                 viewHolder.favoriteSwitchCompat.setOnCheckedChangeListener(this);
                 break;
             }
-            case ITEM_LABEL: {
-                if (cursor.getPosition() == TRAILER_POSITION){
-                    viewHolder.labelTextview.setText(context.getString(R.string.detail_label_trailer));
-                    review_position=TRAILER_POSITION+1;
-                }
-                viewHolder.labelTextview.setText(context.getString(R.string.detail_label_review));
-                break;
-            }
             case ITEM_TRAILER: {
-                review_position=review_position++;
+                if(cursor.getPosition()==DESC_ITEM_COUNT)
+                    viewHolder.labelTextview.setText(context.getString(R.string.detail_label_trailer));
                 URL thumbnailTrailerURL = Utility.constructYoutubeThumbnailTrailerURL(cursor.getString
-                        (DetailFragment.COL_KEY));
+                        (MovieProvider.COL_KEY));
                 Picasso.with(context).load(thumbnailTrailerURL.toString()).into(viewHolder.trailerImgView);
-                viewHolder.trailerTitleView.setText(cursor.getString(DetailFragment.COL_NAME));
+                viewHolder.trailerTitleView.setText(cursor.getString(MovieProvider.COL_NAME));
                 break;
             }
             case ITEM_REVIEW: {
-                viewHolder.reviewAuthorTextView.setText(cursor.getString(DetailFragment.COL_AUTHOR));
-                viewHolder.reviewContentTextView.setText(cursor.getString(DetailFragment.COL_CONTENT));
+                if(cursor.getPosition()==DESC_ITEM_COUNT+TRAILER_ITEM_COUNT)
+                    viewHolder.labelTextview.setText(context.getString(R.string.detail_label_review));
+                viewHolder.labelTextview.setText(context.getString(R.string.detail_label_review));
+                viewHolder.reviewAuthorTextView.setText(cursor.getString(MovieProvider.COL_AUTHOR));
+                viewHolder.reviewContentTextView.setText(cursor.getString(MovieProvider.COL_CONTENT));
                 break;
             }
         }
@@ -195,12 +183,17 @@ public class DetailAdapter extends CursorAdapter  implements CompoundButton.OnCh
 
     @Override
     public int getItemViewType(int position) {
-        return (position == 0) ? ITEM_DESC : ITEM_LABEL;
+        if (position < DESC_ITEM_COUNT) return ITEM_DESC;
+        else if (position >= DESC_ITEM_COUNT && position < (DESC_ITEM_COUNT + TRAILER_ITEM_COUNT))
+            return ITEM_TRAILER;
+        else if (position >= DESC_ITEM_COUNT + TRAILER_ITEM_COUNT && position <
+                (DESC_ITEM_COUNT + TRAILER_ITEM_COUNT + REVIEW_ITEM_COUNT)) return ITEM_REVIEW;
+        else return -1;
     }
 
     @Override
     public int getViewTypeCount() {
-        return VIEW_TYPE_COUNT;
+        return MovieProvider.VIEW_TYPE_COUNT;
     }
 
     @Override
@@ -218,6 +211,6 @@ public class DetailAdapter extends CursorAdapter  implements CompoundButton.OnCh
 
         mContext.getContentResolver().update(MovieContract.MovieEntry.CONTENT_URI,
                 movieValues, MovieContract.MovieEntry
-                ._ID + "=?", new String[]{Long.toString(mId)});
+                        ._ID + "=?", new String[]{Long.toString(mId)});
     }
 }
