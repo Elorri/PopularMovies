@@ -81,34 +81,4 @@
         android:paddingRight="@dimen/overviewPaddingRight"
         android:paddingBottom="@dimen/overviewPaddingBottom"
         tools:text="An apocalyptic story set in the furthest reaches of our planet, in a stark desert landscape where humanity is broken, and most everyone is crazed fighting for the necessities of life. Within this world exist two rebels on the run who just might be able to restore order. There's Max, a man of action and a man of few words, who seeks peace of mind following the loss of his wife and child in the aftermath of the chaos. And Furiosa, a woman of action and a woman who believes her path to survival may be achieved if she can make it across the desert back to her childhood homeland."/>
-
-
-
-    <ListView
-        android:id="@+id/trailer_list"
-        android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:divider="@null" />
-
-
-    <View android:layout_width="match_parent" android:layout_height="1dp"
-          android:background="@android:color/darker_gray"
-          android:layout_marginLeft="@dimen/lineMarginLeft"
-          android:layout_margin="@dimen/lineMarginRight"
-          android:layout_marginBottom="@dimen/lineMarginBottom"/>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/reviewsLabel"
-        android:paddingLeft="@dimen/titlePaddingLeft"
-        android:textAppearance="?android:textAppearanceLarge"
-        android:paddingBottom="@dimen/trailerReviewPaddingBottom"/>
-
-    <ListView
-        android:id="@+id/review_list"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:divider="@null" />
-
-</LinearLayout>
+    </LinearLayout>

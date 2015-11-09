@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:minHeight="?android:attr/listPreferredItemHeight"
+    android:orientation="vertical">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_margin="@dimen/lineMarginRight"
+        android:layout_marginBottom="@dimen/lineMarginBottom"
+        android:layout_marginLeft="@dimen/lineMarginLeft"
+        android:background="@android:color/darker_gray"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="@dimen/trailerReviewPaddingBottom"
+        android:paddingLeft="@dimen/titlePaddingLeft"
+        android:text="@string/detail_label_review"
+        android:textAppearance="?android:textAppearanceLarge"
+        />
+    <TextView
+        android:id="@+id/review_author"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:textAppearanceMedium"
+        android:paddingLeft="@dimen/reviewAuthorPaddingLeft"
+        android:paddingRight="@dimen/reviewAuthorPaddingRight"
+        android:paddingBottom="@dimen/reviewAuthorPaddingBottom"
+        android:textStyle="bold"
+        tools:text="Phileas Fogg"/>
+
+
+    <TextView
+        android:id="@+id/review_content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:textAppearanceMedium"
+        android:paddingLeft="@dimen/overviewPaddingLeft"
+        android:paddingRight="@dimen/overviewPaddingRight"
+        android:paddingBottom="@dimen/overviewPaddingBottom"
+        tools:text="Fabulous action movie. Lots of interesting characters. They don't make many movies like this. The whole movie from start to finish was entertaining I'm looking forward to seeing it again. I definitely recommend seeing it."/>
+</LinearLayout>

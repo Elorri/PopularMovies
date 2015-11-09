@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:minHeight="?android:attr/listPreferredItemHeight"
+    android:orientation="vertical">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_margin="@dimen/lineMarginRight"
+        android:layout_marginBottom="@dimen/lineMarginBottom"
+        android:layout_marginLeft="@dimen/lineMarginLeft"
+        android:background="@android:color/darker_gray"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="@dimen/trailerReviewPaddingBottom"
+        android:paddingLeft="@dimen/titlePaddingLeft"
+        android:text="@string/detail_label_trailer"
+        android:textAppearance="?android:textAppearanceLarge"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/trailer_img"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginBottom="@dimen/thummnailMarginBottom"
+            android:layout_marginLeft="@dimen/thummnailMarginLeft"
+            android:layout_marginRight="@dimen/thummnailMarginRight"
+            android:layout_weight="2"
+            android:minHeight="@dimen/trailerImgHeight"
+            android:minWidth="@dimen/trailerImgWidth"
+            android:scaleType="centerCrop"
+            tools:src="@mipmap/ic_launcher"/>
+
+
+        <TextView
+            android:id="@+id/trailer_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginBottom="@dimen/itemMarginBottom"
+            android:layout_marginLeft="@dimen/itemMarginLeft"
+            android:layout_weight="3"
+            android:textAppearance="?android:textAppearanceMedium"
+            tools:text="Trailers from hell (featurette)"/>
+
+    </LinearLayout>
+</LinearLayout>
