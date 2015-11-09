@@ -32,7 +32,7 @@ import com.squareup.picasso.Picasso;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, CompoundButton.OnCheckedChangeListener, TrailersAdapter.Callback {
+public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, CompoundButton.OnCheckedChangeListener {
 
     private static final String LOG_TAG = DetailFragment.class.getSimpleName();
     public static final String DETAIL_URI = "URI";
@@ -331,7 +331,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     }
 
 
-    @Override
+
     public void onFirstTrailerUriKnown(Uri uri) {
         this.mFirstVideoUri = uri;
         if (mFirstVideoUri != null)

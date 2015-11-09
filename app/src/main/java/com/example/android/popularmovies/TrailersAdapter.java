@@ -24,9 +24,7 @@ public class TrailersAdapter extends CursorAdapter {
 
     private final DetailFragment mDetailFragment;
 
-    public interface Callback {
-        void onFirstTrailerUriKnown(Uri uri);
-    }
+
 
     private static final String LOG_TAG = TrailersAdapter.class.getSimpleName();
 
