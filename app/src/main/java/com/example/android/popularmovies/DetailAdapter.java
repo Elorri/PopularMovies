@@ -177,7 +177,6 @@ public class DetailAdapter extends CursorAdapter  implements CompoundButton.OnCh
                 break;
             }
             case ITEM_TRAILER: {
-                cursor.getCount()
                 review_position=review_position++;
                 URL thumbnailTrailerURL = Utility.constructYoutubeThumbnailTrailerURL(cursor.getString
                         (DetailFragment.COL_KEY));

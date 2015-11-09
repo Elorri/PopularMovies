@@ -5,6 +5,7 @@ import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.MergeCursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.Nullable;
@@ -17,6 +18,60 @@ import com.example.android.popularmovies.data.MovieContract.TrailerEntry;
  * Created by Elorri on 27/10/2015.
  */
 public class MovieProvider extends ContentProvider {
+
+    private static final String[] MOVIE_COLUMNS = {
+            MovieEntry._ID,
+            MovieEntry.COLUMN_TITLE,
+            MovieEntry.COLUMN_DURATION,
+            MovieEntry.COLUMN_RELEASE_DATE,
+            MovieEntry.COLUMN_POSTER_PATH,
+            MovieEntry.COLUMN_PLOT_SYNOPSIS,
+            MovieEntry.COLUMN_RATE,
+            MovieEntry.COLUMN_POPULARITY,
+            MovieEntry.COLUMN_FAVORITE
+    };
+
+    static final int COL_ID = 0;
+    static final int COL_TITLE = 1;
+    static final int COL_DURATION = 2;
+    static final int COL_RELEASE_DATE = 3;
+    static final int COL_POSTER_PATH = 4;
+    static final int COL_PLOT_SYNOPSIS = 5;
+    static final int COL_RATE = 6;
+    static final int COL_POPULARITY = 7;
+    static final int COL_FAVORITE = 8;
+
+    private static final String[] TRAILER_COLUMNS = {
+            TrailerEntry._ID,
+            TrailerEntry.COLUMN_KEY,
+            TrailerEntry.COLUMN_NAME,
+            TrailerEntry.COLUMN_TYPE,
+            TrailerEntry.COLUMN_MOVIE_ID
+    };
+
+    // These indices are tied to TRAILER_COLUMNS.  If MOVIE_COLUMNS changes, these
+// must change.
+    static final int TRAILER_ID = 0;
+    static final int COL_KEY = 1;
+    static final int COL_NAME = 2;
+    static final int COL_TYPE = 3;
+    static final int COL_MOVIE_ID_T = 4;
+
+
+    private static final String[] REVIEWS_COLUMNS = {
+            ReviewEntry._ID,
+            ReviewEntry.COLUMN_AUTHOR,
+            ReviewEntry.COLUMN_CONTENT,
+            ReviewEntry.COLUMN_MOVIE_ID
+    };
+
+    // These indices are tied to REVIEWS_COLUMNS.  If MOVIE_COLUMNS changes, these
+// must change.
+    static final int REVIEWS_ID = 0;
+    static final int COL_AUTHOR = 1;
+    static final int COL_CONTENT = 2;
+    static final int COL_MOVIE_ID_R = 3;
+
 
     static final int MOVIE = 100;
     //will match content://com.example.android.popularmovies/movie/ (directory)
@@ -39,10 +94,17 @@ public class MovieProvider extends ContentProvider {
     //will match content://com.example.android.popularmovies/review/135399/ (directory)
     static final int REVIEW_DETAIL = 302;
     //will match content://com.example.android.popularmovies/review/75660928c3a3687ad7002db (item)
+    static final int TRAILERS_REVIEWS_MOVIE = 400;
+    //will match content://com.example.android.popularmovies/trailer.review/135399/ (item)
 
 
     private static final UriMatcher sUriMatcher = buildUriMatcher();
+    private static final String LOG_TAG = MovieProvider.class.getSimpleName();
     private MoviesDbHelper mOpenHelper;
+    private int DETAIL_CURSORS = 3;
+
+    public static int[] cursorsCount; //This will be helpful to determine our DetailAdapter item
+    // type
 
     static UriMatcher buildUriMatcher() {
         // All paths added to the UriMatcher have a corresponding code to return when a match is
@@ -59,6 +121,8 @@ public class MovieProvider extends ContentProvider {
         matcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_REVIEW, REVIEW);
         matcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_REVIEW + "/#", REVIEWS_MOVIE);
         matcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_REVIEW + "/*", REVIEW_DETAIL);
+        matcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_TRAILER + "" +
+                "." + MovieContract.PATH_REVIEW + "/*", TRAILERS_REVIEWS_MOVIE);
         return matcher;
     }
 
@@ -72,7 +136,7 @@ public class MovieProvider extends ContentProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         Cursor cursor;
-        String movie_id;
+        String movieId;
         switch (sUriMatcher.match(uri)) {
             case MOVIE:
                 cursor = mOpenHelper.getReadableDatabase().query(MovieEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
@@ -85,22 +149,51 @@ public class MovieProvider extends ContentProvider {
                 cursor = mOpenHelper.getReadableDatabase().query(MovieEntry.TABLE_NAME, projection, MovieEntry.COLUMN_FAVORITE + "=?", new String[]{MovieEntry.FAVORITE_ON_VALUE}, null, null, MovieEntry.COLUMN_POPULARITY + " DESC");
                 break;
             case MOVIE_DETAIL:
-                movie_id = MovieEntry.getMovieIdFromMovieDetailUri(uri);
-                cursor = mOpenHelper.getReadableDatabase().query(MovieEntry.TABLE_NAME, projection, MovieEntry._ID + "=?", new String[]{movie_id}, null, null, null);
+                movieId = MovieEntry.getMovieIdFromMovieDetailUri(uri);
+                cursor = mOpenHelper.getReadableDatabase().query(MovieEntry.TABLE_NAME, projection, MovieEntry._ID + "=?", new String[]{movieId}, null, null, null);
                 break;
             case TRAILER:
                 cursor = mOpenHelper.getReadableDatabase().query(TrailerEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
                 break;
             case TRAILERS_MOVIE:
-                movie_id = TrailerEntry.getMovieIdFromMovieTrailerUri(uri);
-                cursor = mOpenHelper.getReadableDatabase().query(TrailerEntry.TABLE_NAME, projection, TrailerEntry.COLUMN_MOVIE_ID + "=?", new String[]{movie_id}, null, null, TrailerEntry.COLUMN_NAME+" desc");
+                movieId = TrailerEntry.getMovieIdFromMovieTrailerUri(uri);
+                cursor = mOpenHelper.getReadableDatabase().query(TrailerEntry.TABLE_NAME, projection, TrailerEntry.COLUMN_MOVIE_ID + "=?", new String[]{movieId}, null, null, TrailerEntry.COLUMN_NAME + " desc");
                 break;
             case REVIEW:
                 cursor = mOpenHelper.getReadableDatabase().query(ReviewEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
                 break;
             case REVIEWS_MOVIE:
-                movie_id = ReviewEntry.getMovieIdFromMovieReviewUri(uri);
-                cursor = mOpenHelper.getReadableDatabase().query(ReviewEntry.TABLE_NAME, projection, ReviewEntry.COLUMN_MOVIE_ID + "=?", new String[]{movie_id}, null, null, null);
+                movieId = ReviewEntry.getMovieIdFromMovieReviewUri(uri);
+                cursor = mOpenHelper.getReadableDatabase().query(ReviewEntry.TABLE_NAME, projection, ReviewEntry.COLUMN_MOVIE_ID + "=?", new String[]{movieId}, null, null, null);
+                break;
+            case TRAILERS_REVIEWS_MOVIE:
+                movieId = MovieEntry.getMovieIdFromMovieTrailersReviewsUri(uri);
+
+                Cursor[] cursors = new Cursor[DETAIL_CURSORS];
+                 cursorsCount= new int[DETAIL_CURSORS]; //This will be helful to determine
+                // our DetailAdapter item type
+                cursors[0] = query(
+                        MovieEntry.buildMovieDetailUri(Long.valueOf(movieId)),
+                        MOVIE_COLUMNS,
+                        null,
+                        null,
+                        null);
+                cursorsCount[0]=cursors[0].getCount();
+                cursors[1] = query(
+                        TrailerEntry.buildMovieTrailerUri(Long.valueOf(movieId)),
+                        TRAILER_COLUMNS,
+                        null,
+                        null,
+                        null);
+                cursorsCount[1]=cursors[1].getCount();
+                cursors[2] = query(
+                        ReviewEntry.buildMovieReviewUri(Long.valueOf(movieId)),
+                        REVIEWS_COLUMNS,
+                        null,
+                        null,
+                        null);
+                cursorsCount[2]=cursors[2].getCount();
+                cursor = new MergeCursor(cursors);
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -152,7 +245,7 @@ public class MovieProvider extends ContentProvider {
 
         switch (match) {
             case MOVIE:
-                values=createCorrectContentValue(db, values);
+                values = createCorrectContentValue(db, values);
                 _id = db.insert(MovieEntry.TABLE_NAME, null, values);
                 if (_id > 0)
                     returnUri = MovieEntry.buildMovieDetailUri(_id);
@@ -250,7 +343,6 @@ public class MovieProvider extends ContentProvider {
     }
 
 
-
     //This bulk insert is better than the default, because we use only one transaction for all inserts.
     @Override
     public int bulkInsert(Uri uri, ContentValues[] values) {
@@ -258,15 +350,15 @@ public class MovieProvider extends ContentProvider {
         int returnCount = 0;
         switch (match) {
             case MOVIE:
-                returnCount=insertInBulk(MovieEntry.TABLE_NAME, values);
+                returnCount = insertInBulk(MovieEntry.TABLE_NAME, values);
                 getContext().getContentResolver().notifyChange(uri, null);
                 return returnCount;
             case TRAILER:
-                returnCount=insertInBulk(TrailerEntry.TABLE_NAME, values);
+                returnCount = insertInBulk(TrailerEntry.TABLE_NAME, values);
                 getContext().getContentResolver().notifyChange(uri, null);
                 return returnCount;
             case REVIEW:
-                returnCount=insertInBulk(ReviewEntry.TABLE_NAME, values);
+                returnCount = insertInBulk(ReviewEntry.TABLE_NAME, values);
                 getContext().getContentResolver().notifyChange(uri, null);
                 return returnCount;
             default:
@@ -280,7 +372,7 @@ public class MovieProvider extends ContentProvider {
         int returnCount = 0;
         try {
             for (ContentValues value : values) {
-                value=createCorrectContentValue(db, value);
+                value = createCorrectContentValue(db, value);
                 long _id = db.insert(tableName, null, value);
                 if (_id != -1) {
                     returnCount++;
@@ -296,9 +388,9 @@ public class MovieProvider extends ContentProvider {
     private ContentValues createCorrectContentValue(SQLiteDatabase writableDb, ContentValues
             value) {
         //Check if the movie already exist and is a favorite
-        Cursor cursor=writableDb.query(MovieEntry.TABLE_NAME, new String[]{MovieEntry
+        Cursor cursor = writableDb.query(MovieEntry.TABLE_NAME, new String[]{MovieEntry
                         .COLUMN_FAVORITE},
-                MovieEntry._ID+"=? and "+MovieEntry.COLUMN_FAVORITE+"=?",
+                MovieEntry._ID + "=? and " + MovieEntry.COLUMN_FAVORITE + "=?",
                 new String[]{value.get(MovieEntry._ID).toString(), MovieEntry
                         .FAVORITE_ON_VALUE}, null,
                 null,
@@ -318,5 +410,6 @@ public class MovieProvider extends ContentProvider {
         mOpenHelper.close();
         super.shutdown();
     }
+
 
 }

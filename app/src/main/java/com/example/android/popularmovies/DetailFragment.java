@@ -2,7 +2,6 @@ package com.example.android.popularmovies;
 
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.MergeCursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -153,6 +152,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         CursorLoader cursorLoader = null;
         Log.e("PopularMovies", "onCreateLoader " + getClass().getSimpleName());
 
+
         Bundle arguments = getArguments();
         if (arguments != null) {
             mUri = arguments.getParcelable(DETAIL_URI);
@@ -205,7 +205,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         if (data != null && data.moveToFirst()) {
             switch (loader.getId()) {
                 case MOVIE_LOADER:
-new MergeCursor()
                     break;
                 case TRAILER_LOADER:
                     Log.e("PopularMovies", "TRAILER_LOADER "+" "+this.getClass().getSimpleName());

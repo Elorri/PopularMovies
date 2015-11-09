@@ -53,6 +53,12 @@ public class MovieContract {
         }
 
 
+        public static Uri buildMovieTrailersReviewsUri(String movieId) {
+            return BASE_CONTENT_URI.buildUpon().appendPath(PATH_TRAILER+"."+PATH_REVIEW).appendPath(movieId)
+                    .build();
+        }
+
+
         public static String getSortOrderFromMovieSortByUri(Uri uri) {
             String sortOrder=uri.getPathSegments().get(1);
             sortOrder=sortOrder.split("\\.")[0];
@@ -61,6 +67,10 @@ public class MovieContract {
 
         public static String getMovieIdFromMovieDetailUri(Uri uri) {
             return uri.getPathSegments().get(1);
+        }
+
+        public static String getMovieIdFromMovieTrailersReviewsUri(Uri uri) {
+            return uri.getLastPathSegment();
         }
     }
 

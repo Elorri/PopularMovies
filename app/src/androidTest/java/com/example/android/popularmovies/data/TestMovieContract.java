@@ -68,6 +68,13 @@ public class TestMovieContract extends AndroidTestCase {
     }
 
 
+    public void testBuildMovieTrailersReviewsUri(){
+        Uri uri=MovieEntry.buildMovieTrailersReviewsUri(MOVIE_ID.toString());
+        assertNotNull("Error : null uri", uri);
+        assertEquals("Error", uri.toString(), "content://com.example.android.popularmovies/trailer.review/135399");
+    }
+
+
     public void testGetSortOrderFromMovieSortByUri(){
         String sort_by = MovieEntry.getSortOrderFromMovieSortByUri(MovieEntry.buildMoviesSortByUri(SORT_BY_VALUE));
         assertEquals("popularity",sort_by);
