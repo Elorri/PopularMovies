@@ -28,12 +28,13 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public static final String DETAIL_URI = "URI";
     private static Uri mUri;
 
-
-
     private static final int MOVIE_LOADER = 0;
 
     private DetailAdapter mDetailAdapter;
     private ListView mDetailListView;
+    private ShareActionProvider mShareActionProvider;
+    private Uri mFirstVideoUri;
+
 
 
     public DetailFragment() {
@@ -42,22 +43,32 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        Log.e(LOG_TAG, "onCreateOptionsMenu " + getClass().getSimpleName());
         inflater.inflate(R.menu.fragment_detail, menu);
         MenuItem menuItem = menu.findItem(R.id.action_share);
-        ShareActionProvider mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menuItem);
+        mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menuItem);
+        Log.e(LOG_TAG, "mShareActionProvider " + mShareActionProvider + " " + getClass().getSimpleName());
+        Log.e(LOG_TAG, "mFirstVideoUri " + mFirstVideoUri + " " + getClass().getSimpleName());
+        if (mFirstVideoUri != null)
+            setShareActionProvider(mFirstVideoUri);
+    }
+
+    private void setShareActionProvider(Uri uri) {
+        Log.e(LOG_TAG, "setShareActionProvider " + getClass().getSimpleName());
+        Log.e(LOG_TAG, "mShareActionProvider " + mShareActionProvider + " " + getClass().getSimpleName());
         if (mShareActionProvider != null) {
-            mShareActionProvider.setShareIntent(createShareIntent());
+            mShareActionProvider.setShareIntent(createShareIntent(uri));
         } else {
             Log.d(LOG_TAG, "Share Action Provider is null?");
         }
     }
 
-    private Intent createShareIntent() {
+    private Intent createShareIntent(Uri uri) {
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
         shareIntent.setType("text/plain");
-        shareIntent.putExtra(Intent.EXTRA_TEXT,
-                "will be the first video URL here");
+        Log.e(LOG_TAG, "shared intent uri " + uri);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, uri.toString());
         return shareIntent;
     }
 
@@ -67,7 +78,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.detail_fragment, container, false);
         mDetailListView = (ListView) rootView.findViewById(R.id.detail_list);
-        mDetailAdapter = new DetailAdapter(getActivity(), null, 0);
+        mDetailAdapter = new DetailAdapter(getActivity(), null, 0, this);
         mDetailListView.setAdapter(mDetailAdapter);
         return rootView;
     }
@@ -103,10 +114,11 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        Log.e("PopularMovies", "onLoadFinished "+this.getClass().getSimpleName());
+        Log.e("PopularMovies", "onLoadFinished " + this.getClass().getSimpleName());
         if (data != null && data.moveToFirst()) {
             mDetailAdapter.swapCursor(data);
         }
+
     }
 
 
@@ -123,4 +135,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
 
 
+    public void onFirstTrailerUriKnown(Uri uri) {
+        this.mFirstVideoUri = uri;
+        if (mFirstVideoUri != null)
+            setShareActionProvider(mFirstVideoUri);
+    }
 }

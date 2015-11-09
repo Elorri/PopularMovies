@@ -3,6 +3,7 @@ package com.example.android.popularmovies;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.net.Uri;
 import android.support.v7.widget.SwitchCompat;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.CursorAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.android.popularmovies.data.MovieContract;
@@ -31,8 +33,7 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton.OnChe
     private static final int ITEM_REVIEW_LABEL = 3;
     private static final int ITEM_REVIEW = 4;
 
-    private int next_item_type;
-
+    private final DetailFragment mDetailFragment;
 
     private long mId;
     private String mTitleValue;
@@ -55,6 +56,8 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton.OnChe
      * Cache of the children views for a forecast list item.
      */
     public static class ViewHolder {
+
+
         private TextView titleTextView;
         private ImageView posterimageImageView;
         private TextView plotsynopsisTextView;
@@ -63,6 +66,8 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton.OnChe
         private TextView durationTextView;
         private SwitchCompat favoriteSwitchCompat;
 
+        public Uri youtubeVideoURI;
+        public final LinearLayout trailerItem;
         private ImageView trailerImgView;
         private TextView trailerTitleView;
 
@@ -71,6 +76,7 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton.OnChe
 
 
         public ViewHolder(View view, int viewType) {
+
             titleTextView = (TextView) view.findViewById(R.id.title);
             posterimageImageView = (ImageView) view.findViewById(R.id.posterImage);
             plotsynopsisTextView = (TextView) view.findViewById(R.id.overview);
@@ -79,6 +85,7 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton.OnChe
             durationTextView = (TextView) view.findViewById(R.id.duration);
             favoriteSwitchCompat = (SwitchCompat) view.findViewById(R.id.favorite);
 
+            trailerItem = (LinearLayout) view.findViewById(R.id.trailer_item);
             trailerImgView = (ImageView) view.findViewById(R.id.trailer_img);
             trailerTitleView = (TextView) view.findViewById(R.id.trailer_title);
 
@@ -89,9 +96,10 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton.OnChe
     }
 
 
-    public DetailAdapter(Context context, Cursor c, int flags) {
+    public DetailAdapter(Context context, Cursor c, int flags, DetailFragment detailFragment) {
         super(context, c, flags);
         mContext = context;
+        this.mDetailFragment = detailFragment;
     }
 
     @Override
@@ -126,7 +134,7 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton.OnChe
     }
 
     @Override
-    public void bindView(View view, Context context, Cursor cursor) {
+    public void bindView(View view, final Context context, Cursor cursor) {
         ViewHolder viewHolder = (ViewHolder) view.getTag();
         int viewType = getItemViewType(cursor.getPosition());
         switch (viewType) {
@@ -157,11 +165,25 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton.OnChe
             }
 
             case ITEM_TRAILER_LABEL:
+                viewHolder.youtubeVideoURI = Utility.buildYoutubeVideoURI(cursor.getString
+                        (MovieProvider.COL_KEY));
+                mDetailFragment.onFirstTrailerUriKnown(viewHolder.youtubeVideoURI);
             case ITEM_TRAILER: {
-                URL thumbnailTrailerURL = Utility.constructYoutubeThumbnailTrailerURL(cursor.getString
+                viewHolder.youtubeVideoURI = Utility.buildYoutubeVideoURI(cursor.getString
+                        (MovieProvider.COL_KEY));
+                URL thumbnailTrailerURL = Utility.buildYoutubeThumbnailTrailerURL(cursor.getString
                         (MovieProvider.COL_KEY));
                 Picasso.with(context).load(thumbnailTrailerURL.toString()).into(viewHolder.trailerImgView);
                 viewHolder.trailerTitleView.setText(cursor.getString(MovieProvider.COL_NAME));
+                viewHolder.trailerItem.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        DetailAdapter.ViewHolder viewHolder = (DetailAdapter.ViewHolder) v
+                                .getTag();
+                        Uri uri = viewHolder.youtubeVideoURI;
+                        Utility.openYoutube(uri, context);
+                    }
+                });
                 break;
             }
             case ITEM_REVIEW_LABEL:

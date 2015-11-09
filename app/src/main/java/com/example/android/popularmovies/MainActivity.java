@@ -12,6 +12,7 @@ import com.example.android.popularmovies.sync.MoviesSyncAdapter;
 public class MainActivity extends AppCompatActivity implements MainFragment.Callback{
 
     private static final String DETAILFRAGMENT_TAG = "detail_fragment";
+    private final String LOG_TAG = getClass().getSimpleName();
     private boolean mTwoPane;
     private String mSortOrder;
 
@@ -95,4 +96,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Call
             }
         }
     }
+
+
+
 }
