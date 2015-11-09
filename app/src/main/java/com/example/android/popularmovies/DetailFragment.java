@@ -32,7 +32,7 @@ import com.squareup.picasso.Picasso;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, CompoundButton.OnCheckedChangeListener {
+public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, CompoundButton.OnCheckedChangeListener, TrailersAdapter.Callback {
 
     private static final String LOG_TAG = DetailFragment.class.getSimpleName();
     public static final String DETAIL_URI = "URI";
@@ -119,6 +119,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private ListView mReviewListView;
     private TrailersAdapter mTrailerAdapter;
     private ShareActionProvider mShareActionProvider;
+    private Uri mFirstVideoUri;
 
 
     public DetailFragment() {
@@ -127,28 +128,32 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        Log.e(LOG_TAG,"onCreateOptionsMenu "+getClass().getSimpleName());
+        Log.e(LOG_TAG, "onCreateOptionsMenu " + getClass().getSimpleName());
         inflater.inflate(R.menu.fragment_detail, menu);
         MenuItem menuItem = menu.findItem(R.id.action_share);
         mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menuItem);
-        setShareActionProvider();
+        Log.e(LOG_TAG, "mShareActionProvider " + mShareActionProvider + " " + getClass().getSimpleName());
+        Log.e(LOG_TAG, "mFirstVideoUri " + mFirstVideoUri + " " + getClass().getSimpleName());
+        if (mFirstVideoUri != null)
+            setShareActionProvider(mFirstVideoUri);
     }
 
-    private void setShareActionProvider() {
-        Log.e(LOG_TAG,"setShareActionProvider "+getClass().getSimpleName());
+    private void setShareActionProvider(Uri uri) {
+        Log.e(LOG_TAG, "setShareActionProvider " + getClass().getSimpleName());
+        Log.e(LOG_TAG, "mShareActionProvider " + mShareActionProvider + " " + getClass().getSimpleName());
         if (mShareActionProvider != null) {
-           // mShareActionProvider.setShareIntent(createShareIntent());
+            mShareActionProvider.setShareIntent(createShareIntent(uri));
         } else {
             Log.d(LOG_TAG, "Share Action Provider is null?");
         }
     }
 
-    private Intent createShareIntent() {
+    private Intent createShareIntent(Uri uri) {
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
         shareIntent.setType("text/plain");
-        Log.e(LOG_TAG, "mTrailerAdapter.getmFirstTrailerUri() "+mTrailerAdapter.getmFirstTrailerUri());
-        shareIntent.putExtra(Intent.EXTRA_TEXT, mTrailerAdapter.getmFirstTrailerUri().toString());
+        Log.e(LOG_TAG, "shared intent uri " + uri);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, uri.toString());
         return shareIntent;
     }
 
@@ -170,7 +175,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         mTrailerListView = (ListView) rootView.findViewById(R.id.trailer_list);
         mReviewListView = (ListView) rootView.findViewById(R.id.review_list);
 
-        mTrailerAdapter = new TrailersAdapter(getActivity(), null, 0);
+        mTrailerAdapter = new TrailersAdapter(getActivity(), null, 0, this);
         mTrailerListView.setAdapter(mTrailerAdapter);
 
 
@@ -241,11 +246,11 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        Log.e("PopularMovies", "onLoadFinished "+this.getClass().getSimpleName());
+        Log.e("PopularMovies", "onLoadFinished " + this.getClass().getSimpleName());
         if (data != null && data.moveToFirst()) {
             switch (loader.getId()) {
                 case MOVIE_LOADER:
-                    Log.e("PopularMovies", "MOVIE_LOADER "+" "+this.getClass().getSimpleName());
+                    Log.e("PopularMovies", "MOVIE_LOADER " + " " + this.getClass().getSimpleName());
                     mId = data.getLong(COL_ID);
                     mTitleValue = data.getString(COL_TITLE);
                     mDurationValue = data.getInt(COL_DURATION);
@@ -268,12 +273,11 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                     mFavorite.setChecked(mFavoriteValue);
                     break;
                 case TRAILER_LOADER:
-                    Log.e("PopularMovies", "TRAILER_LOADER "+" "+this.getClass().getSimpleName());
+                    Log.e("PopularMovies", "TRAILER_LOADER " + " " + this.getClass().getSimpleName());
                     mTrailerAdapter.swapCursor(data);
-                    setShareActionProvider();
                     break;
                 case REVIEW_LOADER:
-                    Log.e("PopularMovies", "REVIEW_LOADER"+this.getClass().getSimpleName());
+                    Log.e("PopularMovies", "REVIEW_LOADER" + this.getClass().getSimpleName());
                     // do some more stuff here
                     break;
                 default:
@@ -281,12 +285,13 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             }
 
         }
+
     }
 
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        Log.e(LOG_TAG,"onLoaderReset "+getClass().getSimpleName());
+        Log.e(LOG_TAG, "onLoaderReset " + getClass().getSimpleName());
         switch (loader.getId()) {
             case MOVIE_LOADER:
                 break;
@@ -323,5 +328,13 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
         getContext().getContentResolver().update(MovieEntry.CONTENT_URI, movieValues, MovieEntry
                 ._ID + "=?", new String[]{Long.toString(mId)});
+    }
+
+
+    @Override
+    public void onFirstTrailerUriKnown(Uri uri) {
+        this.mFirstVideoUri = uri;
+        if (mFirstVideoUri != null)
+            setShareActionProvider(mFirstVideoUri);
     }
 }

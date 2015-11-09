@@ -22,7 +22,13 @@ import java.net.URL;
  */
 public class TrailersAdapter extends CursorAdapter {
 
-    private Uri mFirstTrailerUri;
+    private final DetailFragment mDetailFragment;
+
+    public interface Callback {
+        void onFirstTrailerUriKnown(Uri uri);
+    }
+
+    private static final String LOG_TAG = TrailersAdapter.class.getSimpleName();
 
     /**
      * Cache of the children views for a forecast list item.
@@ -34,15 +40,16 @@ public class TrailersAdapter extends CursorAdapter {
         public Uri youtubeVideoURI;
 
         public ViewHolder(View view) {
-            trailerItem=(LinearLayout)view.findViewById(R.id.trailer_item);
+            trailerItem = (LinearLayout) view.findViewById(R.id.trailer_item);
             trailerImgView = (ImageView) view.findViewById(R.id.trailer_img);
             trailerTitleView = (TextView) view.findViewById(R.id.trailer_title);
         }
     }
 
 
-    public TrailersAdapter(Context context, Cursor c, int flags) {
+    public TrailersAdapter(Context context, Cursor c, int flags, DetailFragment detailFragment) {
         super(context, c, flags);
+        this.mDetailFragment = detailFragment;
     }
 
     @Override
@@ -58,11 +65,15 @@ public class TrailersAdapter extends CursorAdapter {
     public void bindView(View view, final Context context, Cursor cursor) {
         Log.e("PopularMovies", "bindView " + cursor.getString
                 (DetailFragment.COL_KEY) + " " + cursor.getString(DetailFragment.COL_NAME) + this.getClass().getSimpleName());
-         ViewHolder viewHolder = (ViewHolder) view.getTag();
+        ViewHolder viewHolder = (ViewHolder) view.getTag();
         viewHolder.youtubeVideoURI = Utility.buildYoutubeVideoURI(cursor.getString
                 (DetailFragment.COL_KEY));
-        if(cursor.getPosition()==0)        mFirstTrailerUri=viewHolder.youtubeVideoURI; //We'll
-        // need this for the share action provider.
+        Log.e("PopularMovies", "viewHolder.youtubeVideoURI " + viewHolder.youtubeVideoURI + " " + this
+                .getClass().getSimpleName());
+        //We'll need this for the share action provider.
+        if (cursor.getPosition() == 0)
+            mDetailFragment.onFirstTrailerUriKnown(viewHolder.youtubeVideoURI);
+
         URL thumbnailTrailerURL = Utility.buildYoutubeThumbnailTrailerURL(cursor.getString
                 (DetailFragment.COL_KEY));
         Picasso.with(context).load(thumbnailTrailerURL.toString()).into(viewHolder.trailerImgView);
@@ -71,14 +82,11 @@ public class TrailersAdapter extends CursorAdapter {
             @Override
             public void onClick(View v) {
                 TrailersAdapter.ViewHolder viewHolder = (TrailersAdapter.ViewHolder) v.getTag();
-                Uri uri=viewHolder.youtubeVideoURI;
-                Utility.openYoutube(uri,context);
+                Uri uri = viewHolder.youtubeVideoURI;
+                Utility.openYoutube(uri, context);
             }
         });
     }
 
 
-    public Uri getmFirstTrailerUri() {
-        return mFirstTrailerUri;
-    }
 }
