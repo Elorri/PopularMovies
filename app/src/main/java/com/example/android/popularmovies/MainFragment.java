@@ -79,7 +79,8 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Cursor cursor = (Cursor) parent.getItemAtPosition(position);
                 if (cursor != null) {
-                    Uri uri = MovieEntry.buildMovieDetailUri(cursor.getLong(COL_MOVIE_ID));
+                    String movieId=(Long.valueOf(cursor.getLong(COL_MOVIE_ID))).toString();
+                    Uri uri = MovieEntry.buildMovieTrailersReviewsUri(movieId);
                     ((Callback) getActivity()).onItemSelected(uri, false);
                 }
             }
