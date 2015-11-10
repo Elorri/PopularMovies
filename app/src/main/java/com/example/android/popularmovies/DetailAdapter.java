@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.v7.widget.SwitchCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,39 +59,66 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton.OnChe
     public static class ViewHolder {
 
 
+        //set by the constructor
         private TextView titleTextView;
         private ImageView posterimageImageView;
         private TextView plotsynopsisTextView;
         private TextView voteaverageTextView;
         private TextView releasedateTextView;
         private TextView durationTextView;
-        private SwitchCompat favoriteSwitchCompat;
+        private SwitchCompat favoriteView;
 
-        public Uri youtubeVideoURI;
-        public final LinearLayout trailerItem;
+        private LinearLayout trailerItemView;
         private ImageView trailerImgView;
         private TextView trailerTitleView;
 
         private TextView reviewAuthorTextView;
         private TextView reviewContentTextView;
 
+        private int viewType;
 
-        public ViewHolder(View view) {
+        //set in the bindview method
+        public Uri youtubeVideoURI;
 
-            titleTextView = (TextView) view.findViewById(R.id.title);
-            posterimageImageView = (ImageView) view.findViewById(R.id.posterImage);
-            plotsynopsisTextView = (TextView) view.findViewById(R.id.overview);
-            voteaverageTextView = (TextView) view.findViewById(R.id.voteAverage);
-            releasedateTextView = (TextView) view.findViewById(R.id.releaseYear);
-            durationTextView = (TextView) view.findViewById(R.id.duration);
-            favoriteSwitchCompat = (SwitchCompat) view.findViewById(R.id.favorite);
 
-            trailerItem = (LinearLayout) view.findViewById(R.id.trailer_item);
-            trailerImgView = (ImageView) view.findViewById(R.id.trailer_img);
-            trailerTitleView = (TextView) view.findViewById(R.id.trailer_title);
 
-            reviewAuthorTextView = (TextView) view.findViewById(R.id.review_author);
-            reviewContentTextView = (TextView) view.findViewById(R.id.review_content);
+        public ViewHolder(View view, int viewType) {
+            Log.e("PopularMovies", "ViewHolder()");
+            switch (viewType) {
+                case ITEM_DESC:
+                    Log.d("PopularMovies", "ITEM_DESC");
+                    titleTextView = (TextView) view.findViewById(R.id.title);
+                    posterimageImageView = (ImageView) view.findViewById(R.id.posterImage);
+                    plotsynopsisTextView = (TextView) view.findViewById(R.id.overview);
+                    voteaverageTextView = (TextView) view.findViewById(R.id.voteAverage);
+                    releasedateTextView = (TextView) view.findViewById(R.id.releaseYear);
+                    durationTextView = (TextView) view.findViewById(R.id.duration);
+                    favoriteView = (SwitchCompat) view.findViewById(R.id.favorite);
+                    break;
+                case ITEM_TRAILER_LABEL:
+                    Log.d("PopularMovies", "ITEM_TRAILER_LABEL");
+                    trailerItemView = (LinearLayout) view.findViewById(R.id.trailer_item);
+                    trailerImgView = (ImageView) view.findViewById(R.id.trailer_img);
+                    trailerTitleView = (TextView) view.findViewById(R.id.trailer_title);
+                    break;
+                case ITEM_TRAILER:
+                    Log.d("PopularMovies", "ITEM_TRAILER");
+                    trailerItemView = (LinearLayout) view.findViewById(R.id.trailer_item);
+                    trailerImgView = (ImageView) view.findViewById(R.id.trailer_img);
+                    trailerTitleView = (TextView) view.findViewById(R.id.trailer_title);
+                    break;
+                case ITEM_REVIEW_LABEL:
+                    Log.d("PopularMovies", "ITEM_REVIEW_LABEL");
+                    reviewAuthorTextView = (TextView) view.findViewById(R.id.review_author);
+                    reviewContentTextView = (TextView) view.findViewById(R.id.review_content);
+                    break;
+                case ITEM_REVIEW:
+                    Log.d("PopularMovies", "ITEM_REVIEW");
+                    reviewAuthorTextView = (TextView) view.findViewById(R.id.review_author);
+                    reviewContentTextView = (TextView) view.findViewById(R.id.review_content);
+                    break;
+            }
+            this.viewType=viewType;
 
         }
     }
@@ -104,41 +132,48 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton.OnChe
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
+        Log.e("PopularMovies", "newView");
         // Choose the layout type
         int viewType = getItemViewType(cursor.getPosition());
         int layoutId = -1;
         switch (viewType) {
-            case ITEM_DESC: {
+            case ITEM_DESC:
+                Log.d("PopularMovies", "ITEM_DESC");
                 layoutId = R.layout.detail_desc_item;
                 break;
-            }
             case ITEM_TRAILER_LABEL:
+                Log.d("PopularMovies", "ITEM_TRAILER_LABEL");
                 layoutId = R.layout.detail_label_trailer_item;
                 break;
-            case ITEM_TRAILER: {
+            case ITEM_TRAILER:
+                Log.d("PopularMovies", "ITEM_TRAILER");
                 layoutId = R.layout.detail_trailer_item;
                 break;
-            }
             case ITEM_REVIEW_LABEL:
+                Log.d("PopularMovies", "ITEM_REVIEW_LABEL");
                 layoutId = R.layout.detail_label_review_item;
                 break;
-            case ITEM_REVIEW: {
+            case ITEM_REVIEW:
+                Log.d("PopularMovies", "ITEM_REVIEW");
                 layoutId = R.layout.detail_review_item;
                 break;
-            }
         }
         View view = LayoutInflater.from(context).inflate(layoutId, parent, false);
-        ViewHolder viewHolder = new ViewHolder(view);
+        ViewHolder viewHolder = new ViewHolder(view, viewType);
         view.setTag(viewHolder);
+        Log.d("PopularMovies", "setTag viewHolder " + viewHolder);
         return view;
     }
 
     @Override
-    public void bindView(View view, final Context context, Cursor cursor) {
+    public void bindView(View view, Context context, Cursor cursor) {
+        Log.e("PopularMovies", "bindView");
         ViewHolder viewHolder = (ViewHolder) view.getTag();
+        Log.d("PopularMovies", "viewHolder viewType "+viewHolder.viewType);
         int viewType = getItemViewType(cursor.getPosition());
         switch (viewType) {
-            case ITEM_DESC: {
+            case ITEM_DESC:
+                Log.d("PopularMovies", "ITEM_DESC");
                 mId = cursor.getLong(MovieProvider.COL_ID);
                 mTitleValue = cursor.getString(MovieProvider.COL_TITLE);
                 mDurationValue = cursor.getInt(MovieProvider.COL_DURATION);
@@ -159,40 +194,54 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton.OnChe
                 viewHolder.plotsynopsisTextView.setText(mPlotSynopsisValue);
                 viewHolder.voteaverageTextView.setText(mRateValue + context.getString(R.string
                         .rateMax));
-                viewHolder.favoriteSwitchCompat.setChecked(mFavoriteValue);
-                viewHolder.favoriteSwitchCompat.setOnCheckedChangeListener(this);
+                viewHolder.favoriteView.setChecked(mFavoriteValue);
+                viewHolder.favoriteView.setOnCheckedChangeListener(this);
                 break;
-            }
-
             case ITEM_TRAILER_LABEL:
+                Log.d("PopularMovies", "ITEM_TRAILER_LABEL");
                 viewHolder.youtubeVideoURI = Utility.buildYoutubeVideoURI(cursor.getString
                         (MovieProvider.COL_KEY));
                 mDetailFragment.onFirstTrailerUriKnown(viewHolder.youtubeVideoURI);
-            case ITEM_TRAILER: {
+                setItemTrailerView(viewHolder, cursor, context);
+                break;
+            case ITEM_TRAILER:
+                Log.d("PopularMovies", "ITEM_TRAILER");
                 viewHolder.youtubeVideoURI = Utility.buildYoutubeVideoURI(cursor.getString
                         (MovieProvider.COL_KEY));
-                URL thumbnailTrailerURL = Utility.buildYoutubeThumbnailTrailerURL(cursor.getString
-                        (MovieProvider.COL_KEY));
-                Picasso.with(context).load(thumbnailTrailerURL.toString()).into(viewHolder.trailerImgView);
-                viewHolder.trailerTitleView.setText(cursor.getString(MovieProvider.COL_NAME));
-                viewHolder.trailerItem.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        DetailAdapter.ViewHolder viewHolder = (DetailAdapter.ViewHolder) v
-                                .getTag();
-                        Uri uri = viewHolder.youtubeVideoURI;
-                        Utility.openYoutube(uri, context);
-                    }
-                });
+                setItemTrailerView(viewHolder, cursor, context);
                 break;
-            }
             case ITEM_REVIEW_LABEL:
-            case ITEM_REVIEW: {
-                viewHolder.reviewAuthorTextView.setText(cursor.getString(MovieProvider.COL_AUTHOR));
-                viewHolder.reviewContentTextView.setText(cursor.getString(MovieProvider.COL_CONTENT));
+                Log.d("PopularMovies", "ITEM_REVIEW_LABEL");
+                setItemReview(viewHolder, cursor);
                 break;
-            }
+            case ITEM_REVIEW:
+                Log.d("PopularMovies", "ITEM_REVIEW");
+                setItemReview(viewHolder, cursor);
+                break;
         }
+    }
+
+
+    private void setItemTrailerView(ViewHolder viewHolder, Cursor cursor, final Context context) {
+
+        URL thumbnailTrailerURL = Utility.buildYoutubeThumbnailTrailerURL(cursor.getString
+                (MovieProvider.COL_KEY));
+        Picasso.with(context).load(thumbnailTrailerURL.toString()).into(viewHolder.trailerImgView);
+        viewHolder.trailerTitleView.setText(cursor.getString(MovieProvider.COL_NAME));
+        viewHolder.trailerItemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ViewHolder viewHolder = (ViewHolder) v.getTag();
+                Log.d("PopularMovies", "getTag viewHolder " + v.getTag());
+                Uri uri = viewHolder.youtubeVideoURI;
+                Utility.openYoutube(uri, context);
+            }
+        });
+    }
+
+    private void setItemReview(ViewHolder viewHolder, Cursor cursor) {
+        viewHolder.reviewAuthorTextView.setText(cursor.getString(MovieProvider.COL_AUTHOR));
+        viewHolder.reviewContentTextView.setText(cursor.getString(MovieProvider.COL_CONTENT));
     }
 
 

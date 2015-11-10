@@ -29,7 +29,7 @@ public class TmdbAccess {
 
 
     private static final String LOG_TAG = "PopularMovies";
-    private final String API_KEY = "";
+    private final String API_KEY = "4691965cfc3e6f0591bc595986e92e84";
     private final Context context;
 
 
