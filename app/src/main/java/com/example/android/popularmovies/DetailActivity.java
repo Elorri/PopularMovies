@@ -3,6 +3,7 @@ package com.example.android.popularmovies;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -22,6 +23,12 @@ public class DetailActivity extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.detail_fragment_container, fragment)
                 .commit();
+
+        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
+                " : DetailFragment :  object created");
+        Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() +
+                " : DetailFragment uri :  change state");
+
     }
 
 
@@ -40,6 +47,7 @@ public class DetailActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if (id == R.id.action_settings) {
+            Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2]+ ": "+Utility.thread()+" : onOptionsItemSelected : SettingsActivity intent : object created");
             startActivity(new Intent(this, SettingsActivity.class));
             return true;
         }

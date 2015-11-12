@@ -1,9 +1,9 @@
 package com.example.android.popularmovies;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -18,14 +18,7 @@ public class Utility {
     private static final String LOG_TAG = Utility.class.getSimpleName();
 
 
-    public static void openYoutube(Uri uri,Context context){
-        Intent intent=new Intent(Intent.ACTION_VIEW).setData(uri);
-        if(intent.resolveActivity(context.getPackageManager())!=null){
-            context.startActivity(intent);
-        }else {
-            Log.d(LOG_TAG, "Couldn't call " + uri.toString() + ", no receiving apps installed!");
-        }
-    }
+
 
     public static String getSortOrderPreferences(Context context) {
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -82,4 +75,11 @@ public class Utility {
         return builtUri;
 
     }
+
+    public static String thread() {
+        if (Looper.getMainLooper().getThread() == Thread.currentThread())
+            return "ThreadUI";
+        else return "Background";
+    }
+
 }

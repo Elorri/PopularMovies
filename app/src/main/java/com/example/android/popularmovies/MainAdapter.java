@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,9 +24,8 @@ import java.net.URL;
  */
 public class MainAdapter extends CursorAdapter {
 
-    private static final String LOG_TAG = "PopularMovies";
 
-    private TmdbAccess tmdbAccess;
+    private final TmdbAccess tmdbAccess;
     private Uri mUriFirstItem;
 
 
@@ -41,15 +41,21 @@ public class MainAdapter extends CursorAdapter {
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         View view = LayoutInflater.from(context).inflate(R.layout.main_item, parent, false);
+        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + " : " + Utility
+                .thread() + " : MainAdapter item view :  object created");
         return view;
     }
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        if(cursor.getPosition()==0)mUriFirstItem= MovieEntry.buildMovieDetailUri(Long.parseLong(cursor
-                .getString(MainFragment.COL_MOVIE_ID)));
+        if (cursor.getPosition() == 0) {
+            mUriFirstItem = MovieEntry.buildMovieDetailUri(Long.parseLong(cursor
+                    .getString(MainFragment.COL_MOVIE_ID)));
+            Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + " : " + Utility
+                    .thread() + " : MainAdapter mUriFirstItem :  change state");
+        }
         URL posterURL = tmdbAccess.constructPosterImageURL(cursor.getString(MainFragment.COL_POSTER_PATH));
-        String title=Utility.getShortString(cursor.getString(MainFragment.COL_TITLE), Integer.valueOf(context.getResources().getString(R.string.movie_title_size)));
+        String title = Utility.getShortString(cursor.getString(MainFragment.COL_TITLE), Integer.valueOf(context.getResources().getString(R.string.movie_title_size)));
 
 
         ColorGenerator generator = ColorGenerator.MATERIAL; // or use DEFAULT
@@ -60,6 +66,8 @@ public class MainAdapter extends CursorAdapter {
                 .textColor(Color.BLACK)
                 .endConfig().buildRect(title, noPosterColor);
         Picasso.with(context).load(posterURL.toString()).error(noPoster).into((ImageView) view);
+        Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + " : " + Utility
+                .thread() + " : MainAdapter poster ImageView :  change state");
     }
 
 

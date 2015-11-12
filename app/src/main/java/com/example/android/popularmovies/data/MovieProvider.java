@@ -9,7 +9,10 @@ import android.database.MergeCursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
+import com.example.android.popularmovies.DetailAdapter;
+import com.example.android.popularmovies.Utility;
 import com.example.android.popularmovies.data.MovieContract.MovieEntry;
 import com.example.android.popularmovies.data.MovieContract.ReviewEntry;
 import com.example.android.popularmovies.data.MovieContract.TrailerEntry;
@@ -104,7 +107,10 @@ public class MovieProvider extends ContentProvider {
 
     //This will be helpful to determine our DetailAdapter item type
     public static int CURSOR_TYPE_COUNT = 3;
-    public static int[] mCursorsCount;
+
+    public interface Callback {
+        void onDetailCursorMerged(int[] mCursorsCount);
+    }
 
     static UriMatcher buildUriMatcher() {
         // All paths added to the UriMatcher have a corresponding code to return when a match is
@@ -123,12 +129,19 @@ public class MovieProvider extends ContentProvider {
         matcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_REVIEW + "/*", REVIEW_DETAIL);
         matcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_TRAILER + "" +
                 "." + MovieContract.PATH_REVIEW + "/*", TRAILERS_REVIEWS_MOVIE);
+
+        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + " : " + Utility
+                .thread() + " : UriMatcher :  object created");
         return matcher;
     }
 
     @Override
     public boolean onCreate() {
         mOpenHelper = new MoviesDbHelper(getContext());
+        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + " : " + Utility
+                .thread() + " : MoviesDbHelper :  object created");
+        Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + " : " + Utility
+                .thread() + " : MoviesProvider.mOpenHelper :  change state");
         return true;
     }
 
@@ -170,29 +183,37 @@ public class MovieProvider extends ContentProvider {
                 movieId = MovieEntry.getMovieIdFromMovieTrailersReviewsUri(uri);
 
                 Cursor[] cursors = new Cursor[CURSOR_TYPE_COUNT];
-                 mCursorsCount = new int[CURSOR_TYPE_COUNT];
+                int[] cursorsCount = new int[CURSOR_TYPE_COUNT];
                 cursors[0] = query(
                         MovieEntry.buildMovieDetailUri(Long.valueOf(movieId)),
                         MOVIE_COLUMNS,
                         null,
                         null,
                         null);
-                mCursorsCount[0]=cursors[0].getCount();
+                cursorsCount[0]=cursors[0].getCount();
                 cursors[1] = query(
                         TrailerEntry.buildMovieTrailerUri(Long.valueOf(movieId)),
                         TRAILER_COLUMNS,
                         null,
                         null,
                         null);
-                mCursorsCount[1]=cursors[1].getCount();
+                cursorsCount[1]=cursors[1].getCount();
                 cursors[2] = query(
                         ReviewEntry.buildMovieReviewUri(Long.valueOf(movieId)),
                         REVIEWS_COLUMNS,
                         null,
                         null,
                         null);
-                mCursorsCount[2]=cursors[2].getCount();
-                cursor = new MergeCursor(cursors);
+                cursorsCount[2]=cursors[2].getCount();
+                 cursor = new MergeCursor(cursors);
+
+                Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + " : " + Utility
+                        .thread() + " : query cursor :  object created");
+                Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + " : " + Utility
+                        .thread() + " : query cursorCount[] :  object created");
+
+                 DetailAdapter.getInstance(getContext(), null,0, null ).onDetailCursorMerged(cursorsCount);
+
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -228,6 +249,8 @@ public class MovieProvider extends ContentProvider {
                 return ReviewEntry.CONTENT_TYPE;
             case REVIEW_DETAIL:
                 return ReviewEntry.CONTENT_ITEM_TYPE;
+            case TRAILERS_REVIEWS_MOVIE:
+                return MovieEntry.CONTENT_ITEM_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -268,6 +291,8 @@ public class MovieProvider extends ContentProvider {
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
+        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + " : " + Utility
+                .thread() + " : insert uri :  object created");
         getContext().getContentResolver().notifyChange(uri, null);
         return returnUri;
     }
@@ -280,7 +305,6 @@ public class MovieProvider extends ContentProvider {
         // this makes delete all rows return the number of rows deleted but there is no null where clause here
         if (null == selection) selection = "1";
         switch (match)
-
         {
             case MOVIE:
                 //delete from movie where favorite=0;
@@ -307,6 +331,9 @@ public class MovieProvider extends ContentProvider {
         if (rowsDeleted != 0) {
             getContext().getContentResolver().notifyChange(uri, null);
         }
+
+        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + " : " + Utility
+                .thread() + " : delete nb rowsDeleted :  object created");
         return rowsDeleted;
 
     }
@@ -338,6 +365,8 @@ public class MovieProvider extends ContentProvider {
         if (rowsUpdated != 0) {
             getContext().getContentResolver().notifyChange(uri, null);
         }
+        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + " : " + Utility
+                .thread() + " : delete nb rowsUpdated :  object created");
         return rowsUpdated;
     }
 
@@ -378,6 +407,8 @@ public class MovieProvider extends ContentProvider {
                 }
             }
             db.setTransactionSuccessful();
+            Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + " : " + Utility
+                    .thread() + " : delete nb rowsInserted :  object created");
             return returnCount;
         } finally {
             db.endTransaction();
@@ -396,6 +427,8 @@ public class MovieProvider extends ContentProvider {
                 null);
         if (cursor.moveToFirst()) {//Set favorite on on the record we want to insert
             value.put(MovieEntry.COLUMN_FAVORITE, MovieEntry.FAVORITE_ON_VALUE);
+            Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + " : " + Utility
+                    .thread() + " : ContentValues change to favorite :  state change");
         }
         return value;
     }

@@ -43,32 +43,34 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        Log.e(LOG_TAG, "onCreateOptionsMenu " + getClass().getSimpleName());
         inflater.inflate(R.menu.fragment_detail, menu);
         MenuItem menuItem = menu.findItem(R.id.action_share);
         mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menuItem);
-        Log.e(LOG_TAG, "mShareActionProvider " + mShareActionProvider + " " + getClass().getSimpleName());
-        Log.e(LOG_TAG, "mFirstVideoUri " + mFirstVideoUri + " " + getClass().getSimpleName());
-        if (mFirstVideoUri != null)
+        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "+Utility.thread()+" : " +
+                " : ShareActionProvider :  object created");
+        if (mFirstVideoUri != null){
             setShareActionProvider(mFirstVideoUri);
+        }
     }
 
     private void setShareActionProvider(Uri uri) {
-        Log.e(LOG_TAG, "setShareActionProvider " + getClass().getSimpleName());
-        Log.e(LOG_TAG, "mShareActionProvider " + mShareActionProvider + " " + getClass().getSimpleName());
+        Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "+Utility.thread()+" : " +
+                " : DetailFragment.mShareActionProvider :  change state");
         if (mShareActionProvider != null) {
             mShareActionProvider.setShareIntent(createShareIntent(uri));
         } else {
             Log.d(LOG_TAG, "Share Action Provider is null?");
         }
+
     }
 
     private Intent createShareIntent(Uri uri) {
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
         shareIntent.setType("text/plain");
-        Log.e(LOG_TAG, "shared intent uri " + uri);
         shareIntent.putExtra(Intent.EXTRA_TEXT, uri.toString());
+        Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "+Utility.thread()+" : " +
+                " : Intent shareIntent :  change state");
         return shareIntent;
     }
 
@@ -78,16 +80,25 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.detail_fragment, container, false);
         mDetailListView = (ListView) rootView.findViewById(R.id.detail_list);
-        mDetailAdapter = new DetailAdapter(getActivity(), null, 0, this);
+        mDetailAdapter = DetailAdapter.getInstance(getActivity(), null, 0, this);
         mDetailListView.setAdapter(mDetailAdapter);
+        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "+Utility.thread()+" : " +
+                " : DetailFragment.mDetailListView :  object created");
+        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "+Utility.thread()+" : " +
+                " : DetailFragment.mDetailAdapter :  object created");
+        Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "+Utility.thread()+" : " +
+                " : DetailFragment.mDetailListView :  change state");
+        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "+Utility.thread()+" : " +
+                " : DetailFragmentView :  object created");
         return rootView;
     }
 
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        Log.e("PopularMovies", "onActivityCreated " + getClass().getSimpleName());
         getLoaderManager().initLoader(MOVIE_LOADER, null, this);
+        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "+Utility.thread()+" : " +
+                " : DetailFragment Loader :  object created");
         super.onActivityCreated(savedInstanceState);
     }
 
@@ -95,11 +106,14 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         CursorLoader cursorLoader = null;
-        Log.e("PopularMovies", "onCreateLoader " + getClass().getSimpleName());
+        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "+Utility.thread()+" : " +
+                " : CursorLoader :  object created");
 
         Bundle arguments = getArguments();
         if (arguments != null) {
             mUri = arguments.getParcelable(DETAIL_URI);
+            Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "+Utility.thread()+" : " +
+                    " : DetailFragment.mDetailListView :  change state");
             if (mUri != null) {
                 cursorLoader = new CursorLoader(getActivity(),
                         mUri,
@@ -114,9 +128,10 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        Log.e("PopularMovies", "onLoadFinished " + this.getClass().getSimpleName());
         if (data != null && data.moveToFirst()) {
             mDetailAdapter.swapCursor(data);
+            Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "+Utility.thread()+" : " +
+                    " : DetailFragment.mDetailAdapter :  change state");
         }
 
     }
@@ -125,11 +140,15 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         mDetailAdapter.swapCursor(null);
+        Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "+Utility.thread()+" : onCreateView" +
+                " : DetailFragment.mDetailAdapter :  change state");
     }
 
     public void onSettingsChange() {
         if (mUri != null) {
             getLoaderManager().restartLoader(MOVIE_LOADER, null, this);
+            Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "+Utility.thread()+" : onSettingsChange" +
+                    " : MainFragment Loader :  change state");
         }
     }
 
@@ -139,5 +158,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         this.mFirstVideoUri = uri;
         if (mFirstVideoUri != null)
             setShareActionProvider(mFirstVideoUri);
+        Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "+Utility.thread()+" : " +
+                " : MainFragment.mFirstVideoUri :  change state");
     }
 }

@@ -2,6 +2,7 @@ package com.example.android.popularmovies;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.v7.widget.SwitchCompat;
@@ -16,6 +17,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.android.popularmovies.data.MovieContract;
+import com.example.android.popularmovies.data.MovieContract.MovieEntry;
 import com.example.android.popularmovies.data.MovieProvider;
 import com.squareup.picasso.Picasso;
 
@@ -25,8 +27,11 @@ import java.net.URL;
  * {@link DetailAdapter} exposes a list of trailer
  * from a {@link android.database.Cursor} to a {@link android.widget.ListView}.
  */
-public class DetailAdapter extends CursorAdapter implements CompoundButton.OnCheckedChangeListener {
+public class DetailAdapter extends CursorAdapter implements CompoundButton
+        .OnCheckedChangeListener, MovieProvider.Callback {
 
+    private static final String LOG_TAG = DetailAdapter.class.getSimpleName();
+    private static DetailAdapter instance = null;
 
     private static final int ITEM_DESC = 0;
     private static final int ITEM_TRAILER_LABEL = 1;
@@ -51,6 +56,27 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton.OnChe
     private int mReviewItemCount;
 
     private int VIEW_TYPE_COUNT = MovieProvider.CURSOR_TYPE_COUNT + 2; //plus 2 labels
+
+    @Override
+    public void onDetailCursorMerged(int[] mCursorsCount) {
+        mDescItemCount = mCursorsCount[0];
+        mTrailerItemCount = mCursorsCount[1];
+        mReviewItemCount = mCursorsCount[2];
+        Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
+                " : DetailAdapter.mDescItemCount :  change state");
+        Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
+                " : DetailAdapter.mTrailerItemCount :  change state");
+        Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
+                " : DetailAdapter.mReviewItemCount :  change state");
+    }
+
+    public static DetailAdapter getInstance(Context context, Cursor c, int flags, DetailFragment
+            detailFragment) {
+        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
+                " : DetailAdapter :  object created");
+        if (instance == null) return new DetailAdapter(context, c, flags, detailFragment);
+        else return instance;
+    }
 
 
     /**
@@ -81,12 +107,20 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton.OnChe
         public Uri youtubeVideoURI;
 
 
-
         public ViewHolder(View view, int viewType) {
-            Log.e("PopularMovies", "ViewHolder()");
             switch (viewType) {
                 case ITEM_DESC:
                     Log.d("PopularMovies", "ITEM_DESC");
+                    Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility
+                            .thread() + " : DetailAdapter " +
+                            "titleTextView  " +
+                            "posterimageImageView  " +
+                            "plotsynopsisTextView " +
+                            "voteaverageTextView " +
+                            "releasedateTextView " +
+                            "durationTextView " +
+                            "favoriteView " +
+                            ": object created");
                     titleTextView = (TextView) view.findViewById(R.id.title);
                     posterimageImageView = (ImageView) view.findViewById(R.id.posterImage);
                     plotsynopsisTextView = (TextView) view.findViewById(R.id.overview);
@@ -97,28 +131,50 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton.OnChe
                     break;
                 case ITEM_TRAILER_LABEL:
                     Log.d("PopularMovies", "ITEM_TRAILER_LABEL");
+                    Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility
+                            .thread() + " : DetailAdapter " +
+                            "trailerItemView  " +
+                            "trailerImgView  " +
+                            "trailerTitleView " +
+                            ": object created");
                     trailerItemView = (LinearLayout) view.findViewById(R.id.trailer_item);
                     trailerImgView = (ImageView) view.findViewById(R.id.trailer_img);
                     trailerTitleView = (TextView) view.findViewById(R.id.trailer_title);
                     break;
                 case ITEM_TRAILER:
                     Log.d("PopularMovies", "ITEM_TRAILER");
+                    Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility
+                            .thread() + " : DetailAdapter " +
+                            "trailerItemView  " +
+                            "trailerImgView  " +
+                            "trailerTitleView " +
+                            ": object created");
                     trailerItemView = (LinearLayout) view.findViewById(R.id.trailer_item);
                     trailerImgView = (ImageView) view.findViewById(R.id.trailer_img);
                     trailerTitleView = (TextView) view.findViewById(R.id.trailer_title);
                     break;
                 case ITEM_REVIEW_LABEL:
                     Log.d("PopularMovies", "ITEM_REVIEW_LABEL");
+                    Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility
+                            .thread() + " : DetailAdapter " +
+                            "reviewAuthorTextView  " +
+                            "reviewContentTextView  " +
+                            ": object created");
                     reviewAuthorTextView = (TextView) view.findViewById(R.id.review_author);
                     reviewContentTextView = (TextView) view.findViewById(R.id.review_content);
                     break;
                 case ITEM_REVIEW:
                     Log.d("PopularMovies", "ITEM_REVIEW");
+                    Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility
+                            .thread() + " : DetailAdapter " +
+                            "reviewAuthorTextView  " +
+                            "reviewContentTextView  " +
+                            ": object created");
                     reviewAuthorTextView = (TextView) view.findViewById(R.id.review_author);
                     reviewContentTextView = (TextView) view.findViewById(R.id.review_content);
                     break;
             }
-            this.viewType=viewType;
+            this.viewType = viewType;
 
         }
     }
@@ -128,7 +184,13 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton.OnChe
         super(context, c, flags);
         mContext = context;
         this.mDetailFragment = detailFragment;
+        Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility
+                .thread() + " : DetailAdapter " +
+                "mContext  " +
+                "mDetailFragment  " +
+                ": change state");
     }
+
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
@@ -159,17 +221,19 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton.OnChe
                 break;
         }
         View view = LayoutInflater.from(context).inflate(layoutId, parent, false);
+        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
+                " : DetailAdapter item View :  object created");
         ViewHolder viewHolder = new ViewHolder(view, viewType);
+        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
+                " : DetailAdapter item View :  object created");
         view.setTag(viewHolder);
-        Log.d("PopularMovies", "setTag viewHolder " + viewHolder);
+        Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : DetailAdapter item View : change state");
         return view;
     }
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        Log.e("PopularMovies", "bindView");
         ViewHolder viewHolder = (ViewHolder) view.getTag();
-        Log.d("PopularMovies", "viewHolder viewType "+viewHolder.viewType);
         int viewType = getItemViewType(cursor.getPosition());
         switch (viewType) {
             case ITEM_DESC:
@@ -184,6 +248,19 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton.OnChe
                 mRateValue = cursor.getDouble(MovieProvider.COL_RATE);
                 mPopularityValue = cursor.getString(MovieProvider.COL_POPULARITY);
                 mFavoriteValue = Utility.isFavorite(cursor.getInt(MovieProvider.COL_FAVORITE));
+                Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility
+                        .thread() + " : DetailAdapter " +
+                        "mId  " +
+                        "mTitleValue  " +
+                        "mDurationValue " +
+                        "mReleaseDateValue " +
+                        "mPosterPathValue " +
+                        "mPlotSynopsisValue " +
+                        "mRateValue " +
+                        "mPopularityValue " +
+                        "mFavoriteValue " +
+                        ": change state");
+
 
                 viewHolder.titleTextView.setText(mTitleValue);
                 viewHolder.durationTextView.setText(mDurationValue + " " + context.getString(R
@@ -195,12 +272,25 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton.OnChe
                 viewHolder.voteaverageTextView.setText(mRateValue + context.getString(R.string
                         .rateMax));
                 viewHolder.favoriteView.setChecked(mFavoriteValue);
+                Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility
+                        .thread() + " : ViewHolder " +
+                        "titleTextView  " +
+                        "durationTextView  " +
+                        "releasedateTextView " +
+                        "posterimageImageView " +
+                        "plotsynopsisTextView " +
+                        "voteaverageTextView " +
+                        "favoriteView " +
+                        ": change state");
+
                 viewHolder.favoriteView.setOnCheckedChangeListener(this);
                 break;
             case ITEM_TRAILER_LABEL:
                 Log.d("PopularMovies", "ITEM_TRAILER_LABEL");
                 viewHolder.youtubeVideoURI = Utility.buildYoutubeVideoURI(cursor.getString
                         (MovieProvider.COL_KEY));
+                Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility
+                        .thread() + " : ViewHolder youtubeVideoURI : change state");
                 mDetailFragment.onFirstTrailerUriKnown(viewHolder.youtubeVideoURI);
                 setItemTrailerView(viewHolder, cursor, context);
                 break;
@@ -208,6 +298,8 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton.OnChe
                 Log.d("PopularMovies", "ITEM_TRAILER");
                 viewHolder.youtubeVideoURI = Utility.buildYoutubeVideoURI(cursor.getString
                         (MovieProvider.COL_KEY));
+                Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility
+                        .thread() + " : ViewHolder youtubeVideoURI : change state");
                 setItemTrailerView(viewHolder, cursor, context);
                 break;
             case ITEM_REVIEW_LABEL:
@@ -228,29 +320,38 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton.OnChe
                 (MovieProvider.COL_KEY));
         Picasso.with(context).load(thumbnailTrailerURL.toString()).into(viewHolder.trailerImgView);
         viewHolder.trailerTitleView.setText(cursor.getString(MovieProvider.COL_NAME));
+        Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility
+                .thread() + " : ViewHolder trailerImgView trailerTitleView : change state");
         viewHolder.trailerItemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ViewHolder viewHolder = (ViewHolder) v.getTag();
-                Log.d("PopularMovies", "getTag viewHolder " + v.getTag());
-                Uri uri = viewHolder.youtubeVideoURI;
-                Utility.openYoutube(uri, context);
+                openYoutube(v, context);
             }
         });
+    }
+
+    private void openYoutube(View v, Context context) {
+        ViewHolder viewHolder = (ViewHolder) v.getTag();
+        Intent intent = new Intent(Intent.ACTION_VIEW).setData(viewHolder.youtubeVideoURI);
+        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + " : " + Utility
+                .thread() + " : Intent youtube :  object created");
+        if (intent.resolveActivity(context.getPackageManager()) != null) {
+            context.startActivity(intent);
+        } else {
+            Log.d(LOG_TAG, "Couldn't call " + viewHolder.youtubeVideoURI.toString() + ", no receiving apps installed!");
+        }
     }
 
     private void setItemReview(ViewHolder viewHolder, Cursor cursor) {
         viewHolder.reviewAuthorTextView.setText(cursor.getString(MovieProvider.COL_AUTHOR));
         viewHolder.reviewContentTextView.setText(cursor.getString(MovieProvider.COL_CONTENT));
+        Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility
+                .thread() + " : ViewHolder reviewAuthorTextView reviewContentTextView : change state");
     }
 
 
     @Override
     public int getItemViewType(int position) {
-        mDescItemCount = MovieProvider.mCursorsCount[0];
-        mTrailerItemCount = MovieProvider.mCursorsCount[1];
-        mReviewItemCount = MovieProvider.mCursorsCount[2];
-
         if (position < mDescItemCount)
             return ITEM_DESC;
         else if (position == mDescItemCount)
@@ -273,18 +374,22 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton.OnChe
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         ContentValues movieValues = new ContentValues();
-        movieValues.put(MovieContract.MovieEntry._ID, mId);
-        movieValues.put(MovieContract.MovieEntry.COLUMN_TITLE, mTitleValue);
-        movieValues.put(MovieContract.MovieEntry.COLUMN_DURATION, mDurationValue);
-        movieValues.put(MovieContract.MovieEntry.COLUMN_RELEASE_DATE, mReleaseDateValue);
-        movieValues.put(MovieContract.MovieEntry.COLUMN_POSTER_PATH, mPosterPathValue);
-        movieValues.put(MovieContract.MovieEntry.COLUMN_PLOT_SYNOPSIS, mPlotSynopsisValue);
-        movieValues.put(MovieContract.MovieEntry.COLUMN_RATE, mRateValue);
-        movieValues.put(MovieContract.MovieEntry.COLUMN_POPULARITY, mPopularityValue);
-        movieValues.put(MovieContract.MovieEntry.COLUMN_FAVORITE, Utility.getDbFavoriteValue(isChecked));
+        movieValues.put(MovieEntry._ID, mId);
+        movieValues.put(MovieEntry.COLUMN_TITLE, mTitleValue);
+        movieValues.put(MovieEntry.COLUMN_DURATION, mDurationValue);
+        movieValues.put(MovieEntry.COLUMN_RELEASE_DATE, mReleaseDateValue);
+        movieValues.put(MovieEntry.COLUMN_POSTER_PATH, mPosterPathValue);
+        movieValues.put(MovieEntry.COLUMN_PLOT_SYNOPSIS, mPlotSynopsisValue);
+        movieValues.put(MovieEntry.COLUMN_RATE, mRateValue);
+        movieValues.put(MovieEntry.COLUMN_POPULARITY, mPopularityValue);
+        movieValues.put(MovieEntry.COLUMN_FAVORITE, Utility.getDbFavoriteValue(isChecked));
+        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + " : " + Utility
+                .thread() + " : ContentValues :  object created");
 
         mContext.getContentResolver().update(MovieContract.MovieEntry.CONTENT_URI,
                 movieValues, MovieContract.MovieEntry
                         ._ID + "=?", new String[]{Long.toString(mId)});
+
+
     }
 }

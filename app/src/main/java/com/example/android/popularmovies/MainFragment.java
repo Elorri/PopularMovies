@@ -54,7 +54,6 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Log.e("PopularMovies", "onCreate " + getClass().getSimpleName());
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
@@ -63,11 +62,18 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         // up with an empty list the first time we run.
         tmdbAccess = new TmdbAccess(getContext());
         mMainAdapter = new MainAdapter(getActivity(), null, 0, tmdbAccess);
+
+        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "+Utility.thread()+" : " +
+                " : TmdbAccess :  object created");
+        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "+Utility.thread()+" : " +
+                " : MainAdapter :  object created");
+        Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "+Utility.thread()+" : " +
+                " : MainFragment :  change state");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Log.e("PopularMovies", "onCreateView " + getClass().getSimpleName());
+        Log.e("PopularMovies", "onCreateView " + Thread.currentThread().getStackTrace()[2]);
         View rootView = inflater.inflate(R.layout.main_fragment, container, false);
 
         // Get a reference to the ListView, and attach this adapter to it.
@@ -77,35 +83,48 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Cursor cursor = (Cursor) parent.getItemAtPosition(position);
-                if (cursor != null) {
-                    String movieId=(Long.valueOf(cursor.getLong(COL_MOVIE_ID))).toString();
-                    Uri uri = MovieEntry.buildMovieTrailersReviewsUri(movieId);
-                    ((Callback) getActivity()).onItemSelected(uri, false);
-                }
+                onMovieClicked(parent, position);
             }
         });
+        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "+Utility.thread()+" : " +
+                " : GridView :  object created");
+        Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
+                " : MainFragment :  change state");
+        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
+                " : MainFragmentView :  object created");
         return rootView;
     }
 
-
+    private void onMovieClicked(AdapterView<?> parent, int position) {
+        Cursor cursor = (Cursor) parent.getItemAtPosition(position);
+        if (cursor != null) {
+            String movieId = (Long.valueOf(cursor.getLong(COL_MOVIE_ID))).toString();
+            Uri uri = MovieEntry.buildMovieTrailersReviewsUri(movieId);
+            Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "+Utility.thread()+" : " +
+                    " : Uri :  object created");
+            ((Callback) getActivity()).onItemSelected(uri, false);
+        }
+    }
 
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        Log.e("PopularMovies", "onActivityCreated " + getClass().getSimpleName());
         getLoaderManager().initLoader(MOVIES_LOADER, null, this);
+        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "+Utility.thread()+" : " +
+                " : MainFragment Loader :  object created");
         super.onActivityCreated(savedInstanceState);
     }
 
 
     public void onSettingsChange() {
-        //Offline 'popularity.desc' and 'vote_average.desc' sort order will display the display
+        //Offline 'popularity.desc' and 'vote_average.desc' sort order will display
         // the favorites in the order chosen.
         deleteUnfavorites(getContext());
         if (isConnected())
             syncDB();
         getLoaderManager().restartLoader(MOVIES_LOADER, null, this);
+        Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
+                " : MainFragment Loader :  change state");
     }
 
 
@@ -119,6 +138,8 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
                 (Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
         boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
+                " : isConnected boolean :  object created");
         return isConnected;
     }
 
@@ -132,7 +153,9 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
 
     private Uri buildMoviesUri() {
-        String sortBy=Utility.getSortOrderPreferences(getContext());
+        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
+                " : movies uri :  object created");
+        String sortBy = Utility.getSortOrderPreferences(getContext());
         if (sortBy.equals(getString(R.string.pref_sort_order_favorite)))
             return MovieEntry.buildMoviesFavoriteUri();
         return MovieEntry.buildMoviesSortByUri(sortBy);
@@ -141,7 +164,8 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Log.e("PopularMovies", "onCreateLoader " + getClass().getSimpleName());
+        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "+Utility.thread()+" : " +
+                " : CursorLoader :  object created");
         return new CursorLoader(getActivity(),
                 buildMoviesUri(),
                 MOVIE_COLUMNS,
@@ -151,11 +175,11 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     }
 
 
-
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        Log.e("PopularMovies", "onLoadFinished " + getClass().getSimpleName());
         mMainAdapter.swapCursor(data);
+        Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "+Utility.thread()+" : " +
+                " : mMainAdapter :  change state");
         //To avoid 'java.lang.IllegalStateException: Can not perform this action inside of onLoadFinished'
         Handler handler = new Handler();
         handler.post(new Runnable() {
@@ -169,8 +193,9 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        Log.e("PopularMovies", "onLoaderReset " + getClass().getSimpleName());
         mMainAdapter.swapCursor(null);
+        Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : onLoaderReset" +
+                " : mMainAdapter :  change state");
     }
 
 
