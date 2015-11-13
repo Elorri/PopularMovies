@@ -140,8 +140,6 @@ public class MovieProvider extends ContentProvider {
         mOpenHelper = new MoviesDbHelper(getContext());
         Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + " : " + Utility
                 .thread() + " : MoviesDbHelper :  object created");
-        Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + " : " + Utility
-                .thread() + " : MoviesProvider.mOpenHelper :  change state");
         return true;
     }
 

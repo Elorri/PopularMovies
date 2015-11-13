@@ -82,4 +82,13 @@ public class Utility {
         else return "Background";
     }
 
+    /**
+     * Compare the second Uri to the first and return true if equals, false if not
+     * @param uri1 first uri
+     * @param uri2 second uri to compare to the first
+     * @return true if the 2 uris are equals, false otherwise
+     */
+    public static boolean compareUris(Uri uri1, Uri uri2) {
+        return uri1.toString().equals(uri2.toString());
+    }
 }

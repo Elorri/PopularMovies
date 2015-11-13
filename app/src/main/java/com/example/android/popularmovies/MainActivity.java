@@ -8,34 +8,48 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.example.android.popularmovies.data.MovieContract;
 import com.example.android.popularmovies.sync.MoviesSyncAdapter;
 
-public class MainActivity extends AppCompatActivity implements MainFragment.Callback{
+public class MainActivity extends AppCompatActivity implements MainFragment.Callback {
 
     private static final String DETAILFRAGMENT_TAG = "detail_fragment";
     private boolean mTwoPane;
-    private String mSortOrder;
+
+
+    private Uri mMainUri;
+    static final String MAIN_URI = "mMainUri";
+    private MainFragment mMainFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2]+" : "+Utility.thread()+" : MainActivity : object created");
+        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + " : " + Utility.thread() + " : MainActivity : object created");
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main_activity);
+        setContentView(R.layout.main_activity); //This will call the MainFragment onCreate
+
+        if (savedInstanceState == null)
+            mMainUri = buildMoviesUri();
+        else
+            mMainUri = savedInstanceState.getParcelable(MAIN_URI);
+        mMainFragment = (MainFragment) getSupportFragmentManager().findFragmentById(R.id.main_fragment);
+        Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
+                " :mMainFragment.mMainUri :  change state");
+        mMainFragment.setMainUri(mMainUri);
 
         if (findViewById(R.id.detail_fragment_container) != null) {
             mTwoPane = true;
             if (savedInstanceState == null) {
                 getSupportFragmentManager().beginTransaction().replace(R.id
                         .detail_fragment_container, new DetailFragment(), DETAILFRAGMENT_TAG).commit();
-                Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2]+ ": "+Utility.thread()+" : onCreate : " +
+                Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : onCreate : " +
                         "DetailFragment " +
                         ": object created");
             }
         } else {
             mTwoPane = false;
         }
-        Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "+Utility.thread()+" : " +
-                " : DetailFragment.mTwoPane :  change state");
+        Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
+                " : MainActivity.mTwoPane :  change state");
         MoviesSyncAdapter.initializeSyncAdapter(this);
     }
 
@@ -50,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Call
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2]+ ": "+Utility.thread()+" : onOptionsItemSelected");
+        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : onOptionsItemSelected");
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
@@ -58,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Call
 
 
         if (id == R.id.action_settings) {
-            Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2]+ ": "+Utility.thread()+" : onOptionsItemSelected : SettingsActivity intent : object created");
+            Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : onOptionsItemSelected : SettingsActivity intent : object created");
             startActivity(new Intent(this, SettingsActivity.class));
             return true;
         }
@@ -67,49 +81,54 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Call
     }
 
 
-
     @Override
     protected void onResume() {
         super.onResume();
-        String sortOrder = Utility.getSortOrderPreferences(this);
-        if (sortOrder != null && !sortOrder.equals(mSortOrder)) {
-            MainFragment mainFragment = (MainFragment) getSupportFragmentManager().findFragmentById(R.id.main_fragment);
-            Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2]+ ": "+Utility.thread()+" : MainFragment : object created");
-            if (null != mainFragment) {
-                mainFragment.onSettingsChange();
-            }
-            DetailFragment detailFragment = (DetailFragment) getSupportFragmentManager().findFragmentByTag(DETAILFRAGMENT_TAG);
-            if (null != detailFragment) {
-                detailFragment.onSettingsChange();
-            }
-            mSortOrder = sortOrder;
+        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
+                "currentMainUri : object created");
+        Uri currentMainUri = buildMoviesUri();
+        if (!Utility.compareUris(mMainUri, currentMainUri)) {
+            onMainUriChange(currentMainUri);
             Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
-                    "MainActivity.mSortOrder : change state");
+                    "MainActivity.mMainUri : change state");
         }
     }
 
+    private void onMainUriChange(Uri newUri) {
+        mMainUri = newUri;
+        mMainFragment.setMainUri(mMainUri);
+        mMainFragment.onMainUriChange();
+
+        DetailFragment detailFragment = (DetailFragment) getSupportFragmentManager().findFragmentByTag(DETAILFRAGMENT_TAG);
+        if (null != detailFragment) {
+            detailFragment.onMainUriChange();
+        }
+    }
+
+
+
     @Override
     public void onItemSelected(Uri uri, boolean firstDisplay) {
-        if(mTwoPane){
+        if (mTwoPane) {
             Bundle arguments = new Bundle();
             arguments.putParcelable(DetailFragment.DETAIL_URI, uri);
 
             DetailFragment fragment = new DetailFragment();
-            Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "+Utility.thread()+" : onItemSelected" +
+            Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : onItemSelected" +
                     " : DetailFragment :  object created");
             fragment.setArguments(arguments);
-            Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "+Utility.thread()+" : onItemSelected" +
+            Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : onItemSelected" +
                     " : DetailFragment :  change state");
 
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.detail_fragment_container, fragment, DETAILFRAGMENT_TAG)
                     .commit();
-        }else{
-            if(firstDisplay==false) {
+        } else {
+            if (firstDisplay == false) {
                 Intent intent = new Intent(this, DetailActivity.class);
-                Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2]+ ": "+Utility.thread()+" : DetailActivity intent : object created");
+                Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : DetailActivity intent : object created");
                 intent.setData(uri);
-                Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "+Utility.thread() +
+                Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() +
                         " : DetailActivity intent :  change state");
                 startActivity(intent);
             }
@@ -117,6 +136,19 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Call
     }
 
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(MAIN_URI, mMainUri);
+    }
 
+    private Uri buildMoviesUri() {
+        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
+                " : movies uri :  object created");
+        String sortBy = Utility.getSortOrderPreferences(this);
+        if (sortBy.equals(getString(R.string.pref_sort_order_favorite)))
+            return MovieContract.MovieEntry.buildMoviesFavoriteUri();
+        return MovieContract.MovieEntry.buildMoviesSortByUri(sortBy);
+    }
 
 }

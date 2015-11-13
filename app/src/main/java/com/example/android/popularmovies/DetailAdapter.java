@@ -352,6 +352,8 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton
 
     @Override
     public int getItemViewType(int position) {
+        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility
+                .thread() + " : DetailAdapter int item type : object created");
         if (position < mDescItemCount)
             return ITEM_DESC;
         else if (position == mDescItemCount)

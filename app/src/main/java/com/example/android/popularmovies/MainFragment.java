@@ -29,12 +29,15 @@ import com.example.android.popularmovies.sync.MoviesSyncAdapter;
 public class MainFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
 
+
+
     public interface Callback {
         void onItemSelected(Uri uri, boolean firstDisplay);
     }
 
     private MainAdapter mMainAdapter;
     private TmdbAccess tmdbAccess;
+    private Uri mMainUri;
 
     private static final int MOVIES_LOADER = 0;
 
@@ -63,12 +66,12 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         tmdbAccess = new TmdbAccess(getContext());
         mMainAdapter = new MainAdapter(getActivity(), null, 0, tmdbAccess);
 
-        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "+Utility.thread()+" : " +
+        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
                 " : TmdbAccess :  object created");
-        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "+Utility.thread()+" : " +
+        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
                 " : MainAdapter :  object created");
-        Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "+Utility.thread()+" : " +
-                " : MainFragment :  change state");
+        Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
+                " : mMainAdapter cursor null :  change state");
     }
 
     @Override
@@ -86,10 +89,10 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
                 onMovieClicked(parent, position);
             }
         });
-        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "+Utility.thread()+" : " +
+        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
                 " : GridView :  object created");
         Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
-                " : MainFragment :  change state");
+                " : GridView setAdapter :  change state");
         Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
                 " : MainFragmentView :  object created");
         return rootView;
@@ -100,7 +103,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         if (cursor != null) {
             String movieId = (Long.valueOf(cursor.getLong(COL_MOVIE_ID))).toString();
             Uri uri = MovieEntry.buildMovieTrailersReviewsUri(movieId);
-            Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "+Utility.thread()+" : " +
+            Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
                     " : Uri :  object created");
             ((Callback) getActivity()).onItemSelected(uri, false);
         }
@@ -109,23 +112,37 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        getLoaderManager().initLoader(MOVIES_LOADER, null, this);
-        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "+Utility.thread()+" : " +
-                " : MainFragment Loader :  object created");
+//        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "+Utility.thread()+" : " +
+//                " : MainFragment Loader :  object created");
+//        getLoaderManager().initLoader(MOVIES_LOADER, null, this);
         super.onActivityCreated(savedInstanceState);
     }
 
+    // We call the initLoader in the onResume instead of the onActivityCreated, because the former
+    // method is called after the activity
+    // onResume that can possibly change the mUri
+    @Override
+    public void onResume() {
+        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
+                " : MainFragment Loader :  object created");
+        getLoaderManager().initLoader(MOVIES_LOADER, null, this);
+        super.onResume();
+    }
 
-    public void onSettingsChange() {
+    public void onMainUriChange() {
+
+        Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
+                " : MainFragment Loader :  change state");
         //Offline 'popularity.desc' and 'vote_average.desc' sort order will display
         // the favorites in the order chosen.
         deleteUnfavorites(getContext());
         if (isConnected())
             syncDB();
         getLoaderManager().restartLoader(MOVIES_LOADER, null, this);
-        Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
-                " : MainFragment Loader :  change state");
+
     }
+
+
 
 
     public void syncDB() {
@@ -152,22 +169,13 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     }
 
 
-    private Uri buildMoviesUri() {
-        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
-                " : movies uri :  object created");
-        String sortBy = Utility.getSortOrderPreferences(getContext());
-        if (sortBy.equals(getString(R.string.pref_sort_order_favorite)))
-            return MovieEntry.buildMoviesFavoriteUri();
-        return MovieEntry.buildMoviesSortByUri(sortBy);
-    }
-
-
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "+Utility.thread()+" : " +
+        Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() +
+                " : " +
                 " : CursorLoader :  object created");
         return new CursorLoader(getActivity(),
-                buildMoviesUri(),
+                mMainUri,
                 MOVIE_COLUMNS,
                 null,
                 null,
@@ -178,7 +186,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mMainAdapter.swapCursor(data);
-        Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "+Utility.thread()+" : " +
+        Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
                 " : mMainAdapter :  change state");
         //To avoid 'java.lang.IllegalStateException: Can not perform this action inside of onLoadFinished'
         Handler handler = new Handler();
@@ -198,5 +206,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
                 " : mMainAdapter :  change state");
     }
 
-
+    public void setMainUri(Uri mMainUri) {
+        this.mMainUri=mMainUri;
+    }
 }

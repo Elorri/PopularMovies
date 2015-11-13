@@ -144,10 +144,10 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                 " : DetailFragment.mDetailAdapter :  change state");
     }
 
-    public void onSettingsChange() {
+    public void onMainUriChange() {
         if (mUri != null) {
             getLoaderManager().restartLoader(MOVIE_LOADER, null, this);
-            Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "+Utility.thread()+" : onSettingsChange" +
+            Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "+Utility.thread()+" : onMainUriChange" +
                     " : MainFragment Loader :  change state");
         }
     }
