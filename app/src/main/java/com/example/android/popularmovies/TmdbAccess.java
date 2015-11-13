@@ -40,8 +40,9 @@ public class TmdbAccess {
 
     public void syncMovies(String sortBy) {
         URL url = constructMovieListQuery(sortBy);
+        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "
+                + Utility.thread() + " : popularMoviesJsonStr : object created");
         String popularMoviesJsonStr = getJsonString(url);
-
         try {
              syncMoviesFromJson(popularMoviesJsonStr);
         } catch (JSONException e) {
@@ -53,10 +54,12 @@ public class TmdbAccess {
 
     private ContentValues getMovieById(String id){
         URL url = constructMovieDetailQuery(id);
-        String popularMoviesJsonStr = getJsonString(url);
+        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "
+                + Utility.thread() + " : aMovieJsonStr : object created");
+        String aMovieJsonStr = getJsonString(url);
 
         try {
-            return getOneMovieFromJson(popularMoviesJsonStr);
+            return getOneMovieFromJson(aMovieJsonStr);
         } catch (JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
             e.printStackTrace();
@@ -135,6 +138,8 @@ public class TmdbAccess {
             urlConnection.connect();
 
             // Read the input stream into a String
+            Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "
+                    + Utility.thread() + " : InputStream json : object created");
             InputStream inputStream = urlConnection.getInputStream();
             StringBuffer buffer = new StringBuffer();
             if (inputStream == null) {
@@ -212,6 +217,8 @@ public class TmdbAccess {
 
     private void syncTrailers(String movieId) {
         URL url = constructTrailersListQuery(movieId);
+        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "
+                + Utility.thread() + " : trailersJsonStr : object created");
         String trailersJsonStr = getJsonString(url);
         try {
             syncTrailersFromJson(trailersJsonStr, movieId);
@@ -223,6 +230,8 @@ public class TmdbAccess {
 
     private void syncReviews(String movieId) {
         URL url = constructReviewsListQuery(movieId);
+        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "
+                + Utility.thread() + " : reviewsJsonStr : object created");
         String reviewsJsonStr = getJsonString(url);
         try {
             syncReviewsFromJson(reviewsJsonStr, movieId);

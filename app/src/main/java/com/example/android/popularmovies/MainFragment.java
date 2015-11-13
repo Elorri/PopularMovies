@@ -18,8 +18,9 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
-import com.example.android.popularmovies.data.MovieContract;
 import com.example.android.popularmovies.data.MovieContract.MovieEntry;
+import com.example.android.popularmovies.data.MovieContract.ReviewEntry;
+import com.example.android.popularmovies.data.MovieContract.TrailerEntry;
 import com.example.android.popularmovies.sync.MoviesSyncAdapter;
 
 
@@ -146,6 +147,8 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
 
     public void syncDB() {
+        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
+                " : will sync :  evt");
         MoviesSyncAdapter.syncImmediately(getActivity());
     }
 
@@ -163,8 +166,8 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     private static void deleteUnfavorites(Context context) {
         //Need to delete Trailer and Reviews entry first to avoid foreign key conflict
         //Need to delete Trailer and Reviews, because 'on delete cascade does not seems to work'
-        context.getContentResolver().delete(MovieContract.TrailerEntry.CONTENT_URI, null, null);
-        context.getContentResolver().delete(MovieContract.ReviewEntry.CONTENT_URI, null, null);
+        context.getContentResolver().delete(TrailerEntry.CONTENT_URI, null, null);
+        context.getContentResolver().delete(ReviewEntry.CONTENT_URI, null, null);
         context.getContentResolver().delete(MovieEntry.CONTENT_URI, null, null);
     }
 

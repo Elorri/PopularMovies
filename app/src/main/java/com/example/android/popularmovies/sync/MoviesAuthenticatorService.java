@@ -3,6 +3,9 @@ package com.example.android.popularmovies.sync;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
+import android.util.Log;
+
+import com.example.android.popularmovies.Utility;
 
 /**
  * Created by Elorri on 04/11/2015.
@@ -14,6 +17,10 @@ public class MoviesAuthenticatorService extends Service {
     @Override
     public void onCreate() {
         // Create a new authenticator object
+        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
+                " : MoviesAuthenticatorService :  object created");
+        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
+                " : MoviesAuthenticator :  object created");
         mAuthenticator = new MoviesAuthenticator(this);
     }
 

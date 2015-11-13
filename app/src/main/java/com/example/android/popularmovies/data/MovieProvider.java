@@ -406,7 +406,7 @@ public class MovieProvider extends ContentProvider {
             }
             db.setTransactionSuccessful();
             Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + " : " + Utility
-                    .thread() + " : delete nb rowsInserted :  object created");
+                    .thread() + " : nb rowsInserted :  object created");
             return returnCount;
         } finally {
             db.endTransaction();
