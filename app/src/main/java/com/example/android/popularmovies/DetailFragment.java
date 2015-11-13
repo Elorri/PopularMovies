@@ -78,17 +78,21 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.detail_fragment, container, false);
-        mDetailListView = (ListView) rootView.findViewById(R.id.detail_list);
-        mDetailAdapter = DetailAdapter.getInstance(getActivity(), null, 0, this);
-        mDetailListView.setAdapter(mDetailAdapter);
         Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "+Utility.thread()+" : " +
                 " : DetailFragment.mDetailListView :  object created");
         Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "+Utility.thread()+" : " +
                 " : DetailFragment.mDetailAdapter :  object created");
+
+        View rootView = inflater.inflate(R.layout.detail_fragment, container, false);
+
+
+        mDetailListView = (ListView) rootView.findViewById(R.id.detail_list);
+        mDetailAdapter = DetailAdapter.getInstance(getActivity(), null, 0, this);
+        mDetailListView.setAdapter(mDetailAdapter);
+
         Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "+Utility.thread()+" : " +
                 " : DetailFragment.mDetailListView :  change state");
-        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "+Utility.thread()+" : " +
+        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
                 " : DetailFragmentView :  object created");
         return rootView;
     }
@@ -96,9 +100,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        getLoaderManager().initLoader(MOVIE_LOADER, null, this);
         Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "+Utility.thread()+" : " +
                 " : DetailFragment Loader :  object created");
+        getLoaderManager().initLoader(MOVIE_LOADER, null, this);
         super.onActivityCreated(savedInstanceState);
     }
 

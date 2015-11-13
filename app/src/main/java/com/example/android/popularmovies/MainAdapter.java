@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.example.android.popularmovies.data.MovieContract.MovieEntry;
+import com.example.android.popularmovies.sync.TmdbSync;
 import com.squareup.picasso.Picasso;
 
 import java.net.URL;
@@ -25,13 +26,11 @@ import java.net.URL;
 public class MainAdapter extends CursorAdapter {
 
 
-    private final TmdbAccess tmdbAccess;
     private Uri mUriFirstItem;
 
 
-    public MainAdapter(Context context, Cursor c, int flags, TmdbAccess tmdbAccess) {
+    public MainAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
-        this.tmdbAccess = tmdbAccess;
     }
 
 
@@ -54,7 +53,8 @@ public class MainAdapter extends CursorAdapter {
             Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + " : " + Utility
                     .thread() + " : MainAdapter mUriFirstItem :  change state");
         }
-        URL posterURL = tmdbAccess.constructPosterImageURL(cursor.getString(MainFragment.COL_POSTER_PATH));
+        URL posterURL = TmdbSync.buildPosterImageURL(cursor.getString(MainFragment
+                .COL_POSTER_PATH));
         String title = Utility.getShortString(cursor.getString(MainFragment.COL_TITLE), Integer.valueOf(context.getResources().getString(R.string.movie_title_size)));
 
 

@@ -1,13 +1,14 @@
-package com.example.android.popularmovies;
+package com.example.android.popularmovies.sync;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
 
+import com.example.android.popularmovies.Utility;
 import com.example.android.popularmovies.data.MovieContract.MovieEntry;
-import com.example.android.popularmovies.data.MovieContract.TrailerEntry;
 import com.example.android.popularmovies.data.MovieContract.ReviewEntry;
+import com.example.android.popularmovies.data.MovieContract.TrailerEntry;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,23 +24,29 @@ import java.net.URL;
 /**
  * Created by Elorri-user on 28/09/2015.
  */
-public class TmdbAccess {
+public class TmdbSync {
 
-
+private static TmdbSync instance=null;
 
 
     private static final String LOG_TAG = "PopularMovies";
-    private final String API_KEY = "4691965cfc3e6f0591bc595986e92e84";
+    private static final String API_KEY = "4691965cfc3e6f0591bc595986e92e84";
     private final Context context;
 
 
 
-    public TmdbAccess(Context context){
+    private TmdbSync(Context context){
         this.context=context;
     }
 
+    static TmdbSync getInstance(Context context){
+        if (instance == null)
+            instance = new TmdbSync(context);
+        return instance;
+    }
+
     public void syncMovies(String sortBy) {
-        URL url = constructMovieListQuery(sortBy);
+        URL url = buildMovieListQuery(sortBy);
         Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "
                 + Utility.thread() + " : popularMoviesJsonStr : object created");
         String popularMoviesJsonStr = getJsonString(url);
@@ -52,8 +59,8 @@ public class TmdbAccess {
     }
 
 
-    private ContentValues getMovieById(String id){
-        URL url = constructMovieDetailQuery(id);
+    private static ContentValues getMovieById(String id){
+        URL url = buildMovieDetailQuery(id);
         Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "
                 + Utility.thread() + " : aMovieJsonStr : object created");
         String aMovieJsonStr = getJsonString(url);
@@ -67,7 +74,7 @@ public class TmdbAccess {
         }
     }
 
-    public static URL constructPosterImageURL(String posterName) {
+    public static URL buildPosterImageURL(String posterName) {
         try {
             final String BASE_URL = "http://image.tmdb.org/t/p/";
             final String SIZE = "w185";
@@ -84,7 +91,7 @@ public class TmdbAccess {
         }
     }
 
-    private URL constructMovieListQuery(String sortByValue) {
+    private static URL buildMovieListQuery(String sortByValue) {
         try {
             final String BASE_URL = "http://api.themoviedb.org/3/discover/movie?";
             final String SORTBY_PARAM = "sort_by";
@@ -102,7 +109,7 @@ public class TmdbAccess {
         }
     }
 
-    private URL constructMovieDetailQuery(String id) {
+    private static URL buildMovieDetailQuery(String id) {
         try {
             final String BASE_URL = "http://api.themoviedb.org/3/movie/";
             final String KEY_PARAM = "api_key";
@@ -122,7 +129,7 @@ public class TmdbAccess {
 
 
 
-    private String getJsonString(URL url) {
+    private static String getJsonString(URL url) {
         // These two need to be declared outside the try/catch
         // so that they can be closed in the finally block.
         HttpURLConnection urlConnection = null;
@@ -138,7 +145,7 @@ public class TmdbAccess {
             urlConnection.connect();
 
             // Read the input stream into a String
-            Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "
+            Log.d("Json", Thread.currentThread().getStackTrace()[2] + ": "
                     + Utility.thread() + " : InputStream json : object created");
             InputStream inputStream = urlConnection.getInputStream();
             StringBuffer buffer = new StringBuffer();
@@ -216,7 +223,7 @@ public class TmdbAccess {
     }
 
     private void syncTrailers(String movieId) {
-        URL url = constructTrailersListQuery(movieId);
+        URL url = buildTrailersListQuery(movieId);
         Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "
                 + Utility.thread() + " : trailersJsonStr : object created");
         String trailersJsonStr = getJsonString(url);
@@ -229,7 +236,7 @@ public class TmdbAccess {
     }
 
     private void syncReviews(String movieId) {
-        URL url = constructReviewsListQuery(movieId);
+        URL url = buildReviewsListQuery(movieId);
         Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "
                 + Utility.thread() + " : reviewsJsonStr : object created");
         String reviewsJsonStr = getJsonString(url);
@@ -241,7 +248,7 @@ public class TmdbAccess {
         }
     }
 
-    private URL constructTrailersListQuery(String movieId) {
+    private static URL buildTrailersListQuery(String movieId) {
             try {
                 final String BASE_URL = "http://api.themoviedb.org/3/movie/";
                 final String TRAILERS_QUERY_PARAM = "videos";
@@ -260,7 +267,7 @@ public class TmdbAccess {
             }
     }
 
-    private URL constructReviewsListQuery(String movieId) {
+    private static URL buildReviewsListQuery(String movieId) {
         try {
             final String BASE_URL = "http://api.themoviedb.org/3/movie/";
             final String REVIEWS_QUERY_PARAM = "reviews";
@@ -279,7 +286,8 @@ public class TmdbAccess {
         }
     }
 
-    private void syncTrailersFromJson(String trailersJsonStr, String movieId) throws JSONException {
+    private void syncTrailersFromJson(String trailersJsonStr, String movieId) throws
+            JSONException {
 
 
         // These are the names of the JSON objects that need to be extracted.
@@ -324,7 +332,7 @@ public class TmdbAccess {
 
 
 
-    private ContentValues getOneMovieFromJson(String theMovieJsonStr) throws JSONException {
+    private static ContentValues getOneMovieFromJson(String theMovieJsonStr) throws JSONException {
 
         // These are the names of the JSON objects that need to be extracted.
         final String ID = "id";
@@ -370,7 +378,8 @@ public class TmdbAccess {
 
 
 
-    private ContentValues getOneTrailerFromJson(JSONObject aTrailer, String movieId) throws JSONException {
+    private static ContentValues getOneTrailerFromJson(JSONObject aTrailer, String movieId) throws
+            JSONException {
 
         // These are the names of the JSON objects that need to be extracted.
         final String _ID = "id";

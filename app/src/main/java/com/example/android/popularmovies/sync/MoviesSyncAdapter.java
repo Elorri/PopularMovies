@@ -13,7 +13,6 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.example.android.popularmovies.R;
-import com.example.android.popularmovies.TmdbAccess;
 import com.example.android.popularmovies.Utility;
 
 public class MoviesSyncAdapter extends AbstractThreadedSyncAdapter {
@@ -33,10 +32,10 @@ public class MoviesSyncAdapter extends AbstractThreadedSyncAdapter {
         Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
                 " : String sortOrder :  object created");
         Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
-                " : TmdbAccess tmdbAccess :  object created");
+                " : TmdbSync tmdbAccess :  object created");
         String sortOrder = Utility.getSortOrderPreferences(getContext());
-        TmdbAccess tmdbAccess = new TmdbAccess(getContext());
-        tmdbAccess.syncMovies(sortOrder);
+        TmdbSync tmdbSync=TmdbSync.getInstance(getContext());
+        tmdbSync.syncMovies(sortOrder);
     }
 
     public static void initializeSyncAdapter(Context context) {

@@ -19,6 +19,7 @@ import android.widget.TextView;
 import com.example.android.popularmovies.data.MovieContract;
 import com.example.android.popularmovies.data.MovieContract.MovieEntry;
 import com.example.android.popularmovies.data.MovieProvider;
+import com.example.android.popularmovies.sync.TmdbSync;
 import com.squareup.picasso.Picasso;
 
 import java.net.URL;
@@ -74,8 +75,9 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton
             detailFragment) {
         Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
                 " : DetailAdapter :  object created");
-        if (instance == null) return new DetailAdapter(context, c, flags, detailFragment);
-        else return instance;
+        if (instance == null)
+            instance = new DetailAdapter(context, c, flags, detailFragment);
+        return instance;
     }
 
 
@@ -101,10 +103,10 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton
         private TextView reviewAuthorTextView;
         private TextView reviewContentTextView;
 
-        private int viewType;
-
         //set in the bindview method
         public Uri youtubeVideoURI;
+
+
 
 
         public ViewHolder(View view, int viewType) {
@@ -112,7 +114,7 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton
                 case ITEM_DESC:
                     Log.d("PopularMovies", "ITEM_DESC");
                     Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility
-                            .thread() + " : DetailAdapter " +
+                            .thread() + " : "+
                             "titleTextView  " +
                             "posterimageImageView  " +
                             "plotsynopsisTextView " +
@@ -266,7 +268,7 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton
                 viewHolder.durationTextView.setText(mDurationValue + " " + context.getString(R
                         .string.min));
                 viewHolder.releasedateTextView.setText(mReleaseDateValue);
-                Picasso.with(context).load(TmdbAccess.constructPosterImageURL(mPosterPathValue)
+                Picasso.with(context).load(TmdbSync.buildPosterImageURL(mPosterPathValue)
                         .toString()).into(viewHolder.posterimageImageView);
                 viewHolder.plotsynopsisTextView.setText(mPlotSynopsisValue);
                 viewHolder.voteaverageTextView.setText(mRateValue + context.getString(R.string

@@ -37,7 +37,6 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     }
 
     private MainAdapter mMainAdapter;
-    private TmdbAccess tmdbAccess;
     private Uri mMainUri;
 
     private static final int MOVIES_LOADER = 0;
@@ -64,11 +63,10 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         // The CursorAdapter will take data from our cursor and populate the GridView
         // However, we cannot use FLAG_AUTO_REQUERY since it is deprecated, so we will end
         // up with an empty list the first time we run.
-        tmdbAccess = new TmdbAccess(getContext());
-        mMainAdapter = new MainAdapter(getActivity(), null, 0, tmdbAccess);
+        mMainAdapter = new MainAdapter(getActivity(), null, 0);
 
         Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
-                " : TmdbAccess :  object created");
+                " : TmdbSync :  object created");
         Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
                 " : MainAdapter :  object created");
         Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
