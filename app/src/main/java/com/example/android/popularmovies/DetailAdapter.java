@@ -87,6 +87,7 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton
     public static class ViewHolder {
 
 
+        private final int viewType;
         //set by the constructor
         private TextView titleTextView;
         private ImageView posterimageImageView;
@@ -294,6 +295,7 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton
                 Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility
                         .thread() + " : ViewHolder youtubeVideoURI : change state");
                 mDetailFragment.onFirstTrailerUriKnown(viewHolder.youtubeVideoURI);
+                viewHolder.trailerItemView.setTag(viewHolder);
                 setItemTrailerView(viewHolder, cursor, context);
                 break;
             case ITEM_TRAILER:
