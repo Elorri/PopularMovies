@@ -155,7 +155,7 @@ public void testInsertFavoriteQuery(){
 //    );
 
     Cursor cursor=db.query(MovieEntry.TABLE_NAME, null,
-            MovieEntry._ID+"=? and "+MovieEntry.COLUMN_FAVORITE+"=?",
+            MovieEntry._ID + "=? and " + MovieEntry.COLUMN_FAVORITE + "=?",
             new String[]{movieValues.get(MovieEntry._ID).toString(), MovieEntry.FAVORITE_ON_VALUE}, null,
             null,
             null);
@@ -222,9 +222,9 @@ db.close();
         assertTrue("Unable to Insert TrailerEntry into the Database", rowId != -1);
         db.close();
 
-        // Test the sort_by content provider query
+        // Test the content provider query
         Cursor cursor = mContext.getContentResolver().query(
-                TrailerEntry.buildMovieTrailerUri(MOVIE_ID),
+                TrailerEntry.buildMovieTrailerUri(135400l),
                 null,
                 null,
                 null,
@@ -583,7 +583,7 @@ db.close();
 
     }
 
-    public void testDeleteMovieReviewTrailerRecordOnCascade() {
+    public void testDeleteMovieReviewTrailerUnfavoriteRecordOnCascade() {
         //Add 1 movie non favorite
         ContentValues movieValues = TestUtilities.createMovieValuesSameId();
         Uri movieUri = mContext.getContentResolver().insert(MovieEntry.CONTENT_URI, movieValues);
@@ -619,7 +619,7 @@ db.close();
                 null,
                 null
         );
-        //Check that the record is not deleted because it is linked to a favorite movie
+        //Check that the record is deleted because it is not a favorite movie
         assertEquals("Error: Records not deleted from Movie table during delete", 0, cursor.getCount());
 
         cursor = mContext.getContentResolver().query(
@@ -629,9 +629,61 @@ db.close();
                 null,
                 null
         );
-        //Check that the record is not deleted because it is linked to a favorite movie
+        //Check that the record is deleted because it is not linked to a favorite movie
         assertEquals("Error: Records not deleted from Review table during delete", 0, cursor.getCount());
 
+
+        cursor = mContext.getContentResolver().query(
+                TrailerEntry.CONTENT_URI,
+                null,
+                null,
+                null,
+                null
+        );
+        //Check that the record is deleted because it is not linked to a favorite movie
+        assertEquals("Error: Records not deleted from Trailer table during delete", 0, cursor.getCount());
+        cursor.close();
+    }
+
+    public void testDeleteMovieReviewTrailerFavoriteRecordOnCascade() {
+        //Add 1 movie non favorite
+        ContentValues movieValues = TestUtilities.createMovieValuesSameIdFavorite();
+        Uri movieUri = mContext.getContentResolver().insert(MovieEntry.CONTENT_URI, movieValues);
+        long rowId = ContentUris.parseId(movieUri);
+        //Check if the record has been correctly added
+        assertTrue(rowId != -1);
+
+
+        //Add 1 review linked to the non favorite movie
+        ContentValues reviewValues = TestUtilities.createReviewValues();
+        Uri reviewUri = mContext.getContentResolver().insert(ReviewEntry.CONTENT_URI, reviewValues);
+        String rowIdStr = TestUtilities.parseId(reviewUri);
+        //Check if the record has been correctly added
+        assertTrue(!rowIdStr.equals("-1"));
+
+
+        //Add 1 trailer linked to the non favorite movie
+        ContentValues trailerValues = TestUtilities.createTrailerValues();
+        Uri trailerUri = mContext.getContentResolver().insert(TrailerEntry.CONTENT_URI, trailerValues);
+        rowIdStr = TestUtilities.parseId(trailerUri);
+        //Check if the record has been correctly added
+        assertTrue(!rowIdStr.equals("-1"));
+
+        mContext.getContentResolver().delete(
+                MovieEntry.CONTENT_URI,
+                null,
+                null
+        );
+        Cursor cursor = mContext.getContentResolver().query(
+                MovieEntry.CONTENT_URI,
+                null,
+                null,
+                null,
+                null
+        );
+        //Check that the record is not deleted because it is linked to a favorite movie
+        assertEquals("Error: Records not deleted from Movie table during delete", 1, cursor
+                .getCount());
 
         cursor = mContext.getContentResolver().query(
                 ReviewEntry.CONTENT_URI,
@@ -641,7 +693,20 @@ db.close();
                 null
         );
         //Check that the record is not deleted because it is linked to a favorite movie
-        assertEquals("Error: Records not deleted from Trailer table during delete", 0, cursor.getCount());
+        assertEquals("Error: Records not deleted from Review table during delete", 1, cursor
+                .getCount());
+
+
+        cursor = mContext.getContentResolver().query(
+                TrailerEntry.CONTENT_URI,
+                null,
+                null,
+                null,
+                null
+        );
+        //Check that the record is not deleted because it is linked to a favorite movie
+        assertEquals("Error: Records not deleted from Trailer table during delete", 1, cursor
+                .getCount());
         cursor.close();
     }
 

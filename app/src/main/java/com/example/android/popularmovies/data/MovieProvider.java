@@ -306,20 +306,18 @@ public class MovieProvider extends ContentProvider {
         switch (match)
         {
             case MOVIE:
+                //Need to delete Trailer and Reviews entry first to avoid foreign key conflict
+                //Need to delete Trailer and Reviews, because 'on delete cascade does not seems to work'
                 //delete from movie where favorite=0;
-                //db.execSQL("delete from movie where favorite=0;");
-                //rowsDeleted=0;
+                delete(TrailerEntry.CONTENT_URI, null, null);
+                delete(ReviewEntry.CONTENT_URI, null, null);
                 rowsDeleted = db.delete(MovieEntry.TABLE_NAME, MovieEntry.COLUMN_FAVORITE + "=?", new String[]{MovieEntry.FAVORITE_OFF_VALUE});
                 break;
             case TRAILER:
-                //db.execSQL("delete from trailer where movie_id in (select _id from movie where favorite=0);");
-                //rowsDeleted=0;
                 //delete from trailer where movie_id in (select _id from movie where favorite=0);
                 rowsDeleted = db.delete(TrailerEntry.TABLE_NAME, TrailerEntry.COLUMN_MOVIE_ID + " in (select " + MovieEntry._ID + " from " + MovieEntry.TABLE_NAME + " where " + MovieEntry.COLUMN_FAVORITE + "=" + MovieEntry.FAVORITE_OFF_VALUE + ")", null);
                 break;
             case REVIEW:
-                //db.execSQL("delete from review where movie_id in (select _id from movie where favorite=0);");
-                //rowsDeleted=0;
                 //delete from review where movie_id in (select _id from movie where favorite=0);
                 rowsDeleted = db.delete(ReviewEntry.TABLE_NAME, ReviewEntry.COLUMN_MOVIE_ID + " in (select " + MovieEntry._ID + " from " + MovieEntry.TABLE_NAME + " where " + MovieEntry.COLUMN_FAVORITE + "=" + MovieEntry.FAVORITE_OFF_VALUE + ")", null);
                 break;
