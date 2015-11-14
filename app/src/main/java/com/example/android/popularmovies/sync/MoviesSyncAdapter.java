@@ -2,16 +2,26 @@ package com.example.android.popularmovies.sync;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.SyncRequest;
 import android.content.SyncResult;
+import android.content.res.Resources;
+import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 
+import com.example.android.popularmovies.MainActivity;
 import com.example.android.popularmovies.R;
 import com.example.android.popularmovies.Utility;
 
@@ -21,6 +31,8 @@ public class MoviesSyncAdapter extends AbstractThreadedSyncAdapter {
     // 60 seconds (1 minute) * 720 = 12 hours - will sync twice a day
     public static final int SYNC_INTERVAL = 60 * 720;
     public static final int SYNC_FLEXTIME = SYNC_INTERVAL / 3;
+    private static final long DAY_IN_MILLIS = 1000 * 60 * 60 * 24;
+    private static final int MOVIES_NOTIFICATION_ID = 3004;
 
 
     public MoviesSyncAdapter(Context context, boolean autoInitialize) {
@@ -34,9 +46,72 @@ public class MoviesSyncAdapter extends AbstractThreadedSyncAdapter {
         Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
                 " : TmdbSync tmdbAccess :  object created");
         String sortOrder = Utility.getSortOrderPreferences(getContext());
-        TmdbSync tmdbSync=TmdbSync.getInstance(getContext());
+        TmdbSync tmdbSync = TmdbSync.getInstance(getContext());
         tmdbSync.syncMovies(sortOrder);
+        notifyUserSyncDone();
     }
+
+    private void notifyUserSyncDone() {
+        Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] +
+                " : " + Utility.thread() + " : will Sync :  evt");
+        Context context = getContext();
+        //checking the last update and notify if it' the first of the day
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String displayNotificationsKey = context.getString(R.string.pref_enable_notifications_key);
+        boolean displayNotifications = prefs.getBoolean(displayNotificationsKey,
+                Boolean.parseBoolean(context.getString(R.string.pref_enable_notifications_default)));
+
+        if (displayNotifications) {
+
+            String lastNotificationKey = context.getString(R.string.pref_last_notification);
+            long lastSync = prefs.getLong(lastNotificationKey, 0);
+
+            if (System.currentTimeMillis() - lastSync >= DAY_IN_MILLIS) {
+                // Last sync was more than 1 day ago, let's send a notification with the movies
+                // for today
+
+               // NotificationCompatBuilder is a very convenient way to build backward-compatible
+                // notifications.  Just throw in some data.
+                Resources resources=context.getResources();
+                NotificationCompat.Builder mBuilder =
+                        new NotificationCompat.Builder(getContext())
+                                .setColor(resources.getColor(R.color.primary_dark))
+                  .setSmallIcon(R.mipmap.ic_launcher)
+                  .setLargeIcon(BitmapFactory.decodeResource(context
+                          .getResources(), R.mipmap.ic_launcher))
+                    .setContentTitle(context.getString(R.string.app_name))
+                    .setContentText(context.getString(R.string.new_movies));
+
+                // Make something interesting happen when the user clicks on the notification.
+                // In this case, opening the app is sufficient.
+                Intent resultIntent = new Intent(context, MainActivity.class);
+
+                // The stack builder object will contain an artificial back stack for the
+                // started Activity.
+                // This ensures that navigating backward from the Activity leads out of
+                // your application to the Home screen.
+                TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+                stackBuilder.addNextIntent(resultIntent);
+                PendingIntent resultPendingIntent =
+                        stackBuilder.getPendingIntent(0,PendingIntent.FLAG_UPDATE_CURRENT);
+                mBuilder.setContentIntent(resultPendingIntent);
+
+                NotificationManager mNotificationManager =
+                        (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
+
+                // To allows use to  update the notification later on.
+                mNotificationManager.notify(MOVIES_NOTIFICATION_ID, mBuilder.build());
+
+                //refreshing last sync
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putLong(lastNotificationKey, System.currentTimeMillis());
+                editor.commit();
+            }
+        }
+    }
+
+
+
 
     public static void initializeSyncAdapter(Context context) {
         getSyncAccount(context);
@@ -108,7 +183,7 @@ public class MoviesSyncAdapter extends AbstractThreadedSyncAdapter {
         Account account = getSyncAccount(context);
         String authority = context.getString(R.string.content_authority);
         Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] +
-                " : "+Utility.thread() + " : PeriodicSync :  object created");
+                " : " + Utility.thread() + " : PeriodicSync :  object created");
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             // we can enable inexact timers in our periodic sync
@@ -132,11 +207,10 @@ public class MoviesSyncAdapter extends AbstractThreadedSyncAdapter {
         if (!Utility.getSortOrderPreferences(context).equals(context.getString(R.string
                 .pref_sort_order_favorite))) {
             Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] +
-                    " : "+Utility.thread() + " : will Sync :  evt");
-                syncDB(context);
+                    " : " + Utility.thread() + " : will Sync :  evt");
+            syncDB(context);
         }
     }
-
 
 
     private static void syncDB(Context context) {

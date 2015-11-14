@@ -22,6 +22,15 @@
     <string name="pref_sort_order_rate" translatable="false">vote_average.desc</string>
     <string name="pref_sort_order_favorite" translatable="false">favorite</string>
 
+
+    <!-- Strings related to Notification Enabled preference -->
+    <string name="pref_enable_notifications_key" translatable="false">enable_notifications</string>
+    <string name="pref_enable_notifications_label">Movies Notifications</string>
+    <string name="pref_enable_notifications_true">Enabled</string>
+    <string name="pref_enable_notifications_false">Not Enabled</string>
+    <string name="pref_enable_notifications_default" translatable="false">true</string>
+    <string name="pref_last_notification">last_notification</string>
+
     <!-- strings diplayed on the UI -->
     <string name="duration"><xliff:g id="duration">%s</xliff:g> min</string>
     <string name="rateMax"><xliff:g id="rateMax">%s</xliff:g>/10</string>
@@ -40,6 +49,7 @@
     <string name="sync_account_type">popularmovies.android.example.com</string>
     <!-- the content_authority is also define in MovieContract, a change here should be followed by a change there -->
     <string name="content_authority">com.example.android.popularmovies</string>
+    <string name="new_movies">New movies available</string>
 
 
 </resources>
