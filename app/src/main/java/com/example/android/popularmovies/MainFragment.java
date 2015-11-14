@@ -6,7 +6,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -111,8 +110,8 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-//        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "+Utility.thread()+" : " +
-//                " : MainFragment Loader :  object created");
+        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "+Utility.thread()+" : " +
+                " : :");
 //        getLoaderManager().initLoader(MOVIES_LOADER, null, this);
         super.onActivityCreated(savedInstanceState);
     }
@@ -190,13 +189,13 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
                 " : mMainAdapter :  change state");
         //To avoid 'java.lang.IllegalStateException: Can not perform this action inside of onLoadFinished'
-        Handler handler = new Handler();
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                ((Callback) getActivity()).onItemSelected(mMainAdapter.getmUriFirstItem(), true);
-            }
-        });
+//        Handler handler = new Handler();
+//        handler.post(new Runnable() {
+//            @Override
+//            public void run() {
+//                ((Callback) getActivity()).onItemSelected(mMainAdapter.getmUriFirstItem(), true);
+//            }
+//        });
 
     }
 

@@ -124,14 +124,14 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Call
                     .replace(R.id.detail_fragment_container, fragment, DETAILFRAGMENT_TAG)
                     .commit();
         } else {
-            if (firstDisplay == false) {
+ //           if (firstDisplay == false) {
                 Intent intent = new Intent(this, DetailActivity.class);
                 Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : DetailActivity intent : object created");
                 intent.setData(uri);
                 Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() +
                         " : DetailActivity intent :  change state");
                 startActivity(intent);
-            }
+            //}
         }
     }
 
