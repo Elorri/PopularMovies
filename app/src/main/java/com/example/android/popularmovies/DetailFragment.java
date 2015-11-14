@@ -130,6 +130,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         return cursorLoader;
     }
 
+
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (data != null && data.moveToFirst()) {

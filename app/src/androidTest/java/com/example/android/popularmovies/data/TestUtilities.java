@@ -79,7 +79,7 @@ public class TestUtilities extends AndroidTestCase {
     static final int COL_AUTHOR = 1;
     static final int COL_CONTENT = 2;
     static final int COL_MOVIE_ID_R = 3;
-
+    private static final long MADMAX_ID = 76341L;
 
 
     static void validateCursor(String error, Cursor valueCursor, ContentValues expectedValues) {
@@ -338,6 +338,25 @@ public class TestUtilities extends AndroidTestCase {
         // Test the sort_by content provider query
         Cursor cursor = mContext.getContentResolver().query(
                 MovieContract.TrailerEntry.CONTENT_URI,
+                TRAILER_COLUMNS,
+                null,
+                null,
+                null
+        );
+        int i = 0;
+        while (cursor.moveToNext()) {
+            Log.d(LOG_TAG, i + ("$" + cursor.getString(cursor.getColumnIndex(MovieContract.TrailerEntry._ID))
+                    + "|" + cursor.getString(cursor.getColumnIndex(MovieContract.TrailerEntry.COLUMN_KEY)) + "|" + cursor.getString(cursor.getColumnIndex(MovieContract.TrailerEntry.COLUMN_NAME)) + "|" + cursor.getString(cursor.getColumnIndex(MovieContract.TrailerEntry.COLUMN_TYPE)) + "|" + cursor.getInt(cursor.getColumnIndex(MovieContract.TrailerEntry.COLUMN_MOVIE_ID))));
+            i++;
+        }
+        Log.d(LOG_TAG, i + "record displayed");
+    }
+
+
+    public void testShowTrailersMovieQuery(){
+        // Test the sort_by content provider query
+        Cursor cursor = mContext.getContentResolver().query(
+                MovieContract.TrailerEntry.buildMovieTrailerUri(Long.valueOf(MADMAX_ID)),
                 TRAILER_COLUMNS,
                 null,
                 null,

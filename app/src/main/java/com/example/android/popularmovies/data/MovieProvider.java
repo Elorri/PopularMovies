@@ -208,7 +208,8 @@ public class MovieProvider extends ContentProvider {
                 Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + " : " + Utility
                         .thread() + " : query cursor :  object created");
                 Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + " : " + Utility
-                        .thread() + " : query cursorCount[] :  object created");
+                        .thread() + " : query cursorCount[] :  object created " +
+                        "{"+cursorsCount[0]+","+cursorsCount[1]+","+cursorsCount[2]+"}");
 
                  DetailAdapter.getInstance(getContext(), null,0, null ).onDetailCursorMerged(cursorsCount);
 

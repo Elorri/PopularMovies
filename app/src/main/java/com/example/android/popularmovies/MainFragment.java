@@ -65,8 +65,6 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         mMainAdapter = new MainAdapter(getActivity(), null, 0);
 
         Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
-                " : TmdbSync :  object created");
-        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
                 " : MainAdapter :  object created");
         Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
                 " : mMainAdapter cursor null :  change state");

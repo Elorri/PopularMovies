@@ -14,20 +14,21 @@ public class DetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.detail_activity);
 
-        Bundle arguments = new Bundle();
-        arguments.putParcelable(DetailFragment.DETAIL_URI, getIntent().getData());
+        if (savedInstanceState == null) {
+            Bundle arguments = new Bundle();
+            arguments.putParcelable(DetailFragment.DETAIL_URI, getIntent().getData());
 
-        DetailFragment fragment = new DetailFragment();
-        fragment.setArguments(arguments);
+            DetailFragment fragment = new DetailFragment();
+            fragment.setArguments(arguments);
 
-        getSupportFragmentManager().beginTransaction()
-                .add(R.id.detail_fragment_container, fragment)
-                .commit();
-
-        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
-                " : DetailFragment :  object created");
-        Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() +
-                " : DetailFragment uri :  change state");
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.detail_fragment_container, fragment)
+                    .commit();
+            Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
+                    " : DetailFragment :  object created");
+            Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() +
+                    " : DetailFragment uri :  change state");
+        }
 
     }
 

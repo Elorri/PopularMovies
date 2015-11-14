@@ -69,6 +69,9 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton
                 " : DetailAdapter.mTrailerItemCount :  change state");
         Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
                 " : DetailAdapter.mReviewItemCount :  change state");
+        Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + " : " + Utility
+                .thread() + " : DetailAdapter.mDescItemCount  mTrailerItemCount mReviewItemCount :  change state " +
+                "{" + mDescItemCount + "," + mTrailerItemCount + "," + mReviewItemCount + "}");
     }
 
     public static DetailAdapter getInstance(Context context, Cursor c, int flags, DetailFragment
@@ -225,10 +228,10 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton
         }
         View view = LayoutInflater.from(context).inflate(layoutId, parent, false);
         Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
-                " : DetailAdapter item View :  object created");
-        ViewHolder viewHolder = new ViewHolder(view, viewType);
+                " : Cursor : "+cursor.getCount());
         Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
                 " : DetailAdapter item View :  object created");
+        ViewHolder viewHolder = new ViewHolder(view, viewType);
         view.setTag(viewHolder);
         Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : DetailAdapter item View : change state");
         return view;
@@ -238,6 +241,9 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton
     public void bindView(View view, Context context, Cursor cursor) {
         ViewHolder viewHolder = (ViewHolder) view.getTag();
         int viewType = getItemViewType(cursor.getPosition());
+        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
+                " : Cursor : Position : ItemType"+cursor.getCount()+" : "+cursor.getPosition()+
+                " : "+viewType);
         switch (viewType) {
             case ITEM_DESC:
                 Log.d("PopularMovies", "ITEM_DESC");
@@ -357,7 +363,7 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton
     @Override
     public int getItemViewType(int position) {
         Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility
-                .thread() + " : DetailAdapter int item type : object created");
+                .thread() + " : position "+position);
         if (position < mDescItemCount)
             return ITEM_DESC;
         else if (position == mDescItemCount)
