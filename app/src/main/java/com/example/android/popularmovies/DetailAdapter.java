@@ -111,14 +111,12 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton
         public Uri youtubeVideoURI;
 
 
-
-
         public ViewHolder(View view, int viewType) {
             switch (viewType) {
                 case ITEM_DESC:
                     Log.d("PopularMovies", "ITEM_DESC");
                     Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility
-                            .thread() + " : "+
+                            .thread() + " : " +
                             "titleTextView  " +
                             "posterimageImageView  " +
                             "plotsynopsisTextView " +
@@ -228,7 +226,7 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton
         }
         View view = LayoutInflater.from(context).inflate(layoutId, parent, false);
         Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
-                " : Cursor : "+cursor.getCount());
+                " : Cursor : " + cursor.getCount());
         Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
                 " : DetailAdapter item View :  object created");
         ViewHolder viewHolder = new ViewHolder(view, viewType);
@@ -242,8 +240,8 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton
         ViewHolder viewHolder = (ViewHolder) view.getTag();
         int viewType = getItemViewType(cursor.getPosition());
         Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
-                " : Cursor : Position : ItemType"+cursor.getCount()+" : "+cursor.getPosition()+
-                " : "+viewType);
+                " : Cursor : Position : ItemType" + cursor.getCount() + " : " + cursor.getPosition() +
+                " : " + viewType);
         switch (viewType) {
             case ITEM_DESC:
                 Log.d("PopularMovies", "ITEM_DESC");
@@ -272,14 +270,14 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton
 
 
                 viewHolder.titleTextView.setText(mTitleValue);
-                viewHolder.durationTextView.setText(mDurationValue + " " + context.getString(R
-                        .string.min));
+                viewHolder.durationTextView.setText(String.format(context
+                        .getString(R.string.duration), String.valueOf(mDurationValue)));
                 viewHolder.releasedateTextView.setText(mReleaseDateValue);
                 Picasso.with(context).load(TmdbSync.buildPosterImageURL(mPosterPathValue)
                         .toString()).into(viewHolder.posterimageImageView);
                 viewHolder.plotsynopsisTextView.setText(mPlotSynopsisValue);
-                viewHolder.voteaverageTextView.setText(mRateValue + context.getString(R.string
-                        .rateMax));
+                viewHolder.voteaverageTextView.setText(String.format(context
+                        .getString(R.string.rateMax), String.valueOf(mRateValue)));
                 viewHolder.favoriteView.setChecked(mFavoriteValue);
                 Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility
                         .thread() + " : ViewHolder " +
@@ -363,7 +361,7 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton
     @Override
     public int getItemViewType(int position) {
         Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility
-                .thread() + " : position "+position);
+                .thread() + " : position " + position);
         if (position < mDescItemCount)
             return ITEM_DESC;
         else if (position == mDescItemCount)

@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:xliff="http://schemas.android.com/apk/res-auto">
     <!-- the app name -->
     <string name="app_name">Popular Movies</string>
 
@@ -23,10 +23,15 @@
     <string name="pref_sort_order_favorite" translatable="false">favorite</string>
 
     <!-- strings diplayed on the UI -->
-    <string name="min">min</string>
-    <string name="rateMax">/10</string>
+    <string name="duration"><xliff:g id="duration">%s</xliff:g> min</string>
+    <string name="rateMax"><xliff:g id="rateMax">%s</xliff:g>/10</string>
     <string name="refresh">Refresh</string>
     <string name="action_share">Share</string>
+    <string name="detail_label_trailer">Trailers</string>
+    <string name="detail_label_review">Reviews</string>
+
+
+    <!-- strings used by the app but not displayed -->
     <string name="movie_title_size">20</string>
 
 
@@ -35,9 +40,6 @@
     <string name="sync_account_type">popularmovies.android.example.com</string>
     <!-- the content_authority is also define in MovieContract, a change here should be followed by a change there -->
     <string name="content_authority">com.example.android.popularmovies</string>
-    <string name="trailersLabel">Trailers</string>
-    <string name="reviewsLabel">Reviews</string>
-    <string name="detail_label_trailer">Trailers</string>
-    <string name="detail_label_review">Reviews</string>
+
 
 </resources>

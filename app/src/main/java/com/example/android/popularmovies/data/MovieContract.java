@@ -7,6 +7,7 @@ import android.provider.BaseColumns;
 
 /**
  * Created by Elorri on 26/10/2015.
+ * Defines table and column names for the movie database.
  */
 public class MovieContract {
 
