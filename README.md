@@ -17,7 +17,9 @@ This app allows :
 
 * [Picasso](https://github.com/square/picasso)
 * [TextDrawable](https://github.com/amulyakhare/TextDrawable)
-* [Stetho]('com.facebook.stetho:stetho:1.2.0) (for tests)
+ 
+## Libraries used for test only
+* [Stetho]('com.facebook.stetho:stetho:1.2.0) 
 
 
 ## API key needed
