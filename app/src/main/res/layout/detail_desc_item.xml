@@ -63,12 +63,22 @@
                 android:textSize="@dimen/voteAverageTextSize"
                 tools:text="7.6"/>
             <android.support.v7.widget.SwitchCompat
-                android:id="@+id/favorite"
+                android:id="@+id/favorite_switch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/voteAverage"
                 android:text="Favorite"
                 />
+            <ImageButton
+                android:id="@+id/favorite"
+                 style="@style/FavoriteButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:contentDescription="@string/favorite_desc"
+                android:tint="@color/accent" />
         </RelativeLayout>
     </LinearLayout>
 

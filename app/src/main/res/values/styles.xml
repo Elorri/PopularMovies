@@ -18,4 +18,9 @@
         <item name="android:height">@dimen/actionBarSettingsHeight</item>
     </style>
 
+    <!-- Detail activity favorite button style -->
+    <style name="FavoriteButton" parent="Widget.AppCompat.Light.ActionButton">
+        <item name="android:src">@drawable/favorite_selector</item>
+    </style>
+
 </resources>

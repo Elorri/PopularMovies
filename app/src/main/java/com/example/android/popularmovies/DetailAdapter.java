@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.CursorAdapter;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -87,7 +88,9 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton
         private TextView voteaverageTextView;
         private TextView releasedateTextView;
         private TextView durationTextView;
-        private SwitchCompat favoriteView;
+        private SwitchCompat favoriteViewSwitch;
+        private ImageButton favoriteView;
+
 
         private LinearLayout trailerItemView;
         private ImageView trailerImgView;
@@ -109,7 +112,8 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton
                     voteaverageTextView = (TextView) view.findViewById(R.id.voteAverage);
                     releasedateTextView = (TextView) view.findViewById(R.id.releaseYear);
                     durationTextView = (TextView) view.findViewById(R.id.duration);
-                    favoriteView = (SwitchCompat) view.findViewById(R.id.favorite);
+                    favoriteViewSwitch = (SwitchCompat) view.findViewById(R.id.favorite_switch);
+                    favoriteView = (ImageButton) view.findViewById(R.id.favorite);
                     break;
                 case ITEM_TRAILER_LABEL:
                     trailerItemView = (LinearLayout) view.findViewById(R.id.trailer_item);
@@ -197,8 +201,19 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton
                 viewHolder.plotsynopsisTextView.setText(mPlotSynopsisValue);
                 viewHolder.voteaverageTextView.setText(String.format(context
                         .getString(R.string.rateMax), String.valueOf(mRateValue)));
-                viewHolder.favoriteView.setChecked(mFavoriteValue);
-                viewHolder.favoriteView.setOnCheckedChangeListener(this);
+                viewHolder.favoriteViewSwitch.setChecked(mFavoriteValue);
+                viewHolder.favoriteViewSwitch.setOnCheckedChangeListener(this);
+
+                viewHolder.favoriteView.setSelected(mFavoriteValue);
+                viewHolder.favoriteView.setTag(mFavoriteValue);
+                viewHolder.favoriteView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mFavoriteValue=!mFavoriteValue;
+                        v.setSelected(mFavoriteValue);
+                        updateFavoriteValue(v, mFavoriteValue);
+                    }
+                });
                 break;
             case ITEM_TRAILER_LABEL:
                 viewHolder.youtubeVideoURI = Utility.buildYoutubeVideoURI(cursor.getString
@@ -275,6 +290,10 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+updateFavoriteValue(buttonView, isChecked);
+    }
+
+    private void updateFavoriteValue(View buttonView, boolean isChecked) {
         ContentValues movieValues = new ContentValues();
         movieValues.put(MovieEntry._ID, mId);
         movieValues.put(MovieEntry.COLUMN_TITLE, mTitleValue);
@@ -289,7 +308,5 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton
         mContext.getContentResolver().update(MovieContract.MovieEntry.CONTENT_URI,
                 movieValues, MovieContract.MovieEntry
                         ._ID + "=?", new String[]{Long.toString(mId)});
-
-
     }
 }

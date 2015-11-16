@@ -50,6 +50,7 @@
     <!-- the content_authority is also define in MovieContract, a change here should be followed by a change there -->
     <string name="content_authority">com.example.android.popularmovies</string>
     <string name="new_movies">New movies available</string>
+    <string name="favorite_desc">Add to favorites</string>
 
 
 </resources>
