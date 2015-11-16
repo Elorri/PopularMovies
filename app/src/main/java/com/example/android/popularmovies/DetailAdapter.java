@@ -63,21 +63,10 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton
         mDescItemCount = mCursorsCount[0];
         mTrailerItemCount = mCursorsCount[1];
         mReviewItemCount = mCursorsCount[2];
-        Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
-                " : DetailAdapter.mDescItemCount :  change state");
-        Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
-                " : DetailAdapter.mTrailerItemCount :  change state");
-        Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
-                " : DetailAdapter.mReviewItemCount :  change state");
-        Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + " : " + Utility
-                .thread() + " : DetailAdapter.mDescItemCount  mTrailerItemCount mReviewItemCount :  change state " +
-                "{" + mDescItemCount + "," + mTrailerItemCount + "," + mReviewItemCount + "}");
     }
 
     public static DetailAdapter getInstance(Context context, Cursor c, int flags, DetailFragment
             detailFragment) {
-        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
-                " : DetailAdapter :  object created");
         if (instance == null)
             instance = new DetailAdapter(context, c, flags, detailFragment);
         return instance;
@@ -114,17 +103,6 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton
         public ViewHolder(View view, int viewType) {
             switch (viewType) {
                 case ITEM_DESC:
-                    Log.d("PopularMovies", "ITEM_DESC");
-                    Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility
-                            .thread() + " : " +
-                            "titleTextView  " +
-                            "posterimageImageView  " +
-                            "plotsynopsisTextView " +
-                            "voteaverageTextView " +
-                            "releasedateTextView " +
-                            "durationTextView " +
-                            "favoriteView " +
-                            ": object created");
                     titleTextView = (TextView) view.findViewById(R.id.title);
                     posterimageImageView = (ImageView) view.findViewById(R.id.posterImage);
                     plotsynopsisTextView = (TextView) view.findViewById(R.id.overview);
@@ -134,46 +112,20 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton
                     favoriteView = (SwitchCompat) view.findViewById(R.id.favorite);
                     break;
                 case ITEM_TRAILER_LABEL:
-                    Log.d("PopularMovies", "ITEM_TRAILER_LABEL");
-                    Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility
-                            .thread() + " : DetailAdapter " +
-                            "trailerItemView  " +
-                            "trailerImgView  " +
-                            "trailerTitleView " +
-                            ": object created");
                     trailerItemView = (LinearLayout) view.findViewById(R.id.trailer_item);
                     trailerImgView = (ImageView) view.findViewById(R.id.trailer_img);
                     trailerTitleView = (TextView) view.findViewById(R.id.trailer_title);
                     break;
                 case ITEM_TRAILER:
-                    Log.d("PopularMovies", "ITEM_TRAILER");
-                    Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility
-                            .thread() + " : DetailAdapter " +
-                            "trailerItemView  " +
-                            "trailerImgView  " +
-                            "trailerTitleView " +
-                            ": object created");
                     trailerItemView = (LinearLayout) view.findViewById(R.id.trailer_item);
                     trailerImgView = (ImageView) view.findViewById(R.id.trailer_img);
                     trailerTitleView = (TextView) view.findViewById(R.id.trailer_title);
                     break;
                 case ITEM_REVIEW_LABEL:
-                    Log.d("PopularMovies", "ITEM_REVIEW_LABEL");
-                    Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility
-                            .thread() + " : DetailAdapter " +
-                            "reviewAuthorTextView  " +
-                            "reviewContentTextView  " +
-                            ": object created");
                     reviewAuthorTextView = (TextView) view.findViewById(R.id.review_author);
                     reviewContentTextView = (TextView) view.findViewById(R.id.review_content);
                     break;
                 case ITEM_REVIEW:
-                    Log.d("PopularMovies", "ITEM_REVIEW");
-                    Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility
-                            .thread() + " : DetailAdapter " +
-                            "reviewAuthorTextView  " +
-                            "reviewContentTextView  " +
-                            ": object created");
                     reviewAuthorTextView = (TextView) view.findViewById(R.id.review_author);
                     reviewContentTextView = (TextView) view.findViewById(R.id.review_content);
                     break;
@@ -188,50 +140,34 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton
         super(context, c, flags);
         mContext = context;
         this.mDetailFragment = detailFragment;
-        Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility
-                .thread() + " : DetailAdapter " +
-                "mContext  " +
-                "mDetailFragment  " +
-                ": change state");
     }
 
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        Log.e("PopularMovies", "newView");
         // Choose the layout type
         int viewType = getItemViewType(cursor.getPosition());
         int layoutId = -1;
         switch (viewType) {
             case ITEM_DESC:
-                Log.d("PopularMovies", "ITEM_DESC");
                 layoutId = R.layout.detail_desc_item;
                 break;
             case ITEM_TRAILER_LABEL:
-                Log.d("PopularMovies", "ITEM_TRAILER_LABEL");
                 layoutId = R.layout.detail_label_trailer_item;
                 break;
             case ITEM_TRAILER:
-                Log.d("PopularMovies", "ITEM_TRAILER");
                 layoutId = R.layout.detail_trailer_item;
                 break;
             case ITEM_REVIEW_LABEL:
-                Log.d("PopularMovies", "ITEM_REVIEW_LABEL");
                 layoutId = R.layout.detail_label_review_item;
                 break;
             case ITEM_REVIEW:
-                Log.d("PopularMovies", "ITEM_REVIEW");
                 layoutId = R.layout.detail_review_item;
                 break;
         }
         View view = LayoutInflater.from(context).inflate(layoutId, parent, false);
-        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
-                " : Cursor : " + cursor.getCount());
-        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
-                " : DetailAdapter item View :  object created");
         ViewHolder viewHolder = new ViewHolder(view, viewType);
         view.setTag(viewHolder);
-        Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : DetailAdapter item View : change state");
         return view;
     }
 
@@ -239,12 +175,8 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton
     public void bindView(View view, Context context, Cursor cursor) {
         ViewHolder viewHolder = (ViewHolder) view.getTag();
         int viewType = getItemViewType(cursor.getPosition());
-        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
-                " : Cursor : Position : ItemType" + cursor.getCount() + " : " + cursor.getPosition() +
-                " : " + viewType);
         switch (viewType) {
             case ITEM_DESC:
-                Log.d("PopularMovies", "ITEM_DESC");
                 mId = cursor.getLong(MovieProvider.COL_ID);
                 mTitleValue = cursor.getString(MovieProvider.COL_TITLE);
                 mDurationValue = cursor.getInt(MovieProvider.COL_DURATION);
@@ -255,19 +187,6 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton
                 mRateValue = cursor.getDouble(MovieProvider.COL_RATE);
                 mPopularityValue = cursor.getString(MovieProvider.COL_POPULARITY);
                 mFavoriteValue = Utility.isFavorite(cursor.getInt(MovieProvider.COL_FAVORITE));
-                Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility
-                        .thread() + " : DetailAdapter " +
-                        "mId  " +
-                        "mTitleValue  " +
-                        "mDurationValue " +
-                        "mReleaseDateValue " +
-                        "mPosterPathValue " +
-                        "mPlotSynopsisValue " +
-                        "mRateValue " +
-                        "mPopularityValue " +
-                        "mFavoriteValue " +
-                        ": change state");
-
 
                 viewHolder.titleTextView.setText(mTitleValue);
                 viewHolder.durationTextView.setText(String.format(context
@@ -279,43 +198,24 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton
                 viewHolder.voteaverageTextView.setText(String.format(context
                         .getString(R.string.rateMax), String.valueOf(mRateValue)));
                 viewHolder.favoriteView.setChecked(mFavoriteValue);
-                Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility
-                        .thread() + " : ViewHolder " +
-                        "titleTextView  " +
-                        "durationTextView  " +
-                        "releasedateTextView " +
-                        "posterimageImageView " +
-                        "plotsynopsisTextView " +
-                        "voteaverageTextView " +
-                        "favoriteView " +
-                        ": change state");
-
                 viewHolder.favoriteView.setOnCheckedChangeListener(this);
                 break;
             case ITEM_TRAILER_LABEL:
-                Log.d("PopularMovies", "ITEM_TRAILER_LABEL");
                 viewHolder.youtubeVideoURI = Utility.buildYoutubeVideoURI(cursor.getString
                         (MovieProvider.COL_KEY));
-                Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility
-                        .thread() + " : ViewHolder youtubeVideoURI : change state");
                 mDetailFragment.onFirstTrailerUriKnown(viewHolder.youtubeVideoURI);
                 viewHolder.trailerItemView.setTag(viewHolder);
                 setItemTrailerView(viewHolder, cursor, context);
                 break;
             case ITEM_TRAILER:
-                Log.d("PopularMovies", "ITEM_TRAILER");
                 viewHolder.youtubeVideoURI = Utility.buildYoutubeVideoURI(cursor.getString
                         (MovieProvider.COL_KEY));
-                Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility
-                        .thread() + " : ViewHolder youtubeVideoURI : change state");
                 setItemTrailerView(viewHolder, cursor, context);
                 break;
             case ITEM_REVIEW_LABEL:
-                Log.d("PopularMovies", "ITEM_REVIEW_LABEL");
                 setItemReview(viewHolder, cursor);
                 break;
             case ITEM_REVIEW:
-                Log.d("PopularMovies", "ITEM_REVIEW");
                 setItemReview(viewHolder, cursor);
                 break;
         }
@@ -328,8 +228,6 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton
                 (MovieProvider.COL_KEY));
         Picasso.with(context).load(thumbnailTrailerURL.toString()).into(viewHolder.trailerImgView);
         viewHolder.trailerTitleView.setText(cursor.getString(MovieProvider.COL_NAME));
-        Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility
-                .thread() + " : ViewHolder trailerImgView trailerTitleView : change state");
         viewHolder.trailerItemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -341,8 +239,6 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton
     private void openYoutube(View v, Context context) {
         ViewHolder viewHolder = (ViewHolder) v.getTag();
         Intent intent = new Intent(Intent.ACTION_VIEW).setData(viewHolder.youtubeVideoURI);
-        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + " : " + Utility
-                .thread() + " : Intent youtube :  object created");
         if (intent.resolveActivity(context.getPackageManager()) != null) {
             context.startActivity(intent);
         } else {
@@ -353,15 +249,11 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton
     private void setItemReview(ViewHolder viewHolder, Cursor cursor) {
         viewHolder.reviewAuthorTextView.setText(cursor.getString(MovieProvider.COL_AUTHOR));
         viewHolder.reviewContentTextView.setText(cursor.getString(MovieProvider.COL_CONTENT));
-        Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility
-                .thread() + " : ViewHolder reviewAuthorTextView reviewContentTextView : change state");
     }
 
 
     @Override
     public int getItemViewType(int position) {
-        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility
-                .thread() + " : position " + position);
         if (position < mDescItemCount)
             return ITEM_DESC;
         else if (position == mDescItemCount)
@@ -393,8 +285,6 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton
         movieValues.put(MovieEntry.COLUMN_RATE, mRateValue);
         movieValues.put(MovieEntry.COLUMN_POPULARITY, mPopularityValue);
         movieValues.put(MovieEntry.COLUMN_FAVORITE, Utility.getDbFavoriteValue(isChecked));
-        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + " : " + Utility
-                .thread() + " : ContentValues :  object created");
 
         mContext.getContentResolver().update(MovieContract.MovieEntry.CONTENT_URI,
                 movieValues, MovieContract.MovieEntry

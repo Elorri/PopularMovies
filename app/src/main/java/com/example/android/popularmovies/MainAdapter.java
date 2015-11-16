@@ -4,7 +4,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,8 +39,6 @@ public class MainAdapter extends CursorAdapter {
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         View view = LayoutInflater.from(context).inflate(R.layout.main_item, parent, false);
-        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + " : " + Utility
-                .thread() + " : MainAdapter item view :  object created");
         return view;
     }
 
@@ -50,8 +47,6 @@ public class MainAdapter extends CursorAdapter {
         if (cursor.getPosition() == 0) {
             mUriFirstItem = MovieEntry.buildMovieDetailUri(Long.parseLong(cursor
                     .getString(MainFragment.COL_MOVIE_ID)));
-            Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + " : " + Utility
-                    .thread() + " : MainAdapter mUriFirstItem :  change state");
         }
         URL posterURL = TmdbSync.buildPosterImageURL(cursor.getString(MainFragment
                 .COL_POSTER_PATH));
@@ -66,12 +61,7 @@ public class MainAdapter extends CursorAdapter {
                 .textColor(Color.BLACK)
                 .endConfig().buildRect(title, noPosterColor);
         Picasso.with(context).load(posterURL.toString()).error(noPoster).into((ImageView) view);
-        Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + " : " + Utility
-                .thread() + " : MainAdapter poster ImageView :  change state");
     }
 
 
-    public Uri getmUriFirstItem() {
-        return mUriFirstItem;
-    }
 }

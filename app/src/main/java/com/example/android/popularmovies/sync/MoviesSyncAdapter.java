@@ -19,7 +19,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
-import android.util.Log;
 
 import com.example.android.popularmovies.MainActivity;
 import com.example.android.popularmovies.R;
@@ -41,19 +40,13 @@ public class MoviesSyncAdapter extends AbstractThreadedSyncAdapter {
 
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
-        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
-                " : String sortOrder :  object created");
-        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
-                " : TmdbSync tmdbAccess :  object created");
-        String sortOrder = Utility.getSortOrderPreferences(getContext());
+       String sortOrder = Utility.getSortOrderPreferences(getContext());
         TmdbSync tmdbSync = TmdbSync.getInstance(getContext());
         tmdbSync.syncMovies(sortOrder);
         notifyUserSyncDone();
     }
 
     private void notifyUserSyncDone() {
-        Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] +
-                " : " + Utility.thread() + " : will Sync :  evt");
         Context context = getContext();
         //checking the last update and notify if it' the first of the day
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -126,8 +119,6 @@ public class MoviesSyncAdapter extends AbstractThreadedSyncAdapter {
      * @return a fake account.
      */
     public static Account getSyncAccount(Context context) {
-        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
-                " : Account :  object created");
         // Get an instance of the Android account manager
         AccountManager accountManager =
                 (AccountManager) context.getSystemService(Context.ACCOUNT_SERVICE);
@@ -182,8 +173,6 @@ public class MoviesSyncAdapter extends AbstractThreadedSyncAdapter {
     public static void configurePeriodicSync(Context context, int syncInterval, int flexTime) {
         Account account = getSyncAccount(context);
         String authority = context.getString(R.string.content_authority);
-        Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] +
-                " : " + Utility.thread() + " : PeriodicSync :  object created");
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             // we can enable inexact timers in our periodic sync
@@ -206,8 +195,6 @@ public class MoviesSyncAdapter extends AbstractThreadedSyncAdapter {
         //If user has selected 'favorite' settings no need to sync.
         if (!Utility.getSortOrderPreferences(context).equals(context.getString(R.string
                 .pref_sort_order_favorite))) {
-            Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] +
-                    " : " + Utility.thread() + " : will Sync :  evt");
             syncDB(context);
         }
     }

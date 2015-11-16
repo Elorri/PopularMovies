@@ -5,7 +5,6 @@ import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
 
-import com.example.android.popularmovies.Utility;
 import com.example.android.popularmovies.data.MovieContract.MovieEntry;
 import com.example.android.popularmovies.data.MovieContract.ReviewEntry;
 import com.example.android.popularmovies.data.MovieContract.TrailerEntry;
@@ -47,8 +46,6 @@ private static TmdbSync instance=null;
 
     public void syncMovies(String sortBy) {
         URL url = buildMovieListQuery(sortBy);
-        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "
-                + Utility.thread() + " : popularMoviesJsonStr : object created");
         String popularMoviesJsonStr = getJsonString(url);
         try {
              syncMoviesFromJson(popularMoviesJsonStr);
@@ -61,8 +58,6 @@ private static TmdbSync instance=null;
 
     private static ContentValues getMovieById(String id){
         URL url = buildMovieDetailQuery(id);
-        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "
-                + Utility.thread() + " : aMovieJsonStr : object created");
         String aMovieJsonStr = getJsonString(url);
 
         try {
@@ -145,8 +140,6 @@ private static TmdbSync instance=null;
             urlConnection.connect();
 
             // Read the input stream into a String
-            Log.d("Json", Thread.currentThread().getStackTrace()[2] + ": "
-                    + Utility.thread() + " : InputStream json : object created");
             InputStream inputStream = urlConnection.getInputStream();
             StringBuffer buffer = new StringBuffer();
             if (inputStream == null) {
@@ -224,8 +217,6 @@ private static TmdbSync instance=null;
 
     private void syncTrailers(String movieId) {
         URL url = buildTrailersListQuery(movieId);
-        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "
-                + Utility.thread() + " : trailersJsonStr : object created");
         String trailersJsonStr = getJsonString(url);
         try {
             syncTrailersFromJson(trailersJsonStr, movieId);
@@ -237,8 +228,6 @@ private static TmdbSync instance=null;
 
     private void syncReviews(String movieId) {
         URL url = buildReviewsListQuery(movieId);
-        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "
-                + Utility.thread() + " : reviewsJsonStr : object created");
         String reviewsJsonStr = getJsonString(url);
         try {
             syncReviewsFromJson(reviewsJsonStr, movieId);
@@ -259,7 +248,6 @@ private static TmdbSync instance=null;
                         .appendPath(TRAILERS_QUERY_PARAM)
                         .appendQueryParameter(KEY_PARAM, API_KEY)
                         .build();
-                Log.e(LOG_TAG, builtUri.toString());
                 return new URL(builtUri.toString());
             } catch (MalformedURLException e) {
                 Log.e(LOG_TAG, "Error " + e);
@@ -278,7 +266,6 @@ private static TmdbSync instance=null;
                     .appendPath(REVIEWS_QUERY_PARAM)
                     .appendQueryParameter(KEY_PARAM, API_KEY)
                     .build();
-            Log.e(LOG_TAG, builtUri.toString());
             return new URL(builtUri.toString());
         } catch (MalformedURLException e) {
             Log.e(LOG_TAG, "Error " + e);

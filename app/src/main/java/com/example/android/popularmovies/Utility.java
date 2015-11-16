@@ -18,8 +18,6 @@ public class Utility {
     private static final String LOG_TAG = Utility.class.getSimpleName();
 
 
-
-
     public static String getSortOrderPreferences(Context context) {
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
         return sharedPrefs.getString(context.getString(R.string.pref_sort_order_key), context.getString(R.string.pref_sort_order_popularity));

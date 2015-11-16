@@ -9,10 +9,8 @@ import android.database.MergeCursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.example.android.popularmovies.DetailAdapter;
-import com.example.android.popularmovies.Utility;
 import com.example.android.popularmovies.data.MovieContract.MovieEntry;
 import com.example.android.popularmovies.data.MovieContract.ReviewEntry;
 import com.example.android.popularmovies.data.MovieContract.TrailerEntry;
@@ -129,17 +127,12 @@ public class MovieProvider extends ContentProvider {
         matcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_REVIEW + "/*", REVIEW_DETAIL);
         matcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_TRAILER + "" +
                 "." + MovieContract.PATH_REVIEW + "/*", TRAILERS_REVIEWS_MOVIE);
-
-        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + " : " + Utility
-                .thread() + " : UriMatcher :  object created");
         return matcher;
     }
 
     @Override
     public boolean onCreate() {
         mOpenHelper = new MoviesDbHelper(getContext());
-        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + " : " + Utility
-                .thread() + " : MoviesDbHelper :  object created");
         return true;
     }
 
@@ -204,13 +197,6 @@ public class MovieProvider extends ContentProvider {
                         null);
                 cursorsCount[2]=cursors[2].getCount();
                  cursor = new MergeCursor(cursors);
-
-                Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + " : " + Utility
-                        .thread() + " : query cursor :  object created");
-                Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + " : " + Utility
-                        .thread() + " : query cursorCount[] :  object created " +
-                        "{"+cursorsCount[0]+","+cursorsCount[1]+","+cursorsCount[2]+"}");
-
                  DetailAdapter.getInstance(getContext(), null,0, null ).onDetailCursorMerged(cursorsCount);
 
                 break;
@@ -290,8 +276,6 @@ public class MovieProvider extends ContentProvider {
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
-        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + " : " + Utility
-                .thread() + " : insert uri :  object created");
         getContext().getContentResolver().notifyChange(uri, null);
         return returnUri;
     }
@@ -328,9 +312,6 @@ public class MovieProvider extends ContentProvider {
         if (rowsDeleted != 0) {
             getContext().getContentResolver().notifyChange(uri, null);
         }
-
-        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + " : " + Utility
-                .thread() + " : delete nb rowsDeleted :  object created");
         return rowsDeleted;
 
     }
@@ -362,8 +343,6 @@ public class MovieProvider extends ContentProvider {
         if (rowsUpdated != 0) {
             getContext().getContentResolver().notifyChange(uri, null);
         }
-        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + " : " + Utility
-                .thread() + " : delete nb rowsUpdated :  object created");
         return rowsUpdated;
     }
 
@@ -404,8 +383,6 @@ public class MovieProvider extends ContentProvider {
                 }
             }
             db.setTransactionSuccessful();
-            Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + " : " + Utility
-                    .thread() + " : nb rowsInserted :  object created");
             return returnCount;
         } finally {
             db.endTransaction();
@@ -424,8 +401,6 @@ public class MovieProvider extends ContentProvider {
                 null);
         if (cursor.moveToFirst()) {//Set favorite on on the record we want to insert
             value.put(MovieEntry.COLUMN_FAVORITE, MovieEntry.FAVORITE_ON_VALUE);
-            Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + " : " + Utility
-                    .thread() + " : ContentValues change to favorite :  state change");
         }
         return value;
     }
