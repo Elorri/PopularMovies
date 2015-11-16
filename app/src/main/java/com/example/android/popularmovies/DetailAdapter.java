@@ -5,12 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
 import android.widget.CursorAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -29,8 +27,7 @@ import java.net.URL;
  * {@link DetailAdapter} exposes a list of trailer
  * from a {@link android.database.Cursor} to a {@link android.widget.ListView}.
  */
-public class DetailAdapter extends CursorAdapter implements CompoundButton
-        .OnCheckedChangeListener, MovieProvider.Callback {
+public class DetailAdapter extends CursorAdapter implements View.OnClickListener, MovieProvider.Callback {
 
     private static final String LOG_TAG = DetailAdapter.class.getSimpleName();
     private static DetailAdapter instance = null;
@@ -73,6 +70,13 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton
         return instance;
     }
 
+    @Override
+    public void onClick(View v) {
+        mFavoriteValue=!mFavoriteValue;
+        v.setSelected(mFavoriteValue);
+        updateFavoriteValue(mFavoriteValue);
+    }
+
 
     /**
      * Cache of the children views for a forecast list item.
@@ -88,7 +92,6 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton
         private TextView voteaverageTextView;
         private TextView releasedateTextView;
         private TextView durationTextView;
-        private SwitchCompat favoriteViewSwitch;
         private ImageButton favoriteView;
 
 
@@ -112,7 +115,6 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton
                     voteaverageTextView = (TextView) view.findViewById(R.id.voteAverage);
                     releasedateTextView = (TextView) view.findViewById(R.id.releaseYear);
                     durationTextView = (TextView) view.findViewById(R.id.duration);
-                    favoriteViewSwitch = (SwitchCompat) view.findViewById(R.id.favorite_switch);
                     favoriteView = (ImageButton) view.findViewById(R.id.favorite);
                     break;
                 case ITEM_TRAILER_LABEL:
@@ -201,19 +203,10 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton
                 viewHolder.plotsynopsisTextView.setText(mPlotSynopsisValue);
                 viewHolder.voteaverageTextView.setText(String.format(context
                         .getString(R.string.rateMax), String.valueOf(mRateValue)));
-                viewHolder.favoriteViewSwitch.setChecked(mFavoriteValue);
-                viewHolder.favoriteViewSwitch.setOnCheckedChangeListener(this);
 
                 viewHolder.favoriteView.setSelected(mFavoriteValue);
                 viewHolder.favoriteView.setTag(mFavoriteValue);
-                viewHolder.favoriteView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        mFavoriteValue=!mFavoriteValue;
-                        v.setSelected(mFavoriteValue);
-                        updateFavoriteValue(v, mFavoriteValue);
-                    }
-                });
+                viewHolder.favoriteView.setOnClickListener(this);
                 break;
             case ITEM_TRAILER_LABEL:
                 viewHolder.youtubeVideoURI = Utility.buildYoutubeVideoURI(cursor.getString
@@ -288,12 +281,8 @@ public class DetailAdapter extends CursorAdapter implements CompoundButton
         return VIEW_TYPE_COUNT;
     }
 
-    @Override
-    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-updateFavoriteValue(buttonView, isChecked);
-    }
 
-    private void updateFavoriteValue(View buttonView, boolean isChecked) {
+    private void updateFavoriteValue(boolean isSelected) {
         ContentValues movieValues = new ContentValues();
         movieValues.put(MovieEntry._ID, mId);
         movieValues.put(MovieEntry.COLUMN_TITLE, mTitleValue);
@@ -303,7 +292,7 @@ updateFavoriteValue(buttonView, isChecked);
         movieValues.put(MovieEntry.COLUMN_PLOT_SYNOPSIS, mPlotSynopsisValue);
         movieValues.put(MovieEntry.COLUMN_RATE, mRateValue);
         movieValues.put(MovieEntry.COLUMN_POPULARITY, mPopularityValue);
-        movieValues.put(MovieEntry.COLUMN_FAVORITE, Utility.getDbFavoriteValue(isChecked));
+        movieValues.put(MovieEntry.COLUMN_FAVORITE, Utility.getDbFavoriteValue(isSelected));
 
         mContext.getContentResolver().update(MovieContract.MovieEntry.CONTENT_URI,
                 movieValues, MovieContract.MovieEntry
