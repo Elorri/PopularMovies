@@ -27,6 +27,11 @@ import com.example.android.popularmovies.sync.MoviesSyncAdapter;
 public class MainFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
 
+    private static final String SELECTED_KEY = "selected_position";
+    private static final String MAIN_URI = "main_uri";
+    private int mPosition = GridView.INVALID_POSITION;
+     static int GRID_FIRST_POSITION = GridView.INVALID_POSITION;
+    private GridView mGridView;
 
 
     public interface Callback {
@@ -74,15 +79,26 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         View rootView = inflater.inflate(R.layout.main_fragment, container, false);
 
         // Get a reference to the ListView, and attach this adapter to it.
-        GridView gridView = (GridView) rootView.findViewById(R.id.gridView_discovery);
-        gridView.setAdapter(mMainAdapter);
+        mGridView = (GridView) rootView.findViewById(R.id.gridView_discovery);
+        mGridView.setAdapter(mMainAdapter);
 
-        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 onMovieClicked(parent, position);
+                setPosition(position);
+                Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
+                        " : position : "+position);
             }
         });
+
+        if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY)) {
+            mPosition = savedInstanceState.getInt(SELECTED_KEY);
+            Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
+                    " : savedInstanceState != null : ");
+        }
+
+
         Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
                 " : GridView :  object created");
         Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
@@ -106,7 +122,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": "+Utility.thread()+" : " +
+        Log.d("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
                 " : :");
 //        getLoaderManager().initLoader(MOVIES_LOADER, null, this);
         super.onActivityCreated(savedInstanceState);
@@ -135,8 +151,6 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         getLoaderManager().restartLoader(MOVIES_LOADER, null, this);
 
     }
-
-
 
 
     public void syncDB() {
@@ -182,6 +196,15 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mMainAdapter.swapCursor(data);
+        if (mPosition != GridView.INVALID_POSITION) {
+            // If we don't need to restart the loader, and there's a desired position to restore
+            // to, do so now.
+            mGridView.smoothScrollToPosition(mPosition);
+            Log.e("SavedInstanceState", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
+                    " : smoothScrollToPosition");
+        }
+
+
         Log.e("Lifecycle", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
                 " : mMainAdapter :  change state");
         //To avoid 'java.lang.IllegalStateException: Can not perform this action inside of onLoadFinished'
@@ -195,6 +218,13 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
     }
 
+    public void setPosition(int position) {
+        Log.e("SavedInstanceState", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() + " : " +
+                " : position");
+        mPosition = position;
+    }
+
+
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         mMainAdapter.swapCursor(null);
@@ -203,6 +233,21 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     }
 
     public void setMainUri(Uri mMainUri) {
-        this.mMainUri=mMainUri;
+        this.mMainUri = mMainUri;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        Log.d("onSaveInstanceState", Thread.currentThread().getStackTrace()[2] + ": " + Utility.thread() +
+                " : onLoaderReset" +
+                " : outState.putParcelable(MAIN_URI, mMainUri) :  change state");
+        outState.putParcelable(MAIN_URI, mMainUri);
+        // When tablets rotate, the currently selected list item needs to be saved.
+        // When no item is selected, mPosition will be set to GridView.INVALID_POSITION,
+        // so check for that before storing.
+        if (mPosition != GridView.INVALID_POSITION) {
+            outState.putInt(SELECTED_KEY, mPosition);
+        }
+        super.onSaveInstanceState(outState);
     }
 }
