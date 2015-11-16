@@ -2,8 +2,6 @@ package com.example.android.popularmovies;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -117,7 +115,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         //Offline 'popularity.desc' and 'vote_average.desc' sort order will display
         // the favorites in the order chosen.
         deleteUnfavorites(getContext());
-        if (isConnected())
+        if (Utility.isConnected(getContext()))
             syncDB();
         getLoaderManager().restartLoader(MOVIES_LOADER, null, this);
 
@@ -129,13 +127,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     }
 
 
-    public boolean isConnected() {
-        ConnectivityManager connectivityManager = (ConnectivityManager) getContext().getSystemService
-                (Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
-        boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
-        return isConnected;
-    }
+
 
     private static void deleteUnfavorites(Context context) {
         context.getContentResolver().delete(MovieEntry.CONTENT_URI, null, null);
