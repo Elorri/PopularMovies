@@ -84,7 +84,7 @@ public class DetailAdapter extends CursorAdapter implements View.OnClickListener
     public static class ViewHolder {
 
 
-        private final int viewType;
+        private  final int viewType;
         //set by the constructor
         private TextView titleTextView;
         private ImageView posterimageImageView;
@@ -109,6 +109,7 @@ public class DetailAdapter extends CursorAdapter implements View.OnClickListener
         public ViewHolder(View view, int viewType) {
             switch (viewType) {
                 case ITEM_DESC:
+                    //Log.e("Lifecycle", "ITEM_DESC"+Thread.currentThread().getStackTrace()[2]);
                     titleTextView = (TextView) view.findViewById(R.id.title);
                     posterimageImageView = (ImageView) view.findViewById(R.id.posterImage);
                     plotsynopsisTextView = (TextView) view.findViewById(R.id.overview);
@@ -118,20 +119,24 @@ public class DetailAdapter extends CursorAdapter implements View.OnClickListener
                     favoriteView = (ImageButton) view.findViewById(R.id.favorite);
                     break;
                 case ITEM_TRAILER_LABEL:
+                    //Log.e("Lifecycle", "ITEM_TRAILER_LABEL"+Thread.currentThread().getStackTrace()[2]);
                     trailerItemView = (LinearLayout) view.findViewById(R.id.trailer_item);
                     trailerImgView = (ImageView) view.findViewById(R.id.trailer_img);
                     trailerTitleView = (TextView) view.findViewById(R.id.trailer_title);
                     break;
                 case ITEM_TRAILER:
+                    //Log.e("Lifecycle", "ITEM_TRAILER"+Thread.currentThread().getStackTrace()[2]);
                     trailerItemView = (LinearLayout) view.findViewById(R.id.trailer_item);
                     trailerImgView = (ImageView) view.findViewById(R.id.trailer_img);
                     trailerTitleView = (TextView) view.findViewById(R.id.trailer_title);
                     break;
                 case ITEM_REVIEW_LABEL:
+                    //Log.e("Lifecycle", "ITEM_REVIEW_LABEL"+Thread.currentThread().getStackTrace()[2]);
                     reviewAuthorTextView = (TextView) view.findViewById(R.id.review_author);
                     reviewContentTextView = (TextView) view.findViewById(R.id.review_content);
                     break;
                 case ITEM_REVIEW:
+                    //Log.e("Lifecycle", "ITEM_REVIEW"+Thread.currentThread().getStackTrace()[2]);
                     reviewAuthorTextView = (TextView) view.findViewById(R.id.review_author);
                     reviewContentTextView = (TextView) view.findViewById(R.id.review_content);
                     break;
@@ -144,6 +149,7 @@ public class DetailAdapter extends CursorAdapter implements View.OnClickListener
 
     public DetailAdapter(Context context, Cursor c, int flags, DetailFragment detailFragment) {
         super(context, c, flags);
+        Log.e("Lifecycle", "" + Thread.currentThread().getStackTrace()[2]);
         mContext = context;
         this.mDetailFragment = detailFragment;
     }
@@ -156,18 +162,23 @@ public class DetailAdapter extends CursorAdapter implements View.OnClickListener
         int layoutId = -1;
         switch (viewType) {
             case ITEM_DESC:
+                Log.e("Lifecycle", "ITEM_DESC" + Thread.currentThread().getStackTrace()[2]);
                 layoutId = R.layout.detail_desc_item;
                 break;
             case ITEM_TRAILER_LABEL:
+                Log.e("Lifecycle", "ITEM_TRAILER_LABEL" + Thread.currentThread().getStackTrace()[2]);
                 layoutId = R.layout.detail_label_trailer_item;
                 break;
             case ITEM_TRAILER:
+                Log.e("Lifecycle", "ITEM_TRAILER" + Thread.currentThread().getStackTrace()[2]);
                 layoutId = R.layout.detail_trailer_item;
                 break;
             case ITEM_REVIEW_LABEL:
+                Log.e("Lifecycle", "ITEM_REVIEW_LABEL" + Thread.currentThread().getStackTrace()[2]);
                 layoutId = R.layout.detail_label_review_item;
                 break;
             case ITEM_REVIEW:
+                Log.e("Lifecycle", "ITEM_REVIEW" + Thread.currentThread().getStackTrace()[2]);
                 layoutId = R.layout.detail_review_item;
                 break;
         }
@@ -183,6 +194,7 @@ public class DetailAdapter extends CursorAdapter implements View.OnClickListener
         int viewType = getItemViewType(cursor.getPosition());
         switch (viewType) {
             case ITEM_DESC:
+                Log.e("Lifecycle", "ITEM_DESC" + Thread.currentThread().getStackTrace()[2]);
                 mId = cursor.getLong(MovieProvider.COL_ID);
                 mTitleValue = cursor.getString(MovieProvider.COL_TITLE);
                 mDurationValue = cursor.getInt(MovieProvider.COL_DURATION);
@@ -209,6 +221,7 @@ public class DetailAdapter extends CursorAdapter implements View.OnClickListener
                 viewHolder.favoriteView.setOnClickListener(this);
                 break;
             case ITEM_TRAILER_LABEL:
+                Log.e("Lifecycle", "ITEM_TRAILER_LABEL" + Thread.currentThread().getStackTrace()[2]);
                 viewHolder.youtubeVideoURI = Utility.buildYoutubeVideoURI(cursor.getString
                         (MovieProvider.COL_KEY));
                 mDetailFragment.onFirstTrailerUriKnown(viewHolder.youtubeVideoURI);
@@ -216,14 +229,17 @@ public class DetailAdapter extends CursorAdapter implements View.OnClickListener
                 setItemTrailerView(viewHolder, cursor, context);
                 break;
             case ITEM_TRAILER:
+                Log.e("Lifecycle", "ITEM_TRAILER" + Thread.currentThread().getStackTrace()[2]);
                 viewHolder.youtubeVideoURI = Utility.buildYoutubeVideoURI(cursor.getString
                         (MovieProvider.COL_KEY));
                 setItemTrailerView(viewHolder, cursor, context);
                 break;
             case ITEM_REVIEW_LABEL:
+                Log.e("Lifecycle", "ITEM_REVIEW_LABEL" + Thread.currentThread().getStackTrace()[2]);
                 setItemReview(viewHolder, cursor);
                 break;
             case ITEM_REVIEW:
+                Log.e("Lifecycle", "ITEM_REVIEW" + Thread.currentThread().getStackTrace()[2]);
                 setItemReview(viewHolder, cursor);
                 break;
         }
