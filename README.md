@@ -1,6 +1,7 @@
 # Popular Movies 
 
 This repository contains the app Popular Movies stage 2, which is part of the Android Developer Nanodegree program
+Popular Movies was evaluated by certified Udacity code reviewer and was graded as "Exceeds Specifications".
 
 ## Features
 
