@@ -20,12 +20,13 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+
 /**
  * Created by Elorri-user on 28/09/2015.
  */
 public class TmdbSync {
 
-private static TmdbSync instance=null;
+    private static TmdbSync instance = null;
 
 
     private static final String LOG_TAG = "PopularMovies";
@@ -33,12 +34,11 @@ private static TmdbSync instance=null;
     private final Context context;
 
 
-
-    private TmdbSync(Context context){
-        this.context=context;
+    private TmdbSync(Context context) {
+        this.context = context;
     }
 
-    static TmdbSync getInstance(Context context){
+    static TmdbSync getInstance(Context context) {
         if (instance == null)
             instance = new TmdbSync(context);
         return instance;
@@ -48,7 +48,7 @@ private static TmdbSync instance=null;
         URL url = buildMovieListQuery(sortBy);
         String popularMoviesJsonStr = getJsonString(url);
         try {
-             syncMoviesFromJson(popularMoviesJsonStr);
+            syncMoviesFromJson(popularMoviesJsonStr);
         } catch (JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
             e.printStackTrace();
@@ -56,15 +56,19 @@ private static TmdbSync instance=null;
     }
 
 
-    private static ContentValues getMovieById(String id){
+    private static ContentValues getMovieById(String id) {
         URL url = buildMovieDetailQuery(id);
         String aMovieJsonStr = getJsonString(url);
 
         try {
-            return getOneMovieFromJson(aMovieJsonStr);
+            if (aMovieJsonStr != null) {
+                return getOneMovieFromJson(aMovieJsonStr);
+            } else {
+                return null;
+            }
         } catch (JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
-            e.printStackTrace();
+            //e.printStackTrace();
             return null;
         }
     }
@@ -123,7 +127,6 @@ private static TmdbSync instance=null;
     }
 
 
-
     private static String getJsonString(URL url) {
         // These two need to be declared outside the try/catch
         // so that they can be closed in the finally block.
@@ -180,8 +183,6 @@ private static TmdbSync instance=null;
     }
 
 
-
-
     private void syncMoviesFromJson(String moviesJsonStr) throws JSONException {
 
 
@@ -202,17 +203,19 @@ private static TmdbSync instance=null;
 
             // Create Movie Object
             String movieId = aMovie.getString(ID);
-           ContentValues aMovieValue = getMovieById(movieId);
+            ContentValues aMovieValue = getMovieById(movieId);
 
             //We insert each movie one by one and we insert trailers and reviews in bulk. We
             // can't insert movies in bulk because of the foreign key constraint on trailers and
             // reviews.
-            context.getContentResolver().insert(MovieEntry.CONTENT_URI, aMovieValue);
-            syncTrailers(movieId);
-            syncReviews(movieId);
+            if (aMovieValue != null) {
+                context.getContentResolver().insert(MovieEntry.CONTENT_URI, aMovieValue);
+                syncTrailers(movieId);
+                syncReviews(movieId);
+            }
         }
         //int inserted=context.getContentResolver().bulkInsert(MovieEntry.CONTENT_URI, moviesList);
-        Log.d(LOG_TAG, "Inserted "+i+" movies. Sync completed");
+        Log.d(LOG_TAG, "Inserted " + i + " movies. Sync completed");
     }
 
     private void syncTrailers(String movieId) {
@@ -238,21 +241,21 @@ private static TmdbSync instance=null;
     }
 
     private static URL buildTrailersListQuery(String movieId) {
-            try {
-                final String BASE_URL = "http://api.themoviedb.org/3/movie/";
-                final String TRAILERS_QUERY_PARAM = "videos";
-                final String KEY_PARAM = "api_key";
+        try {
+            final String BASE_URL = "http://api.themoviedb.org/3/movie/";
+            final String TRAILERS_QUERY_PARAM = "videos";
+            final String KEY_PARAM = "api_key";
 
-                Uri builtUri = Uri.parse(BASE_URL).buildUpon()
-                        .appendPath(movieId)
-                        .appendPath(TRAILERS_QUERY_PARAM)
-                        .appendQueryParameter(KEY_PARAM, API_KEY)
-                        .build();
-                return new URL(builtUri.toString());
-            } catch (MalformedURLException e) {
-                Log.e(LOG_TAG, "Error " + e);
-                return null;
-            }
+            Uri builtUri = Uri.parse(BASE_URL).buildUpon()
+                    .appendPath(movieId)
+                    .appendPath(TRAILERS_QUERY_PARAM)
+                    .appendQueryParameter(KEY_PARAM, API_KEY)
+                    .build();
+            return new URL(builtUri.toString());
+        } catch (MalformedURLException e) {
+            Log.e(LOG_TAG, "Error " + e);
+            return null;
+        }
     }
 
     private static URL buildReviewsListQuery(String movieId) {
@@ -291,9 +294,9 @@ private static TmdbSync instance=null;
             JSONObject aTrailer = trailersArray.getJSONObject(i);
             trailersList[i] = getOneTrailerFromJson(aTrailer, movieId);
         }
-        int inserted=context.getContentResolver().bulkInsert(TrailerEntry.CONTENT_URI,
+        int inserted = context.getContentResolver().bulkInsert(TrailerEntry.CONTENT_URI,
                 trailersList);
-        Log.d(LOG_TAG, "Inserted "+inserted+" trailers.");
+        Log.d(LOG_TAG, "Inserted " + inserted + " trailers.");
     }
 
     private void syncReviewsFromJson(String reviewsJsonStr, String movieId) throws JSONException {
@@ -313,17 +316,16 @@ private static TmdbSync instance=null;
             JSONObject aReview = reviewsArray.getJSONObject(i);
             reviewsList[i] = getOneReviewFromJson(aReview, movieId);
         }
-        int inserted=context.getContentResolver().bulkInsert(ReviewEntry.CONTENT_URI, reviewsList);
-        Log.d(LOG_TAG, "Inserted "+inserted+" reviews.");
+        int inserted = context.getContentResolver().bulkInsert(ReviewEntry.CONTENT_URI, reviewsList);
+        Log.d(LOG_TAG, "Inserted " + inserted + " reviews.");
     }
-
 
 
     private static ContentValues getOneMovieFromJson(String theMovieJsonStr) throws JSONException {
 
         // These are the names of the JSON objects that need to be extracted.
         final String ID = "id";
-        final String TITLE="title";
+        final String TITLE = "title";
         final String POSTER_PATH = "poster_path";
         final String OVERVIEW = "overview";
         final String VOTE_AVERAGE = "vote_average";
@@ -334,35 +336,31 @@ private static TmdbSync instance=null;
         JSONObject movieJson = new JSONObject(theMovieJsonStr);
 
         String _id = movieJson.getString(ID);
-        String title =movieJson.getString(TITLE);
+        String title = movieJson.getString(TITLE);
         String posterPath = movieJson.getString(POSTER_PATH);
         String posterName = null;
         if (!posterPath.equals("null"))
             posterName = posterPath.split("/")[1]; //To remove the unwanted '/' given by the api
-        String releaseDate =movieJson.getString(RELEASE_DATE);
-        String duration =movieJson.getString(DURATION);
-        String rate =movieJson.getString(VOTE_AVERAGE);
-        String popularity =movieJson.getString(POPULARITY);
-        String plotSynopsis =movieJson.getString(OVERVIEW);
+        String releaseDate = movieJson.getString(RELEASE_DATE);
+        String duration = movieJson.getString(DURATION);
+        String rate = movieJson.getString(VOTE_AVERAGE);
+        String popularity = movieJson.getString(POPULARITY);
+        String plotSynopsis = movieJson.getString(OVERVIEW);
 
 
         ContentValues movieValues = new ContentValues();
-        movieValues.put(MovieEntry._ID,_id);
-        movieValues.put(MovieEntry.COLUMN_TITLE,title);
-        movieValues.put(MovieEntry.COLUMN_DURATION,duration);
-        movieValues.put(MovieEntry.COLUMN_RELEASE_DATE,releaseDate);
-        movieValues.put(MovieEntry.COLUMN_POSTER_PATH,posterName);
-        movieValues.put(MovieEntry.COLUMN_PLOT_SYNOPSIS,plotSynopsis);
-        movieValues.put(MovieEntry.COLUMN_RATE,rate);
-        movieValues.put(MovieEntry.COLUMN_POPULARITY,popularity);
-        movieValues.put(MovieEntry.COLUMN_FAVORITE,MovieEntry.FAVORITE_OFF_VALUE);
+        movieValues.put(MovieEntry._ID, _id);
+        movieValues.put(MovieEntry.COLUMN_TITLE, title);
+        movieValues.put(MovieEntry.COLUMN_DURATION, duration);
+        movieValues.put(MovieEntry.COLUMN_RELEASE_DATE, releaseDate);
+        movieValues.put(MovieEntry.COLUMN_POSTER_PATH, posterName);
+        movieValues.put(MovieEntry.COLUMN_PLOT_SYNOPSIS, plotSynopsis);
+        movieValues.put(MovieEntry.COLUMN_RATE, rate);
+        movieValues.put(MovieEntry.COLUMN_POPULARITY, popularity);
+        movieValues.put(MovieEntry.COLUMN_FAVORITE, MovieEntry.FAVORITE_OFF_VALUE);
         return movieValues;
 
     }
-
-
-
-
 
 
     private static ContentValues getOneTrailerFromJson(JSONObject aTrailer, String movieId) throws
@@ -370,21 +368,21 @@ private static TmdbSync instance=null;
 
         // These are the names of the JSON objects that need to be extracted.
         final String _ID = "id";
-        final String KEY="key";
+        final String KEY = "key";
         final String NAME = "name";
         final String TYPE = "type";
 
         String id = aTrailer.getString(_ID);
-        String key =aTrailer.getString(KEY);
+        String key = aTrailer.getString(KEY);
         String name = aTrailer.getString(NAME);
-        String type =aTrailer.getString(TYPE);
+        String type = aTrailer.getString(TYPE);
 
         ContentValues trailerValues = new ContentValues();
-        trailerValues.put(TrailerEntry._ID,id);
-        trailerValues.put(TrailerEntry.COLUMN_KEY,key);
-        trailerValues.put(TrailerEntry.COLUMN_NAME,name);
-        trailerValues.put(TrailerEntry.COLUMN_TYPE,type);
-        trailerValues.put(TrailerEntry.COLUMN_MOVIE_ID,movieId);
+        trailerValues.put(TrailerEntry._ID, id);
+        trailerValues.put(TrailerEntry.COLUMN_KEY, key);
+        trailerValues.put(TrailerEntry.COLUMN_NAME, name);
+        trailerValues.put(TrailerEntry.COLUMN_TYPE, type);
+        trailerValues.put(TrailerEntry.COLUMN_MOVIE_ID, movieId);
         return trailerValues;
     }
 
@@ -393,18 +391,18 @@ private static TmdbSync instance=null;
 
         // These are the names of the JSON objects that need to be extracted.
         final String _ID = "id";
-        final String AUTHOR="author";
+        final String AUTHOR = "author";
         final String CONTENT = "content";
 
         String _id = aReview.getString(_ID);
-        String author =aReview.getString(AUTHOR);
+        String author = aReview.getString(AUTHOR);
         String content = aReview.getString(CONTENT);
 
         ContentValues reviewValues = new ContentValues();
-        reviewValues.put(ReviewEntry._ID,_id);
-        reviewValues.put(ReviewEntry.COLUMN_AUTHOR,author);
-        reviewValues.put(ReviewEntry.COLUMN_CONTENT,content);
-        reviewValues.put(ReviewEntry.COLUMN_MOVIE_ID,movieId);
+        reviewValues.put(ReviewEntry._ID, _id);
+        reviewValues.put(ReviewEntry.COLUMN_AUTHOR, author);
+        reviewValues.put(ReviewEntry.COLUMN_CONTENT, content);
+        reviewValues.put(ReviewEntry.COLUMN_MOVIE_ID, movieId);
         return reviewValues;
     }
 }
