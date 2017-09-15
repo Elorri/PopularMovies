@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Call
             arguments.putParcelable(DetailFragment.DETAIL_URI, uri);
 
             DetailFragment fragment = new DetailFragment();
-
+            fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.detail_fragment_container, fragment, DETAILFRAGMENT_TAG)
                     .commit();
